@@ -9,11 +9,16 @@ import { toast } from 'react-toastify'
 
 const CustomerLogin = () => {
 
+  // use to change and save new data in redux store
   const dispatch = useDispatch();
 
+  // use to navigate user to other paje
    const navigate = useNavigate();
+
+   // use to get table id
    const {id} = useParams()
 
+   // form data struct
    const {
     register,
     handleSubmit,
@@ -21,6 +26,7 @@ const CustomerLogin = () => {
     formState: { errors },
   } = useForm()
 
+  // submit customer data
   const onSubmit = (data) => {
     if(data.number.toString().length != 10) {
     toast.error('enter valid number');

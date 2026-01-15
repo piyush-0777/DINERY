@@ -2,33 +2,58 @@ import React from 'react'
 import { useState } from 'react';
 import { useSelector , useDispatch } from 'react-redux';
 import { incresContityOfOrder , dicresContityOfOrder , deletOrder } from '../features/customer/customerSlice';
+import { HiChevronLeft } from "react-icons/hi";
+import {useNavigate , useParams } from 'react-router-dom'
+
+
 
 const CustomerBill = () => {
 
+
+  //use dispatch for store and chang the value of user order
   const dispatch = useDispatch()
 
-const orders = useSelector(state => state.customer.customer.order);
-console.log(orders);
+  // use navigate for navigate other paje
+  const navigate = useNavigate()
 
-    const [items, setItems] = useState([
-    { id: 1, name: "Margherita Pizza", price: 173, qty: 1 },
-    { id: 2, name: "Indiana Veg Pizza", price: 173, qty: 1 },
-    { id: 3, name: "Italiano Pasta", price: 345, qty: 2 },
-    { id: 4, name: "Golden Corn Pizza", price: 121, qty: 1 },
-  ]);
+  //  use params to gat usesr table id
+  const {id} = useParams()
+
+
+  // get customer orders 
+const orders = useSelector(state => state.customer.customer.order);
+
+
+    
+
+
+  // function for goto customerHome paje
+
+  const goToCustomerHomepaje = () => {
+      navigate(`/customer/customerHome/${id}`)
+  }
+
+  //increas the contity of any order
 
   const increaseQty = (f_name) => {
     dispatch(incresContityOfOrder({id: 1 ,  f_name:f_name}))
   };
 
+
+  //decreas the contity of order
+
   const decreaseQty = (f_name) => {
     dispatch(dicresContityOfOrder({id: 1 ,  f_name:f_name}))
   };
+
+  // delete order
 
   const deleteItem = (f_name) => {
     dispatch(deletOrder({id: 1 , f_name:f_name}))
     setItems(items.filter(i => i.id !== id));
   };
+
+  // return total amount of all aorder bill
 
   const totalAmount = ()=>{
     let total = 0;
@@ -42,7 +67,15 @@ console.log(orders);
     
        <div className="min-h-screen bg-gray-100 p-3 max-w-md mx-auto flex flex-col justify-between    ">
       {/* Header */}
-      <h1 className="text-xl font-semibold mb-4">Your Order</h1>
+      <div className='mb-8 sticky top-0 bg-gray-100 p-1 pb-3 pt-2'>
+      <div className="flex  gap-3 items-center   ">
+        
+          <HiChevronLeft onClick={goToCustomerHomepaje} className="text-green-600 text-4xl border-1 border-green-600 rounded-full" />
+        <span className="text-xl font-semibold">Your Order</span>
+       
+      </div>
+      </div>
+      
 
       {/* Items List */}
       <div className="space-y-4">
@@ -76,6 +109,16 @@ console.log(orders);
             </div>
           </div>
         ))}
+      
+      </div>
+      <div>
+        {/* <button
+  className="w-full mb-4 border border-green-600 text-green-600 py-2 rounded-xl text-base font-semibold"
+  onClick={() => console.log("Navigate to menu page")}
+>
+  + Add More Items
+</button> */}
+
       </div>
 
       {/* Bottom Fixed Checkout */}

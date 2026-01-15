@@ -12,19 +12,33 @@ import { useNavigate, useParams } from 'react-router-dom';
 
 const CustomerHome = () => {
 
+  // use to get user tabel id
   const {id} = useParams();
+
+  //use to navigate user to other paje
 const navigate = useNavigate()
+
+//use to save and chang the data of redux storge
 const dispatch = useDispatch()
+
+// get foods manu from redux foods storge
 const foods = useSelector(state => state.foodObject.foods)
+
+//get all foods category which is available in restaurant
 const category = useSelector(state => state.foodObject.category)
+// get customer details
 const customer = useSelector(state => state.customer.customer)
+
+// filter  foods based on foods category 
 const [filterfoods, setfilerFoods] = useState(useSelector(state => state.foodObject.foods))
+
+// stor user selected category 
  const [selectedCategory , setSelectedCategory] = useState('All');
 
 
 
 
-
+// if user details is null than navigate to login paje
   useEffect(()=>{
     if(customer.customerName ==='' || customer.CustomerMobile ===''){
       navigate(`/customer/login/${id}`)
@@ -32,7 +46,7 @@ const [filterfoods, setfilerFoods] = useState(useSelector(state => state.foodObj
   }, [])
   
 
-  // for filter food
+  // when user chang food category use to filter food
 
   const changCategory = element =>{
     
@@ -43,26 +57,30 @@ const [filterfoods, setfilerFoods] = useState(useSelector(state => state.foodObj
     setfilerFoods(foods);
   }
 
-// for order 
+// add user order and save to redux customer order store 
   const placeOrder = element =>{
     
     const order =foods.filter((food)=> food.f_name ===element.target.id )[0]
     const isOrder = customer.order.find((item)=>order.f_name == item.f_name)
-    console.log(order);
+    
     
     if(isOrder){
+
+      // if order is already added then incres the contity of order
+
       dispatch(incresContityOfOrder({id:1 , f_name:order.f_name }))
     } else {
+
+      // else add order
     dispatch(addOrder({id:1 , f_name:order.f_name , number_of_item:1 , f_price:order.f_price}))
     }
-  //   if(isOrder != null ){
-  //   dispatch(addOrder({id:1 , f_name:order.f_name , number_of_item:1}))}
+ 
    }
 
 
    
 
-  // for delet order 
+  // for  delete all order 
    const deletAllOrderFunction = element => {
     
     dispatch(deleteAllOrder())
