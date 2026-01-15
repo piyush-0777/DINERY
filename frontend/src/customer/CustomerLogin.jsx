@@ -2,10 +2,17 @@ import React from 'react'
 import Dinery from '../assets/dinery.png'
 import { useForm } from 'react-hook-form'
 import Button from '../components/customer/Button'
-import {useNavigate} from 'react-router-dom'
+import {useNavigate, useParams} from 'react-router-dom'
+import { useSelector , useDispatch } from 'react-redux'
+import { addCustomer } from '../features/customer/customerSlice'
+import { toast } from 'react-toastify'
 
 const CustomerLogin = () => {
+
+  const dispatch = useDispatch();
+
    const navigate = useNavigate();
+   const {id} = useParams()
 
    const {
     register,
@@ -15,9 +22,15 @@ const CustomerLogin = () => {
   } = useForm()
 
   const onSubmit = (data) => {
+    if(data.number.toString().length != 10) {
+    toast.error('enter valid number');
+      console.log(data.number.toString());
+    } else {
     console.log("the data is /n" , data);
-     navigate('/customer/customerHome/23')
-
+    dispatch(addCustomer({customerName:data.name ,CustomerMobile:data.number}))
+     navigate(`/customer/customerHome/${id}`)
+     toast.success("login success!")
+    }
   }
 
   
@@ -58,7 +71,7 @@ const CustomerLogin = () => {
                     placeholder='Enter Your Mobile Number'
                     type='number' {...register("number", { required: true })} />
 
-                      <div className='w-full h-10 mt-5'><Button ButtonName="Log in"/></div>
+                      <div  className='w-full h-10 mt-5'><Button ButtonName="Log in"/></div>
                 </form>
 
             </div>

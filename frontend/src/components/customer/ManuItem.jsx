@@ -1,8 +1,13 @@
 import React, { useEffect, useState } from 'react'
+import { useSelector , useDispatch} from 'react-redux';
+import { dicresContityOfOrder } from '../../features/customer/customerSlice';
 
-const ManuItem = ({food , placeOrder , customerOrder}) => {
+const ManuItem = ({food , placeOrder , customerOrder  }) => {
+
+  const dispatch = useDispatch()
 
 const [isFoodOrder , setIsfoodOrder] = useState(false);
+
 
 useEffect(()=>{
 customerOrder.map((order)=>{
@@ -13,6 +18,14 @@ customerOrder.map((order)=>{
   }
 })
 },[customerOrder])
+
+const hendalDicresContity = (e) => {
+     setContityOforder(contityOforder -1)
+     dispatch(dicresContityOfOrder({id:1 , f_name:food.f_name }));
+     console.log(e);
+   }
+
+
 const [contityOforder , setContityOforder] = useState(()=>{
   if(isFoodOrder == true) return customerOrder.number_of_item
   else return 0;
@@ -104,7 +117,7 @@ const [contityOforder , setContityOforder] = useState(()=>{
             ${contityOforder!==0 ? 'bg-green-800 text-white':'bg-green-50 border text-green-800'}
             border-green-600  font-bold text-sm px-6 py-1.5 
             rounded-lg flex items-center gap-1 shadow-sm hover:bg-green-100 transition`}>
-              {contityOforder !=0 ? <span onClick={()=>setContityOforder(contityOforder -1)} id={food?.f_name} className="text-lg font-bold">-</span>:''}
+              {contityOforder !=0 ? <span onClick={hendalDicresContity} id={food?.f_name} className="text-lg font-bold">-</span>:''}
               
             {contityOforder==0 ? 'ADD' :`${contityOforder}`} 
             <span onClick={()=>setContityOforder(contityOforder +1)} id={food?.f_name} className="text-lg font-bold">+</span>

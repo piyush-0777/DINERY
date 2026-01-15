@@ -1,6 +1,17 @@
 import React from 'react'
+import { useNavigate } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 
 const CartBar = ({order, deletAllOrder}) => {
+
+ const navigate = useNavigate()
+ const {id} = useParams();
+
+  const goTOBillPaje = (e) =>{
+    navigate(`/customer/customerBill/${id}`);
+    console.log(e);
+  }
+
   return (
     <div 
     className="fixed bottom-4 left-4 right-4 bg-white shadow-md rounded-2xl flex items-center justify-between p-3">
@@ -19,7 +30,7 @@ const CartBar = ({order, deletAllOrder}) => {
       </div>
 
       {/* Right Section */}
-      <button className="bg-green-600 text-white font-semibold text-sm px-4 py-2 rounded-xl shadow-sm">
+      <button onClick={goTOBillPaje} className="bg-green-600 text-white font-semibold text-sm px-4 py-2 rounded-xl shadow-sm">
         View Cart
        
       </button>

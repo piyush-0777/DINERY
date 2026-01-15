@@ -6,11 +6,14 @@ import ManuItem from '../components/customer/ManuItem'
 import CartBar from '../components/customer/CartBar';
 import { useSelector , useDispatch} from 'react-redux';
 import {addOrder , deleteAllOrder , incresContityOfOrder} from '../features/customer/customerSlice'
+import { useNavigate, useParams } from 'react-router-dom';
 
 
 
 const CustomerHome = () => {
 
+  const {id} = useParams();
+const navigate = useNavigate()
 const dispatch = useDispatch()
 const foods = useSelector(state => state.foodObject.foods)
 const category = useSelector(state => state.foodObject.category)
@@ -23,10 +26,13 @@ const [filterfoods, setfilerFoods] = useState(useSelector(state => state.foodObj
 
 
   useEffect(()=>{
-    
-  }, [filterfoods , selectedCategory])
+    if(customer.customerName ==='' || customer.CustomerMobile ===''){
+      navigate(`/customer/login/${id}`)
+    }
+  }, [])
   
 
+  // for filter food
 
   const changCategory = element =>{
     
@@ -42,15 +48,19 @@ const [filterfoods, setfilerFoods] = useState(useSelector(state => state.foodObj
     
     const order =foods.filter((food)=> food.f_name ===element.target.id )[0]
     const isOrder = customer.order.find((item)=>order.f_name == item.f_name)
+    console.log(order);
     
     if(isOrder){
       dispatch(incresContityOfOrder({id:1 , f_name:order.f_name }))
     } else {
-    dispatch(addOrder({id:1 , f_name:order.f_name , number_of_item:1}))
+    dispatch(addOrder({id:1 , f_name:order.f_name , number_of_item:1 , f_price:order.f_price}))
     }
   //   if(isOrder != null ){
   //   dispatch(addOrder({id:1 , f_name:order.f_name , number_of_item:1}))}
    }
+
+
+   
 
   // for delet order 
    const deletAllOrderFunction = element => {
