@@ -3,7 +3,7 @@ const {login , registerRestaurant} = require('../controllers/restaurantControlle
 
 const router = express.Router()
 
-router.post('/login' , login );
+router.get('/login' , login );
 router.post('/registerRestaurant' , registerRestaurant)
 
 module.exports = router;

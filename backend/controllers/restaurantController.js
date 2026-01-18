@@ -1,39 +1,48 @@
 const jwt = require('jsonwebtoken')
 const Restaurant = require('../models/restaurant-model')
 const bcrypt = require('bcrypt')
-const hashPassword = require('../utils/hashPassword')
+const { hashPasswordGenerater, hashPasswordChecker } = require('../utils/hashPassword')
 
 
 
-exports.login = (req, res) => {
+exports.login = async (req, res) => {
 
-    const { name, ownerName, email, password } = req.body
+    const { name, ownerName, ownerEmail, password } = req.body
 
     // find user deteal using  resturnt model
-    let user;
+    const restaurant = await Restaurant.findOne({ ownerEmail });
 
-    if (!user) {
+
+
+    if (!restaurant) {
         res.status(400).json({ error: 'invalid email or password' })
         return;
     } else {
+        const isMatchPassword = await hashPasswordChecker(password, restaurant.password);
 
-        const token = jwt.sign({ email }, process.env.JWT_SECRET_KEY, { expiresIn: "48h" })
+        if (isMatchPassword) {
 
-        if (token) {
-            res.cookie("token", token, {
-                httpOnly: true,
-                secure: false, // set true in production (HTTPS)
-                sameSite: "lax",
-                maxAge: 48 * 60 * 60 * 1000 // 48 hour
+            const token = jwt.sign({ ownerEmail }, process.env.JWT_SECRET_KEY, { expiresIn: "48h" })
 
-            })
+            if (token) {
+                res.cookie("token", token, {
+                    httpOnly: true,
+                    secure: false, // set true in production (HTTPS)
+                    sameSite: "lax",
+                    maxAge: 48 * 60 * 60 * 1000 // 48 hour
+
+                })
+            } else {
+                res.status(400).json({
+                    error: 'jsonwebtoken is fail to genarete token'
+                })
+                return;
+            }
+            res.status(200).json({ massage: 'logged in' , restaurant })
         } else {
-            res.tatus(400).json({
-                error: 'jsonwebtoken is fail to genarete token'
-            })
+            res.status(400).json({ error: 'invalid email or password' })
             return;
         }
-        res.tatus(200).json({ massage: 'logged in' })
     }
 }
 
@@ -41,15 +50,15 @@ exports.registerRestaurant = async (req, res) => {
     const { name, address, ownerName, password, ownerPhone, ownerEmail } = req.body;
 
     let hash;
- try {
+    try {
 
-     hash = await hashPassword(password);
- } catch (error) {
-    console.log(error)
- }
-    
+        hash = await hashPasswordGenerater(password);
+    } catch (error) {
+        console.log(error)
+    }
+
     // register data in mongoDB
-    
+
     const restaurant = await Restaurant.create({
         name, address, ownerName, password: hash, ownerPhone, ownerEmail
     })
