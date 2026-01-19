@@ -1,7 +1,15 @@
+const foodModel = require('../models/food-model')
+
+exports.createFood = async(req , res) =>{
+
+ const {name , description, price, category} = req.body
+ const foodImg = req.file.path;
+ const food = await foodModel.create({
+    restaurant:req.restaurant.objectId ,name , description, price, category , foodImg
+ })
 
 
 
-exports.createFood = (req , res) =>{
-console.log(req.body);
-console.log(req.file)
+ res.status(200).json({message: 'done' , food});
+
 }
