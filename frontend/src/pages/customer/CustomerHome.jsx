@@ -1,9 +1,9 @@
 import DineryLogo from '../assets/dinery.png'
 import { FaSearch } from "react-icons/fa";
 import { useEffect, useState } from 'react';
-import ManuCategory from '../components/customer/ManuCategory';
-import ManuItem from '../components/customer/ManuItem'
-import CartBar from '../components/customer/CartBar';
+import ManuCategory from '../../components/customer/ManuCategory';
+import ManuItem from '../../components/customer/ManuItem'
+import CartBar from '../../components/customer/CartBar';
 import { useSelector , useDispatch} from 'react-redux';
 import {addOrder , deleteAllOrder , incresContityOfOrder} from '../features/customer/customerSlice'
 import { useNavigate, useParams } from 'react-router-dom';
