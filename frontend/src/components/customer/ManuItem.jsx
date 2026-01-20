@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { useSelector , useDispatch} from 'react-redux';
-import { dicresContityOfOrder } from '../../features/customer/customerSlice';
+import { dicresContityOfOrder } from '../../redux/features/customer/customerSlice';
 
 const ManuItem = ({food , placeOrder , customerOrder  }) => {
 

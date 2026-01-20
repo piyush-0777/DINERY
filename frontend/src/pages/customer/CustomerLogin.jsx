@@ -1,10 +1,12 @@
 import React from 'react'
-import Dinery from '../assets/dinery.png'
+// import Dinery from '../../assets/dinery.png'
+import Dinery from '../../assets/dinery.png'
 import { useForm } from 'react-hook-form'
 import Button from '../../components/customer/Button'
 import {useNavigate, useParams} from 'react-router-dom'
 import { useSelector , useDispatch } from 'react-redux'
-import { addCustomer } from '../features/customer/customerSlice'
+//import { addCustomer } from '../features/customer/customerSlice'
+import { addCustomer } from '../../redux/features/customer/customerSlice'
 import { toast } from 'react-toastify'
 
 const CustomerLogin = () => {

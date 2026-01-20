@@ -1,21 +1,23 @@
 import { Routes, Route } from "react-router-dom";
 import OwnerLayout from "../layouts/OwnerLayout";
 
-import OwnerDashboard from "../pages/owner/OwnerDashboard";
-import ManageProducts from "../pages/owner/ManageProducts";
-import ManageOrders from "../pages/owner/ManageOrders";
-import SalesAnalytics from "../pages/owner/SalesAnalytics";
-import RestaurantSettings from "../pages/owner/RestaurantSettings";
+// import OwnerDashboard from "../pages/owner/OwnerDashboard";
+// import ManageProducts from "../pages/owner/ManageProducts";
+// import ManageOrders from "../pages/owner/ManageOrders";
+// import SalesAnalytics from "../pages/owner/SalesAnalytics";
+// import RestaurantSettings from "../pages/owner/RestaurantSettings";
 
 const OwnerRoutes = () => {
   return (
     <OwnerLayout>
+      <div>thsi owner rouer</div>
       <Routes>
-        <Route path="dashboard" element={<OwnerDashboard />} />
+        
+        {/* <Route path="dashboard" element={<OwnerDashboard />} />
         <Route path="products" element={<ManageProducts />} />
         <Route path="orders" element={<ManageOrders />} />
         <Route path="analytics" element={<SalesAnalytics />} />
-        <Route path="settings" element={<RestaurantSettings />} />
+        <Route path="settings" element={<RestaurantSettings />} /> */}
       </Routes>
     </OwnerLayout>
   );

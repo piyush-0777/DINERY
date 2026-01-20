@@ -1,7 +1,7 @@
 import React from 'react'
 import { useState } from 'react';
 import { useSelector , useDispatch } from 'react-redux';
-import { incresContityOfOrder , dicresContityOfOrder , deletOrder } from '../features/customer/customerSlice';
+import { incresContityOfOrder , dicresContityOfOrder , deletOrder } from '../../redux/features/customer/customerSlice';
 import { HiChevronLeft } from "react-icons/hi";
 import {useNavigate , useParams } from 'react-router-dom'
 
