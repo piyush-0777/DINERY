@@ -2,10 +2,16 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import PublicLayout from "../../layouts/PublicLayout";
 import { Link } from "react-router-dom";
+import { useDispatch , useSelector } from "react-redux";
+import {registerRestaurnatThunk} from "../../redux/thunks/authThunk"
+
 
 
 const Register = () => {
+  const dispatch = useDispatch();
   const [showOtp, setShowOtp] = useState(false);
+  const restaurant = useSelector(state => state.restaurant)
+  console.log(restaurant)
 
   const {
     register,
@@ -25,6 +31,10 @@ const Register = () => {
 
     console.log("Send OTP to:", ownerEmail, ownerPhone);
     // TODO: call sendOtp API here
+    dispatch(registerRestaurnatThunk({
+      name:"piyjklsh456dfgdrgfgfhgjujvhvjhi67", address:"helloklkl", 
+      ownerName:"piyushklrjkuufghk", password:"piyukhjfghlksh", ownerPhone:"9300161089", ownerEmail:"pijhjkhjkj@123"}));
+      
 
     setShowOtp(true);
   };

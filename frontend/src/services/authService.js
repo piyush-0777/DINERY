@@ -7,8 +7,8 @@ export const authService = {
   customerLogin: (restaurantId, tableId, name, phone) =>
     request(`/customer/${restaurantId}/${tableId}/login`, "POST", { name, phone }),
 
-  ownerRegister: (data) =>
-    request("/owner/register", "POST", data),
+  restaurantRegister: (data) =>
+    request("/restaurant/registerRestaurant", "POST", data),
 
   logout: () =>
     request("/auth/logout", "POST"),

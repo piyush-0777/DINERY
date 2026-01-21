@@ -85,6 +85,6 @@ exports.registerRestaurant = async (req, res) => {
             })
             return;
         }
-        res.status(200).json({ massage: 'logged in' })
+        res.status(200).json({ massage: 'logged in' , restaurant:restaurant })
     }
 }
