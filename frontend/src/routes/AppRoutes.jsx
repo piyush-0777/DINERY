@@ -5,6 +5,11 @@ import CustomerLogin from "../pages/customer/CustomerLogin"
  import OwnerRoutes from "./OwnerRoutes";
  import CustomerRoutes from "./CustomerRoutes";
 import { ToastContainer } from "react-toastify";
+import PublicLayout from "../layouts/PublicLayout";
+import Home from "../pages/public/Home";
+import About from "../pages/public/About";
+import Login from "../pages/auth/Login";
+import Register from "../pages/auth/Register";
 
 // Auth Pages
 
@@ -26,6 +31,12 @@ const AppRoutes = () => {
       <Routes>
         
         {/* Public Routes */}
+        <Route path='/' element ={<PublicLayout/>} >
+        <Route path='home' element={<Home/>} />
+        <Route path='about' element={<About/>} />
+        <Route path='login' element={<Login/>} />
+        <Route path='register' element={<Register/>} />
+        </Route>
         
         <Route path="/customer" element={<CustomerLayout />}>
           <Route path="CustomerLogin/:tableID" element={<CustomerLogin />} />
