@@ -31,12 +31,12 @@ const AppRoutes = () => {
       <Routes>
         
         {/* Public Routes */}
-        <Route path='/' element ={<PublicLayout/>} >
-        <Route path='home' element={<Home/>} />
-        <Route path='about' element={<About/>} />
-        <Route path='login' element={<Login/>} />
-        <Route path='register' element={<Register/>} />
-        </Route>
+        
+        <Route path='/home' element={<Home/>} />
+        <Route path='/about' element={<About/>} />
+        <Route path='/login' element={<Login/>} />
+        <Route path='/register' element={<Register/>} />
+        
         
         <Route path="/customer" element={<CustomerLayout />}>
           <Route path="CustomerLogin/:tableID" element={<CustomerLogin />} />

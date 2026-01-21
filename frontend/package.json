@@ -12,6 +12,8 @@
   "dependencies": {
     "@reduxjs/toolkit": "^2.9.2",
     "@tailwindcss/vite": "^4.1.14",
+    "framer-motion": "^12.27.5",
+    "lucide-react": "^0.562.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
     "react-hook-form": "^7.63.0",
