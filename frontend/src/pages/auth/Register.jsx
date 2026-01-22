@@ -2,14 +2,18 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import PublicLayout from "../../layouts/PublicLayout";
 import { Link } from "react-router-dom";
-import { useDispatch , useSelector } from "react-redux";
-import {registerRestaurnatThunk} from "../../redux/thunks/authThunk"
+import { useDispatch, useSelector } from "react-redux";
+import { registerRestaurnatThunk } from "../../redux/thunks/authThunk"
 
 
 
 const Register = () => {
   const dispatch = useDispatch();
   const [showOtp, setShowOtp] = useState(false);
+
+  const [otpVerified, setOtpVerified] = useState(false);
+  const [verifyingOtp, setVerifyingOtp] = useState(false);
+
   const restaurant = useSelector(state => state.restaurant)
   console.log(restaurant)
 
@@ -29,15 +33,34 @@ const Register = () => {
       return;
     }
 
-    console.log("Send OTP to:", ownerEmail, ownerPhone);
-    // TODO: call sendOtp API here
-    dispatch(registerRestaurnatThunk({
-      name:"piyjklsh456dfgdrgfgfhgjujvhvjhi67", address:"helloklkl", 
-      ownerName:"piyushklrjkuufghk", password:"piyukhjfghlksh", ownerPhone:"9300161089", ownerEmail:"pijhjkhjkj@123"}));
-      
+    // call SEND OTP API
+    console.log("Sending OTP to:", ownerEmail, ownerPhone);
 
     setShowOtp(true);
   };
+
+
+  // handle verify otp
+  const handleVerifyOtp = async () => {
+    const { otp } = getValues();
+
+    if (!otp) {
+      alert("Please enter OTP");
+      return;
+    }
+
+    setVerifyingOtp(true);
+
+    // 🔥 call VERIFY OTP API here
+    console.log("Verifying OTP:", otp);
+
+    // mock success
+    setTimeout(() => {
+      setOtpVerified(true);
+      setVerifyingOtp(false);
+    }, 1000);
+  };
+
 
   // STEP 2: Submit Registration
   const onSubmit = (data) => {
@@ -85,6 +108,7 @@ const Register = () => {
             >
               {/* Restaurant Name */}
               <input
+              required
                 placeholder="Restaurant Name"
                 {...register("restaurantName", { required: true })}
                 className="input"
@@ -132,11 +156,31 @@ const Register = () => {
 
               {/* OTP Field (conditional) */}
               {showOtp && (
-                <input
-                  placeholder="Enter OTP"
-                  {...register("otp", { required: true })}
-                  className="input border-yellow-500"
-                />
+                <div className="flex gap-2">
+                  <input
+                    placeholder="Enter OTP"
+                    {...register("otp", { required: true })}
+                    className="input flex-1 border-yellow-500"
+                    disabled={otpVerified}
+                  />
+
+                  {!otpVerified ? (
+                    <button
+                      type="button"
+                      onClick={handleVerifyOtp}
+                      disabled={verifyingOtp}
+                      className="px-4 bg-zinc-800 border border-zinc-700
+                   rounded-lg hover:border-green-500 hover:text-green-500
+                   transition disabled:opacity-50"
+                    >
+                      {verifyingOtp ? "Verifying..." : "Verify OTP"}
+                    </button>
+                  ) : (
+                    <span className="px-4 flex items-center text-green-500 font-semibold">
+                      ✓ Verified
+                    </span>
+                  )}
+                </div>
               )}
 
               {/* Buttons */}
@@ -162,17 +206,17 @@ const Register = () => {
                 >
                   {isSubmitting ? "Creating Account..." : "Submit & Register"}
                 </button>
-                
+
               )}
               <p className="text-sm text-center text-gray-400 ">
-  Already have an account?{" "}
-  <Link
-    to="/login"
-    className="text-yellow-500 hover:text-yellow-400 transition"
-  >
-    Login here
-  </Link>
-</p>
+                Already have an account?{" "}
+                <Link
+                  to="/login"
+                  className="text-yellow-500 hover:text-yellow-400 transition"
+                >
+                  Login here
+                </Link>
+              </p>
 
             </form>
 
