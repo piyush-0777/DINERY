@@ -63,13 +63,16 @@ const Register = () => {
 
 
   // STEP 2: Submit Registration
-  const onSubmit = (data) => {
-    console.log("Register Data:", data);
+  const onSubmit = async (data) => {
+
     // TODO: call register API with OTP verification
+    console.log("Register Data:", data);
+    await dispatch(registerRestaurnatThunk(data))
+    
   };
 
   return (
-    <PublicLayout>
+    <>
       <div className="min-h-[90vh] bg-black flex items-center justify-center px-6">
         <div className="max-w-6xl w-full grid md:grid-cols-2 bg-zinc-900 rounded-2xl overflow-hidden shadow-xl">
 
@@ -247,7 +250,7 @@ const Register = () => {
           }
         `}
       </style>
-    </PublicLayout>
+    </>
   );
 };
 

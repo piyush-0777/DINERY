@@ -1,7 +1,12 @@
 import { useForm } from "react-hook-form";
 import PublicLayout from "../../layouts/PublicLayout";
+import { useDispatch , useSelector} from "react-redux"
+import {loginRestaurantThunk} from "../../redux/thunks/authThunk"
 
 const Login = () => {
+  const dispatch = useDispatch()
+  const auth = useSelector(state => state.auth)
+  console.log(auth);
   const {
     register,
     handleSubmit,
@@ -9,8 +14,11 @@ const Login = () => {
   } = useForm();
 
   const onSubmit = (data) => {
-    console.log("Login Data:", data);
+    
     // TODO: call login API here
+    console.log("Login Data:", data);
+    dispatch(loginRestaurantThunk(data))
+    
   };
 
   return (
@@ -89,9 +97,9 @@ const Login = () => {
               {/* Email */}
               <div>
                 <input
-                  type="email"
+                  type="ownerEmail"
                   placeholder="Email Address"
-                  {...register("email", {
+                  {...register("ownerEmail", {
                     required: "Email is required",
                     pattern: {
                       value: /^\S+@\S+$/i,

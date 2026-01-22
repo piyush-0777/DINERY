@@ -1,8 +1,8 @@
 import request from "./api";
 
 export const authService = {
-  ownerLogin: (email, password) =>
-    request("/owner/login", "POST", { email, password }),
+  ownerLogin: (data) =>
+    request("/restaurant/login", "POST", data),
 
   customerLogin: (restaurantId, tableId, name, phone) =>
     request(`/customer/${restaurantId}/${tableId}/login`, "POST", { name, phone }),

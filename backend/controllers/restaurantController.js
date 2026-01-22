@@ -6,85 +6,122 @@ const { hashPasswordGenerater, hashPasswordChecker } = require('../utils/hashPas
 
 
 exports.login = async (req, res) => {
+    try {
 
-    const { name, ownerName, ownerEmail, password } = req.body
+        const { restaurantName, ownerName, ownerEmail, password } = req.body
 
-    // find user deteal using  resturnt model
-    const restaurant = await Restaurant.findOne({ ownerEmail });
+        // find user deteal using  resturnt model
+        const restaurant = await Restaurant.findOne({ ownerEmail });
 
-
-
-    if (!restaurant) {
-        res.status(400).json({ error: 'invalid email or password' })
-        return;
-    } else {
-        const isMatchPassword = await hashPasswordChecker(password, restaurant.password);
-
-        if (isMatchPassword) {
-
-            const token = jwt.sign({ ownerEmail }, process.env.JWT_SECRET_KEY, { expiresIn: "48h" })
-
-            if (token) {
-                res.cookie("token", token, {
-                    httpOnly: true,
-                    secure: false, // set true in production (HTTPS)
-                    sameSite: "lax",
-                    maxAge: 48 * 60 * 60 * 1000 // 48 hour
-
-                })
-            } else {
-                res.status(400).json({
-                    error: 'jsonwebtoken is fail to genarete token'
-                })
-                return;
-            }
-            res.status(200).json({ massage: 'logged in' , restaurant })
-        } else {
-            res.status(400).json({ error: 'invalid email or password' })
+        if (!restaurant) {
+            res.status(401).json({ error: 'invalid email or password' })
             return;
         }
+
+        const isMatchPassword = await hashPasswordChecker(password, restaurant.password);
+
+        if (!isMatchPassword) {
+            return res.status(401).json({
+                error: "Invalid email or password"
+            });
+        }
+
+        const token = jwt.sign({ ownerEmail }, process.env.JWT_SECRET_KEY, { expiresIn: "48h" })
+
+
+        res.cookie("token", token, {
+            httpOnly: true,
+            secure: false, // set true in production (HTTPS)
+            sameSite: "lax",
+            maxAge: 48 * 60 * 60 * 1000 // 48 hour
+
+        })
+
+
+
+        res.status(200).json({ massage: 'logged in' })
+    } catch (error) {
+        console.error("Login error:", error);
+        res.status(500).json({
+            error: "Internal server error"
+        });
     }
+
+
+
 }
 
 exports.registerRestaurant = async (req, res) => {
-    const { name, address, ownerName, password, ownerPhone, ownerEmail } = req.body;
+  try {
+    const {
+      restaurantName,
+      address,
+      ownerName,
+      password,
+      ownerPhone,
+      ownerEmail,
+    } = req.body;
 
-    let hash;
-    try {
-
-        hash = await hashPasswordGenerater(password);
-    } catch (error) {
-        console.log(error)
+    // 1. Validate input
+    if (!ownerEmail || !password) {
+      return res.status(400).json({
+        error: "Email and password are required",
+      });
     }
 
-    // register data in mongoDB
+    // 2. Check if user already exists
+    const existingRestaurant = await Restaurant.findOne({ ownerEmail });
+    if (existingRestaurant) {
+      return res.status(409).json({
+        error: "Email already registered",
+      });
+    }
 
+    // 3. Hash password
+    const hashedPassword = await hashPasswordGenerater(password);
+
+    // 4. Create restaurant
     const restaurant = await Restaurant.create({
-        name, address, ownerName, password: hash, ownerPhone, ownerEmail
-    })
+      restaurantName,
+      address,
+      ownerName,
+      password: hashedPassword,
+      ownerPhone,
+      ownerEmail,
+    });
 
+    // 5. Generate JWT
+    const token = jwt.sign(
+      {
+        id: restaurant._id,
+        ownerEmail: restaurant.ownerEmail,
+      },
+      process.env.JWT_SECRET_KEY,
+      { expiresIn: "48h" }
+    );
 
-    if (!restaurant) {
-        res.status(400).json({ error: 'invalid email or password' })
-        return;
-    } else {
+    // 6. Set cookie
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 48 * 60 * 60 * 1000,
+    });
 
-        const token = jwt.sign({ ownerName }, process.env.JWT_SECRET_KEY, { expiresIn: "48h" })
-
-        if (token) {
-            res.cookie("token", token, {
-                httpOnly: true,
-                secure: false, // set true in production (HTTPS)
-                sameSite: "lax",
-                maxAge: 48 * 60 * 60 * 1000 // 48 hour
-
-            })
-        } else {
-            res.status(400).json({
-                error: 'jsonwebtoken is fail to genarete token'
-            })
-            return;
-        }
-        res.status(200).json({ massage: 'logged in' , restaurant:restaurant })
-    }
-}
+    // 7. Send response
+    res.status(201).json({
+      message: "Restaurant registered successfully",
+      user: {
+        id: restaurant._id,
+        ownerName: restaurant.ownerName,
+        ownerEmail: restaurant.ownerEmail,
+        restaurantName: restaurant.restaurantName,
+      },
+    });
+  } catch (error) {
+    console.error("Register error:", error);
+    res.status(500).json({
+      error: "Internal server error",
+    });
+  }
+};

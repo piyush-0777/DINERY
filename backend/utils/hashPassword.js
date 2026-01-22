@@ -1,29 +1,33 @@
 
-const bcrypt = require('bcrypt')
+const bcrypt = require("bcrypt");
+
+const SALT_ROUNDS = 10;
 
 const hashPasswordGenerater = async (password) => {
-    try {
-            const salt = await bcrypt.genSalt(10);
-    
-            if(!salt) {
-                throw new Error("salt generation failed")
-            }
-    
-            const hashPassword = await bcrypt.hash(password , salt);
-    
-            if(!hashPassword) {
-                throw new Error(" password generation failed")
-            }
-            return hashPassword
-        } catch (error) {
-            throw new Error(`hashing is failed ..${error}`)
-        }
-}
+  try {
+    if (!password) {
+      throw new Error("Password is required");
+    }
 
-const hashPasswordChecker = async (password , hash) =>{
+    return await bcrypt.hash(password, SALT_ROUNDS);
+  } catch (error) {
+    throw new Error("Password hashing failed");
+  }
+};
 
-    const isMatch = await bcrypt.compare(password , hash);
-    return isMatch;
-}
+const hashPasswordChecker = async (password, hash) => {
+  try {
+    if (!password || !hash) {
+      throw new Error("Password or hash missing");
+    }
 
-module.exports = {hashPasswordGenerater ,hashPasswordChecker};
+    return await bcrypt.compare(password, hash);
+  } catch (error) {
+    throw new Error("Password comparison failed");
+  }
+};
+
+module.exports = {
+  hashPasswordGenerater,
+  hashPasswordChecker,
+};
