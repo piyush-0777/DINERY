@@ -2,7 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 import {registerRestaurnatThunk, loginRestaurantThunk} from "../../thunks/authThunk"
 
 const initialState = {
-    authStatus: 'logout',
+    success: false,
     message: null,
     loading: false,
     error: null,
@@ -28,7 +28,7 @@ export const authSlice = createSlice({
                 console.log(action.payload)
                 state.loading = false;
                 state.message = action.payload.message;
-                state.authStatus = "login"
+                state.success = true
 
             })
             .addCase(registerRestaurnatThunk.rejected, (state, action) => {
@@ -44,6 +44,7 @@ export const authSlice = createSlice({
             .addCase(loginRestaurantThunk.fulfilled , (state , action)=>{
                 state.loading = false;
                 state.message = action.payload.message;
+                state.success= true;
             })
             .addCase(loginRestaurantThunk.rejected , (state , action)=>{
                 state.loading = false;

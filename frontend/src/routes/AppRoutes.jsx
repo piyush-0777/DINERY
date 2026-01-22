@@ -27,7 +27,7 @@ const AppRoutes = () => {
           pauseOnFocusLoss={false}
           draggable={false}
           pauseOnHover={false}
-          theme="colored" />
+          theme="dark" />
       <Routes>
         
         {/* Public Routes */}

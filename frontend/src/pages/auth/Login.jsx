@@ -1,12 +1,33 @@
-import { useForm } from "react-hook-form";
+import { useForm  } from "react-hook-form";
 import PublicLayout from "../../layouts/PublicLayout";
 import { useDispatch , useSelector} from "react-redux"
 import {loginRestaurantThunk} from "../../redux/thunks/authThunk"
+import { useEffect } from "react";
+import {toast} from "react-toastify"
+import {useNavigate} from "react-router-dom"
+import { Link } from "react-router-dom";
 
 const Login = () => {
+  const navigate = useNavigate()
   const dispatch = useDispatch()
-  const auth = useSelector(state => state.auth)
-  console.log(auth);
+  const { loading, error, success }  = useSelector(state => state.auth)
+  
+console.log({ loading, error, success })
+
+
+  useEffect(() => {
+      if (error?.message) {
+        toast.error(error.message);
+      }
+    }, [error]);
+  
+    useEffect(() => {
+      if (success) {
+        toast.success("Registration successful 🎉");
+        navigate("/");
+      }
+    }, [success, navigate]);
+
   const {
     register,
     handleSubmit,
@@ -23,7 +44,7 @@ const Login = () => {
 
   return (
    
-      <div className="min-h-[90vh] bg-black flex items-center justify-center px-6">
+      <div className="min-h-[100vh] bg-black flex items-center justify-center px-6">
         <div className="max-w-5xl w-full grid md:grid-cols-2 bg-zinc-900 rounded-2xl overflow-hidden shadow-xl">
 
           {/* Image Section */}
@@ -151,6 +172,15 @@ const Login = () => {
                 {isSubmitting ? "Logging in..." : "Login to Dinery"}
               </button>
             </form>
+            <p className="text-sm pt-1 text-center text-gray-400 ">
+                            Don't have an account?{" "}
+                            <Link
+                              to="/register"
+                              className="text-yellow-500 hover:text-yellow-400 transition"
+                            >
+                              Register here
+                            </Link>
+                          </p>
 
             {/* Footer */}
             <p className="text-xs text-gray-500 mt-8 text-center">

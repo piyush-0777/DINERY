@@ -1,21 +1,39 @@
-import { useState } from "react";
+import { useState , useEffect } from "react";
 import { useForm } from "react-hook-form";
 import PublicLayout from "../../layouts/PublicLayout";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { registerRestaurnatThunk } from "../../redux/thunks/authThunk"
+import {toast} from "react-toastify"
+import {useNavigate} from "react-router-dom"
+
 
 
 
 const Register = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate()
+  // state for hendel otp
   const [showOtp, setShowOtp] = useState(false);
-
-  const [otpVerified, setOtpVerified] = useState(false);
+ const [otpVerified, setOtpVerified] = useState(false);
   const [verifyingOtp, setVerifyingOtp] = useState(false);
 
-  const restaurant = useSelector(state => state.restaurant)
-  console.log(restaurant)
+  //auth state
+  const { loading, error, success } = useSelector(state => state.auth);
+  
+  
+  useEffect(() => {
+    if (error?.message) {
+      toast.error(error.message);
+    }
+  }, [error]);
+
+  useEffect(() => {
+    if (success) {
+      toast.success("Registration successful 🎉");
+      navigate("/");
+    }
+  }, [success, navigate]);
 
   const {
     register,

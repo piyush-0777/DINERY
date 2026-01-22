@@ -3,10 +3,10 @@ import {authService} from "../../services/authService"
 
 export const registerRestaurnatThunk = createAsyncThunk('registerRestaurnat' , async ( data , thunkAPI)=>{
     try {
-        const restaurant = await authService.restaurantRegister(data)
-        return restaurant
-    } catch {
-        return thunkAPI.rejectWithValue(error.message || error);
+        const res = await authService.restaurantRegister(data)
+        return res
+    } catch (error) {
+         return thunkAPI.rejectWithValue({status:error.status , message:error.data?.error});
     }
 })
 
@@ -16,6 +16,6 @@ export const loginRestaurantThunk = createAsyncThunk('loginRestaurantThunk', asy
         console.lgo(res)
         return res
     } catch(error) {
-        return thunkAPI.rejectWithValue({status:error.status , data:error.data?.error});
+        return thunkAPI.rejectWithValue({status:error.status , message:error.data?.error});
     }
 })
