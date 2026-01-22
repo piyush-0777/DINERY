@@ -24,7 +24,7 @@ console.log({ loading, error, success })
     useEffect(() => {
       if (success) {
         toast.success("Registration successful 🎉");
-        navigate("/");
+        navigate("/owner/dashboard");
       }
     }, [success, navigate]);
 
@@ -169,7 +169,7 @@ console.log({ loading, error, success })
                            disabled:opacity-50 disabled:cursor-not-allowed
                            transition-all duration-300"
               >
-                {isSubmitting ? "Logging in..." : "Login to Dinery"}
+                {loading ? "Logging in..." : "Login to Dinery"}
               </button>
             </form>
             <p className="text-sm pt-1 text-center text-gray-400 ">

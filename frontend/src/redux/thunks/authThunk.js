@@ -13,9 +13,10 @@ export const registerRestaurnatThunk = createAsyncThunk('registerRestaurnat' , a
 export const loginRestaurantThunk = createAsyncThunk('loginRestaurantThunk', async (data ,thunkAPI)=>{
     try {
         const res = await authService.ownerLogin(data);
-        console.lgo(res)
+        
         return res
     } catch(error) {
+        console.log(error)
         return thunkAPI.rejectWithValue({status:error.status , message:error.data?.error});
     }
 })

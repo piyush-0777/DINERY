@@ -121,7 +121,7 @@ const About = () => {
           {/* Back Home Button */}
           <div className="text-center">
             <Link
-              to="/home"
+              to="/"
               className="inline-flex items-center gap-2 px-8 py-3
                bg-zinc-900 text-white font-semibold rounded-full
                border border-zinc-700

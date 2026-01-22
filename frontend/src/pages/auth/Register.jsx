@@ -31,7 +31,7 @@ const Register = () => {
   useEffect(() => {
     if (success) {
       toast.success("Registration successful 🎉");
-      navigate("/");
+      navigate("/owner/dashboard");
     }
   }, [success, navigate]);
 
@@ -225,7 +225,7 @@ const Register = () => {
                              hover:border-green-500 hover:text-green-500
                              disabled:opacity-50 transition-all duration-300"
                 >
-                  {isSubmitting ? "Creating Account..." : "Submit & Register"}
+                  {loading ? "Creating Account..." : "Submit & Register"}
                 </button>
 
               )}
