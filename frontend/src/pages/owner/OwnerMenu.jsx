@@ -29,6 +29,13 @@ const OwnerMenu = () => {
         },
     ]);
 
+    const addManuItem = (data) =>{
+        setItems((prev) => [
+                            ...prev,
+                            { ...data,},
+                        ]);
+                        setShowModal(false);
+    }
 
     const filteredItems = items.filter(
         (item) => item.category === activeCategory._id
@@ -83,13 +90,7 @@ const OwnerMenu = () => {
                     categories={categories}
                     activeCategory={activeCategory}
                     onClose={() => setShowModal(false)}
-                    onSave={(data) => {
-                        setItems((prev) => [
-                            ...prev,
-                            { ...data, _id: Date.now().toString() },
-                        ]);
-                        setShowModal(false);
-                    }}
+                    onSave={addManuItem}
                 />
             )}
         </div>
