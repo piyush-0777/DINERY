@@ -17,6 +17,6 @@ export const loginRestaurantThunk = createAsyncThunk('loginRestaurantThunk', asy
         return res
     } catch(error) {
         console.log(error)
-        return thunkAPI.rejectWithValue({status:error.status , message:error.data?.error});
+        return thunkAPI.rejectWithValue({status:error.status || 500 , message:error.data?.error || error.message});
     }
 })

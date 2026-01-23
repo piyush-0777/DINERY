@@ -16,9 +16,13 @@ console.log({ loading, error, success })
 
 
   useEffect(() => {
+    if(error?.status == 500) {
+      toast.error('sever down');
+    } else {
       if (error?.message) {
         toast.error(error.message);
       }
+    }
     }, [error]);
   
     useEffect(() => {
