@@ -7,7 +7,7 @@ const authenticateResturant = async (req, res, next) => {
         const token = req.cookies?.token;
 
         if (!token) {
-            res.status(401).json({ error: 'token is not provide' })
+           return res.status(401).json({ error: 'token is not provide' });
         }
 
 
@@ -16,14 +16,14 @@ const authenticateResturant = async (req, res, next) => {
         if (decoded) {
             const restaurant = await RestaurantModel.findOne({ownerEmail:decoded.ownerEmail});
             if (!restaurant) {
-                res.status(400).json({ error: 'unvalid token' })
+               return res.status(400).json({ error: 'unvalid token' })
             } else {
                 req.restaurant = restaurant;
                 next()
             }
         }
     } catch (error) {
-        console.log(error);
+        throw new Error('server error auth faild')
     }
 }
 

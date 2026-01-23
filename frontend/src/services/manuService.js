@@ -5,7 +5,7 @@ export const menuService = {
     request(`/menu/${restaurantId}`, "GET"),
 
   addMenuItem: (data) =>
-    request("/menu", "POST", data),
+    request("/food/create", "POST", data),
 
   updateMenuItem: (menuId, data) =>
     request(`/menu/${menuId}`, "PUT", data),

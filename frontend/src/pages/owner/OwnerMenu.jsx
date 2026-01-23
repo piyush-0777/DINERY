@@ -3,9 +3,14 @@ import CategoryTabs from '../../components/owner/manu/CategoryTabs'
 import MenuItemCard from '../../components/owner/manu/MenuItemCard'
 import AddEditItemModal from '../../components/owner/manu/AddEditItemModal'
 import { useState } from 'react'
+import {useSelector , useDispatch} from 'react-redux'
+import {addFoodThunk} from '../../redux/thunks/manuThunk'
 
 
 const OwnerMenu = () => {
+    const dispatch = useDispatch();
+    const foodStatus = useSelector(state => state.addfoodstatus);
+    console.log(foodStatus)
     const [categories] = useState([
         { _id: "1", name: "Starters" },
         { _id: "2", name: "Main Course" },
@@ -30,6 +35,10 @@ const OwnerMenu = () => {
     ]);
 
     const addManuItem = (data) =>{
+        for (let [key, value] of data.entries()) {
+            console.log(key, value);
+          }
+          dispatch(addFoodThunk(data));
         setItems((prev) => [
                             ...prev,
                             { ...data,},

@@ -102,7 +102,7 @@ const AddEditItemModal = ({ categories, activeCategory, onClose, onSave }) => {
                         onClick={() => {
                             const formData = new FormData();
                             formData.append("name", form.name);
-                            formData.append("foodImg", form.foodImg); // multer field
+                            formData.append("image", form.foodImg); // multer field
                             formData.append("description", form.description);
                             formData.append("price", form.price);
                             formData.append("category", form.category);
