@@ -3,13 +3,14 @@ import CategoryTabs from '../../components/owner/manu/CategoryTabs'
 import MenuItemCard from '../../components/owner/manu/MenuItemCard'
 import AddEditItemModal from '../../components/owner/manu/AddEditItemModal'
 import { useState } from 'react'
-import {useSelector , useDispatch} from 'react-redux'
-import {addFoodThunk} from '../../redux/thunks/manuThunk'
+import { useSelector, useDispatch } from 'react-redux'
+import { addFoodThunk } from '../../redux/thunks/manuThunk'
 
 
 const OwnerMenu = () => {
     const dispatch = useDispatch();
     const foodStatus = useSelector(state => state.addfoodstatus);
+    const category = useSelector(state =>state.foodObject.category)
     console.log(foodStatus)
     const [categories] = useState([
         { _id: "1", name: "Starters" },
@@ -34,16 +35,13 @@ const OwnerMenu = () => {
         },
     ]);
 
-    const addManuItem = (data) =>{
+    const addManuItem = (data) => {
         for (let [key, value] of data.entries()) {
             console.log(key, value);
-          }
-          dispatch(addFoodThunk(data));
-        setItems((prev) => [
-                            ...prev,
-                            { ...data,},
-                        ]);
-                        setShowModal(false);
+        }
+        dispatch(addFoodThunk(data));
+
+        setShowModal(false);
     }
 
     const filteredItems = items.filter(
@@ -64,12 +62,31 @@ const OwnerMenu = () => {
             </div>
 
 
-            <CategoryTabs
-                categories={categories}
-                active={activeCategory}
-                onChange={setActiveCategory}
-            />
-            
+            <div className="flex items-center gap-4 mb-6">
+  
+  {/* Categories */}
+  <div className="flex gap-4 overflow-x-auto pr-2">
+    {category.map((cat) => (
+      <CategoryTabs
+        key={cat.c_name}
+        category={cat}
+        active={activeCategory === cat.c_name}
+        onClick={() => setActiveCategory(cat.c_name)}
+      />
+    ))}
+  </div>
+
+  {/* Add Category Button */}
+  <button
+    onClick={() => setShowAddCategory(true)}
+    className="min-w-[120px] h-28 rounded-2xl border border-dashed border-neutral-700 flex flex-col items-center justify-center text-gray-400 hover:text-yellow-400 hover:border-yellow-400 transition"
+  >
+    <span className="text-2xl">+</span>
+    <span className="text-xs mt-1">Add Category</span>
+  </button>
+
+</div>
+
 
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">

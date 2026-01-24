@@ -6,7 +6,6 @@ const request = async (endpoint, method = "GET", body = null, isFormData = false
   const headers = {
     Authorization: getToken() ? `Bearer ${getToken()}` : "",
   };
-
   if (!isFormData) {
     headers["Content-Type"] = "application/json";
   }
