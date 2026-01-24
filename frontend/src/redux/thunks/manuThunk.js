@@ -18,7 +18,7 @@ export const addCategoryThunk = createAsyncThunk('addCategoryThunk' ,
      async (data, thunkAPI)=>{
     try{
         const res = await menuService.addCategory(data);
-       
+      
         return res;
     } catch (error) {
          console.log(error)

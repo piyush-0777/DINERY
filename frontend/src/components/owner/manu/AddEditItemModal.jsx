@@ -1,6 +1,23 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSelector, useDispatch } from 'react-redux'
+import { addFoodThunk } from '../../../redux/thunks/manuThunk'
+import { toast } from "react-toastify";
 
-const AddEditItemModal = ({ categories, activeCategory, onClose, onSave }) => {
+const AddEditItemModal = ({ categories, activeCategory, onClose }) => {
+    const dispatch = useDispatch();
+    const { loading, success, error, } = useSelector(state => state.addfoodstatus);
+
+    useEffect(() => {
+        if (error) {
+            toast.error(error.message || "Something went wrong");
+        }
+
+        if (success) {
+            toast.success("Food item saved successfully");
+            onClose();
+        }
+    }, [error, success]);
+
     const [form, setForm] = useState({
         name: "",
         foodImg: null,          // File object (for multer)
@@ -77,7 +94,7 @@ const AddEditItemModal = ({ categories, activeCategory, onClose, onSave }) => {
                     >
                         {categories.map((cat) => (
                             <option key={cat._id} value={cat._id}>
-                                {cat.name}
+                                {cat.c_name}
                             </option>
                         ))}
                     </select>
@@ -95,25 +112,35 @@ const AddEditItemModal = ({ categories, activeCategory, onClose, onSave }) => {
 
 
                 <div className="flex justify-end gap-4 mt-6">
-                    <button onClick={onClose} className="text-gray-400 hover:text-white">
+                    <button
+                        onClick={onClose}
+                        disabled={loading}
+                        className="text-gray-400 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
                         Cancel
                     </button>
+
                     <button
+                        disabled={loading}
                         onClick={() => {
                             const formData = new FormData();
                             formData.append("name", form.name);
-                            formData.append("image", form.foodImg); // multer field
+                            formData.append("image", form.foodImg);
                             formData.append("description", form.description);
                             formData.append("price", form.price);
                             formData.append("category", form.category);
                             formData.append("isAvailable", form.isAvailable);
 
-                            onSave(formData);
+                            dispatch(addFoodThunk(formData));
                         }}
-                        className="bg-gradient-to-r from-yellow-400 to-yellow-500 text-black px-5 py-2 rounded-xl font-medium hover:opacity-90"
+                        className="bg-gradient-to-r from-yellow-400 to-yellow-500 text-black px-5 py-2 rounded-xl font-medium hover:opacity-90 disabled:opacity-60 disabled:cursor-not-allowed flex items-center gap-2"
                     >
-                        Save Item
+                        {loading && (
+                            <span className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin"></span>
+                        )}
+                        {loading ? "Saving..." : "Save Item"}
                     </button>
+
                 </div>
             </div>
         </div>

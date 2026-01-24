@@ -17,12 +17,14 @@ const addCategorySlice = createSlice({
             state.success = false;
             state.error = null;
         },
-        extraReducers: (builder) => {
+        
+    },
+    extraReducers: (builder) => {
             builder
                 .addCase(addCategoryThunk.pending, (state) => {
                     state.loading = true;
                     state.error = null;
-                    state.success = false;
+                    
                 })
                 .addCase(addCategoryThunk.fulfilled, (state) => {
                     state.loading = false;
@@ -33,7 +35,6 @@ const addCategorySlice = createSlice({
                     state.error = action.payload;
                 });
         }
-    },
 })
 
 export const { resetAddCategoryState } = addCategorySlice.actions;

@@ -149,55 +149,68 @@ const initialState = {
   }
 ],
  category: [
-    {
+  {
+    _id: 1,
     c_name: 'All',
     c_img: 'https://images.pexels.com/photos/958545/pexels-photo-958545.jpeg?auto=compress&cs=tinysrgb&w=600'
   },
   {
+    _id: 2,
     c_name: 'Fast Food',
     c_img: 'https://images.pexels.com/photos/1633578/pexels-photo-1633578.jpeg?auto=compress&cs=tinysrgb&w=600'
   },
   {
+    _id: 3,
     c_name: 'Snacks',
     c_img: 'https://images.pexels.com/photos/1583884/pexels-photo-1583884.jpeg?auto=compress&cs=tinysrgb&w=600'
   },
   {
+    _id: 4,
     c_name: 'Italian',
     c_img: 'https://images.pexels.com/photos/1279330/pexels-photo-1279330.jpeg?auto=compress&cs=tinysrgb&w=600'
   },
   {
+    _id: 5,
     c_name: 'Indian',
     c_img: 'https://images.pexels.com/photos/724216/pexels-photo-724216.jpeg?auto=compress&cs=tinysrgb&w=600'
   },
   {
+    _id: 6,
     c_name: 'South Indian',
     c_img: 'https://images.pexels.com/photos/1624487/pexels-photo-1624487.jpeg?auto=compress&cs=tinysrgb&w=600'
   },
   {
+    _id: 7,
     c_name: 'Street Food',
     c_img: 'https://images.pexels.com/photos/14703736/pexels-photo-14703736.jpeg?auto=compress&cs=tinysrgb&w=600'
   },
   {
+    _id: 8,
     c_name: 'Chinese',
     c_img: 'https://images.pexels.com/photos/1618898/pexels-photo-1618898.jpeg?auto=compress&cs=tinysrgb&w=600'
   },
   {
+    _id: 9,
     c_name: 'Japanese',
     c_img: 'https://images.pexels.com/photos/2098085/pexels-photo-2098085.jpeg?auto=compress&cs=tinysrgb&w=600'
   },
   {
+    _id: 10,
     c_name: 'Mexican',
     c_img: 'https://images.pexels.com/photos/461198/pexels-photo-461198.jpeg?auto=compress&cs=tinysrgb&w=600'
   },
   {
+    _id: 11,
     c_name: 'Dessert',
     c_img: 'https://images.pexels.com/photos/533325/pexels-photo-533325.jpeg?auto=compress&cs=tinysrgb&w=600'
   },
   {
+    _id: 12,
     c_name: 'Beverage',
     c_img: 'https://images.pexels.com/photos/434213/pexels-photo-434213.jpeg?auto=compress&cs=tinysrgb&w=600'
   }
-],
+]
+
 
  
 }

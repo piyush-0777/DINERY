@@ -4,15 +4,13 @@ import MenuItemCard from '../../components/owner/manu/MenuItemCard'
 import AddEditItemModal from '../../components/owner/manu/AddEditItemModal'
 import { useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { addFoodThunk } from '../../redux/thunks/manuThunk'
 import AddCategory from '../../components/owner/manu/AddCategory'
 
 
 const OwnerMenu = () => {
     const dispatch = useDispatch();
-    const foodStatus = useSelector(state => state.addfoodstatus);
     const category = useSelector(state => state.foodObject.category)
-    console.log(foodStatus)
+    
     const [categories] = useState([
         { _id: "1", name: "Starters" },
         { _id: "2", name: "Main Course" },
@@ -20,7 +18,7 @@ const OwnerMenu = () => {
     ]);
 
 
-    const [activeCategory, setActiveCategory] = useState(categories[0]);
+    const [activeCategory, setActiveCategory] = useState(category[0]);
     const [showModal, setShowModal] = useState(false);
     const [showAddCategory ,setShowAddCategory ] = useState(false)
 
@@ -37,14 +35,7 @@ const OwnerMenu = () => {
         },
     ]);
 
-    const addManuItem = (data) => {
-        for (let [key, value] of data.entries()) {
-            console.log(key, value);
-        }
-        dispatch(addFoodThunk(data));
-
-        setShowModal(false);
-    }
+   
 
 
     
@@ -118,10 +109,10 @@ const OwnerMenu = () => {
 
             {showModal && (
                 <AddEditItemModal
-                    categories={categories}
+                    categories={category}
                     activeCategory={activeCategory}
                     onClose={() => setShowModal(false)}
-                    onSave={addManuItem}
+                    
                 />
             )}
 
