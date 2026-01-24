@@ -6,148 +6,189 @@ const fetchFoods = async () =>{
 
 
 const initialState = {
-     foods: [
+     foods:[
   {
-    f_name: 'Pizza Margherita',
-    f_img: 'https://images.pexels.com/photos/315755/pexels-photo-315755.jpeg?auto=compress&cs=tinysrgb&w=600',
-    f_price: 299,
-    f_category: 'Fast Food',
-    f_about: 'Classic Italian pizza with mozzarella cheese and tomato sauce.'
+    _id: 1,
+    name: 'Pizza Margherita',
+    foodImg: 'https://images.pexels.com/photos/315755/pexels-photo-315755.jpeg?auto=compress&cs=tinysrgb&w=600',
+    price: 299,
+    category: 'Fast Food',
+    description: 'Classic Italian pizza with mozzarella cheese and tomato sauce.',
+    isAvailable: true
   },
   {
-    f_name: 'Cheese Burger',
-    f_img: 'https://images.pexels.com/photos/1633578/pexels-photo-1633578.jpeg?auto=compress&cs=tinysrgb&w=600',
-    f_price: 199,
-    f_category: 'Fast Food',
-    f_about: 'Juicy beef patty with melted cheese and soft sesame bun.'
+    _id: 2,
+    name: 'Cheese Burger',
+    foodImg: 'https://images.pexels.com/photos/1633578/pexels-photo-1633578.jpeg?auto=compress&cs=tinysrgb&w=600',
+    price: 199,
+    category: 'Fast Food',
+    description: 'Juicy beef patty with melted cheese and soft sesame bun.',
+    isAvailable: true
   },
   {
-    f_name: 'French Fries',
-    f_img: 'https://images.pexels.com/photos/1583884/pexels-photo-1583884.jpeg?auto=compress&cs=tinysrgb&w=600',
-    f_price: 99,
-    f_category: 'Snacks',
-    f_about: 'Crispy golden fries served with tangy ketchup.'
+    _id: 3,
+    name: 'French Fries',
+    foodImg: 'https://images.pexels.com/photos/1583884/pexels-photo-1583884.jpeg?auto=compress&cs=tinysrgb&w=600',
+    price: 99,
+    category: 'Snacks',
+    description: 'Crispy golden fries served with tangy ketchup.',
+    isAvailable: true
   },
   {
-    f_name: 'Veg Sandwich',
-    f_img: 'https://images.pexels.com/photos/1600711/pexels-photo-1600711.jpeg?auto=compress&cs=tinysrgb&w=600',
-    f_price: 149,
-    f_category: 'Snacks',
-    f_about: 'Fresh vegetables and cheese layered between toasted bread.'
+    _id: 4,
+    name: 'Veg Sandwich',
+    foodImg: 'https://images.pexels.com/photos/1600711/pexels-photo-1600711.jpeg?auto=compress&cs=tinysrgb&w=600',
+    price: 149,
+    category: 'Snacks',
+    description: 'Fresh vegetables and cheese layered between toasted bread.',
+    isAvailable: true
   },
   {
-    f_name: 'Pasta Alfredo',
-    f_img: 'https://images.pexels.com/photos/1279330/pexels-photo-1279330.jpeg?auto=compress&cs=tinysrgb&w=600',
-    f_price: 249,
-    f_category: 'Italian',
-    f_about: 'Creamy Alfredo pasta tossed with herbs and parmesan.'
+    _id: 5,
+    name: 'Pasta Alfredo',
+    foodImg: 'https://images.pexels.com/photos/1279330/pexels-photo-1279330.jpeg?auto=compress&cs=tinysrgb&w=600',
+    price: 249,
+    category: 'Italian',
+    description: 'Creamy Alfredo pasta tossed with herbs and parmesan.',
+    isAvailable: true
   },
   {
-    f_name: 'Chicken Biryani',
-    f_img: 'https://images.pexels.com/photos/724216/pexels-photo-724216.jpeg?auto=compress&cs=tinysrgb&w=600',
-    f_price: 299,
-    f_category: 'Indian',
-    f_about: 'Aromatic basmati rice cooked with spiced chicken and saffron.'
+    _id: 6,
+    name: 'Chicken Biryani',
+    foodImg: 'https://images.pexels.com/photos/724216/pexels-photo-724216.jpeg?auto=compress&cs=tinysrgb&w=600',
+    price: 299,
+    category: 'Indian',
+    description: 'Aromatic basmati rice cooked with spiced chicken and saffron.',
+    isAvailable: true
   },
   {
-    f_name: 'Paneer Tikka',
-    f_img: 'https://images.pexels.com/photos/5410400/pexels-photo-5410400.jpeg?auto=compress&cs=tinysrgb&w=600',
-    f_price: 199,
-    f_category: 'Indian',
-    f_about: 'Grilled paneer cubes marinated in spiced yogurt.'
+    _id: 7,
+    name: 'Paneer Tikka',
+    foodImg: 'https://images.pexels.com/photos/5410400/pexels-photo-5410400.jpeg?auto=compress&cs=tinysrgb&w=600',
+    price: 199,
+    category: 'Indian',
+    description: 'Grilled paneer cubes marinated in spiced yogurt.',
+    isAvailable: true
   },
   {
-    f_name: 'Masala Dosa',
-    f_img: 'https://images.pexels.com/photos/1624487/pexels-photo-1624487.jpeg?auto=compress&cs=tinysrgb&w=600',
-    f_price: 120,
-    f_category: 'South Indian',
-    f_about: 'Crispy rice crepe stuffed with spiced potato filling.'
+    _id: 8,
+    name: 'Masala Dosa',
+    foodImg: 'https://images.pexels.com/photos/1624487/pexels-photo-1624487.jpeg?auto=compress&cs=tinysrgb&w=600',
+    price: 120,
+    category: 'South Indian',
+    description: 'Crispy rice crepe stuffed with spiced potato filling.',
+    isAvailable: true
   },
   {
-    f_name: 'Idli Sambhar',
-    f_img: 'https://images.pexels.com/photos/1629182/pexels-photo-1629182.jpeg?auto=compress&cs=tinysrgb&w=600',
-    f_price: 90,
-    f_category: 'South Indian',
-    f_about: 'Soft steamed rice cakes served with sambhar and chutney.'
+    _id: 9,
+    name: 'Idli Sambhar',
+    foodImg: 'https://images.pexels.com/photos/1629182/pexels-photo-1629182.jpeg?auto=compress&cs=tinysrgb&w=600',
+    price: 90,
+    category: 'South Indian',
+    description: 'Soft steamed rice cakes served with sambhar and chutney.',
+    isAvailable: true
   },
   {
-    f_name: 'Momos',
-    f_img: 'https://images.pexels.com/photos/14703736/pexels-photo-14703736.jpeg?auto=compress&cs=tinysrgb&w=600',
-    f_price: 120,
-    f_category: 'Street Food',
-    f_about: 'Steamed dumplings filled with vegetables or chicken.'
+    _id: 10,
+    name: 'Momos',
+    foodImg: 'https://images.pexels.com/photos/14703736/pexels-photo-14703736.jpeg?auto=compress&cs=tinysrgb&w=600',
+    price: 120,
+    category: 'Street Food',
+    description: 'Steamed dumplings filled with vegetables or chicken.',
+    isAvailable: true
   },
   {
-    f_name: 'Spring Roll',
-    f_img: 'https://images.pexels.com/photos/6937469/pexels-photo-6937469.jpeg?auto=compress&cs=tinysrgb&w=600',
-    f_price: 100,
-    f_category: 'Chinese',
-    f_about: 'Crispy rolls stuffed with spicy vegetables.'
+    _id: 11,
+    name: 'Spring Roll',
+    foodImg: 'https://images.pexels.com/photos/6937469/pexels-photo-6937469.jpeg?auto=compress&cs=tinysrgb&w=600',
+    price: 100,
+    category: 'Chinese',
+    description: 'Crispy rolls stuffed with spicy vegetables.',
+    isAvailable: true
   },
   {
-    f_name: 'Hakka Noodles',
-    f_img: 'https://images.pexels.com/photos/1618898/pexels-photo-1618898.jpeg?auto=compress&cs=tinysrgb&w=600',
-    f_price: 180,
-    f_category: 'Chinese',
-    f_about: 'Stir-fried noodles with vegetables and soy sauce.'
+    _id: 12,
+    name: 'Hakka Noodles',
+    foodImg: 'https://images.pexels.com/photos/1618898/pexels-photo-1618898.jpeg?auto=compress&cs=tinysrgb&w=600',
+    price: 180,
+    category: 'Chinese',
+    description: 'Stir-fried noodles with vegetables and soy sauce.',
+    isAvailable: true
   },
   {
-    f_name: 'Sushi Roll',
-    f_img: 'https://images.pexels.com/photos/2098085/pexels-photo-2098085.jpeg?auto=compress&cs=tinysrgb&w=600',
-    f_price: 350,
-    f_category: 'Japanese',
-    f_about: 'Fresh sushi rolls filled with rice, seaweed, and fish.'
+    _id: 13,
+    name: 'Sushi Roll',
+    foodImg: 'https://images.pexels.com/photos/2098085/pexels-photo-2098085.jpeg?auto=compress&cs=tinysrgb&w=600',
+    price: 350,
+    category: 'Japanese',
+    description: 'Fresh sushi rolls filled with rice, seaweed, and fish.',
+    isAvailable: true
   },
   {
-    f_name: 'Tacos',
-    f_img: 'https://images.pexels.com/photos/461198/pexels-photo-461198.jpeg?auto=compress&cs=tinysrgb&w=600',
-    f_price: 250,
-    f_category: 'Mexican',
-    f_about: 'Soft corn tortillas filled with spiced meat and veggies.'
+    _id: 14,
+    name: 'Tacos',
+    foodImg: 'https://images.pexels.com/photos/461198/pexels-photo-461198.jpeg?auto=compress&cs=tinysrgb&w=600',
+    price: 250,
+    category: 'Mexican',
+    description: 'Soft corn tortillas filled with spiced meat and veggies.',
+    isAvailable: true
   },
   {
-    f_name: 'Hot Dog',
-    f_img: 'https://images.pexels.com/photos/718739/pexels-photo-718739.jpeg?auto=compress&cs=tinysrgb&w=600',
-    f_price: 180,
-    f_category: 'Fast Food',
-    f_about: 'Grilled sausage in a bun topped with mustard and ketchup.'
+    _id: 15,
+    name: 'Hot Dog',
+    foodImg: 'https://images.pexels.com/photos/718739/pexels-photo-718739.jpeg?auto=compress&cs=tinysrgb&w=600',
+    price: 180,
+    category: 'Fast Food',
+    description: 'Grilled sausage in a bun topped with mustard and ketchup.',
+    isAvailable: true
   },
   {
-    f_name: 'Chocolate Cake',
-    f_img: 'https://images.pexels.com/photos/533325/pexels-photo-533325.jpeg?auto=compress&cs=tinysrgb&w=600',
-    f_price: 220,
-    f_category: 'Dessert',
-    f_about: 'Rich, moist chocolate cake with creamy frosting.'
+    _id: 16,
+    name: 'Chocolate Cake',
+    foodImg: 'https://images.pexels.com/photos/533325/pexels-photo-533325.jpeg?auto=compress&cs=tinysrgb&w=600',
+    price: 220,
+    category: 'Dessert',
+    description: 'Rich, moist chocolate cake with creamy frosting.',
+    isAvailable: true
   },
   {
-    f_name: 'Ice Cream Sundae',
-    f_img: 'https://images.pexels.com/photos/1352296/pexels-photo-1352296.jpeg?auto=compress&cs=tinysrgb&w=600',
-    f_price: 150,
-    f_category: 'Dessert',
-    f_about: 'Vanilla ice cream topped with chocolate syrup and nuts.'
+    _id: 17,
+    name: 'Ice Cream Sundae',
+    foodImg: 'https://images.pexels.com/photos/1352296/pexels-photo-1352296.jpeg?auto=compress&cs=tinysrgb&w=600',
+    price: 150,
+    category: 'Dessert',
+    description: 'Vanilla ice cream topped with chocolate syrup and nuts.',
+    isAvailable: true
   },
   {
-    f_name: 'Falooda',
-    f_img: 'https://images.pexels.com/photos/14703729/pexels-photo-14703729.jpeg?auto=compress&cs=tinysrgb&w=600',
-    f_price: 130,
-    f_category: 'Dessert',
-    f_about: 'A chilled sweet drink with vermicelli, rose syrup, and ice cream.'
+    _id: 18,
+    name: 'Falooda',
+    foodImg: 'https://images.pexels.com/photos/14703729/pexels-photo-14703729.jpeg?auto=compress&cs=tinysrgb&w=600',
+    price: 130,
+    category: 'Dessert',
+    description: 'A chilled sweet drink with vermicelli, rose syrup, and ice cream.',
+    isAvailable: true
   },
   {
-    f_name: 'Club Sandwich',
-    f_img: 'https://images.pexels.com/photos/1600711/pexels-photo-1600711.jpeg?auto=compress&cs=tinysrgb&w=600',
-    f_price: 170,
-    f_category: 'Snacks',
-    f_about: 'Triple-layered sandwich with veggies and cheese.'
+    _id: 19,
+    name: 'Club Sandwich',
+    foodImg: 'https://images.pexels.com/photos/1600711/pexels-photo-1600711.jpeg?auto=compress&cs=tinysrgb&w=600',
+    price: 170,
+    category: 'Snacks',
+    description: 'Triple-layered sandwich with veggies and cheese.',
+    isAvailable: true
   },
   {
-    f_name: 'Cold Coffee',
-    f_img: 'https://images.pexels.com/photos/434213/pexels-photo-434213.jpeg?auto=compress&cs=tinysrgb&w=600',
-    f_price: 120,
-    f_category: 'Beverage',
-    f_about: 'Refreshing chilled coffee with milk and sugar.'
+    _id: 20,
+    name: 'Cold Coffee',
+    foodImg: 'https://images.pexels.com/photos/434213/pexels-photo-434213.jpeg?auto=compress&cs=tinysrgb&w=600',
+    price: 120,
+    category: 'Beverage',
+    description: 'Refreshing chilled coffee with milk and sugar.',
+    isAvailable: true
   }
-],
+] ,
+
  category: [
   {
     _id: 1,

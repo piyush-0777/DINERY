@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import CategoryTabs from '../../components/owner/manu/CategoryTabs'
 import MenuItemCard from '../../components/owner/manu/MenuItemCard'
 import AddEditItemModal from '../../components/owner/manu/AddEditItemModal'
@@ -8,41 +8,50 @@ import AddCategory from '../../components/owner/manu/AddCategory'
 
 
 const OwnerMenu = () => {
-    const dispatch = useDispatch();
+
     const category = useSelector(state => state.foodObject.category)
-    
-    const [categories] = useState([
-        { _id: "1", name: "Starters" },
-        { _id: "2", name: "Main Course" },
-        { _id: "3", name: "Drinks" },
-    ]);
+    const items = useSelector(state => state.foodObject.foods)
+    console.log(items)
 
-
-    const [activeCategory, setActiveCategory] = useState(category[0]);
+    const [activeCategory, setActiveCategory] = useState({
+        _id: 1,
+        c_name: 'All',
+        c_img: 'https://images.pexels.com/photos/958545/pexels-photo-958545.jpeg?auto=compress&cs=tinysrgb&w=600'
+    });
     const [showModal, setShowModal] = useState(false);
-    const [showAddCategory ,setShowAddCategory ] = useState(false)
+    const [showAddCategory, setShowAddCategory] = useState(false)
+    const[ editCategory ,setEditCategory] = useState()
+    const[ deleteCategory ,setDeleteCategory] = useState()
 
 
-    const [items, setItems] = useState([
-        {
-            _id: "101",
-            name: "Paneer Tikka",
-            foodImg: "https://images.unsplash.com/photo-1604908177522-402d0b7e0f6d",
-            description: "Smoky grilled paneer with Indian spices",
-            price: 220,
-            category: "1",
-            isAvailable: true,
-        },
-    ]);
-
-   
 
 
-    
+    useEffect(() => {
+        setfilteredItems(items.filter(
+            (item) => {
+                if (activeCategory.c_name == 'All') {
+                    return true;
+                } else {
+                    return item.category === activeCategory.c_name
+                }
+            }
+        ))
+    }, [activeCategory])
 
-    const filteredItems = items.filter(
-        (item) => item.category === activeCategory._id
-    );
+
+
+
+
+    const [filteredItems, setfilteredItems] = useState(items.filter(
+        (item) => {
+            if (activeCategory.c_name == 'All') {
+                return true;
+            } else {
+                return item.category === activeCategory.c_name
+            }
+        }
+    ))
+    console.log(filteredItems)
 
 
     return (
@@ -67,7 +76,9 @@ const OwnerMenu = () => {
                             key={cat.c_name}
                             category={cat}
                             active={activeCategory === cat.c_name}
-                            onClick={() => setActiveCategory(cat.c_name)}
+                            onClick={() => setActiveCategory(cat)}
+                            onEdit={(cat) => setEditCategory(cat)}
+                            onDelete={(id) => setDeleteCategory(id)}
                         />
                     ))}
                 </div>
@@ -102,6 +113,7 @@ const OwnerMenu = () => {
                         onDelete={() =>
                             setItems((prev) => prev.filter((i) => i._id !== item._id))
                         }
+                        onEdit={() =>{console.log('add')}}
                     />
                 ))}
             </div>
@@ -112,13 +124,13 @@ const OwnerMenu = () => {
                     categories={category}
                     activeCategory={activeCategory}
                     onClose={() => setShowModal(false)}
-                    
+
                 />
             )}
 
             {showAddCategory && (
                 <AddCategory
-                    
+
                     onClose={() => setShowAddCategory(false)}
                 />
             )}
