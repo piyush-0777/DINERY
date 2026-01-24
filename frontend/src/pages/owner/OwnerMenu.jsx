@@ -5,12 +5,13 @@ import AddEditItemModal from '../../components/owner/manu/AddEditItemModal'
 import { useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { addFoodThunk } from '../../redux/thunks/manuThunk'
+import AddCategory from '../../components/owner/manu/AddCategory'
 
 
 const OwnerMenu = () => {
     const dispatch = useDispatch();
     const foodStatus = useSelector(state => state.addfoodstatus);
-    const category = useSelector(state =>state.foodObject.category)
+    const category = useSelector(state => state.foodObject.category)
     console.log(foodStatus)
     const [categories] = useState([
         { _id: "1", name: "Starters" },
@@ -21,6 +22,7 @@ const OwnerMenu = () => {
 
     const [activeCategory, setActiveCategory] = useState(categories[0]);
     const [showModal, setShowModal] = useState(false);
+    const [showAddCategory ,setShowAddCategory ] = useState(false)
 
 
     const [items, setItems] = useState([
@@ -44,6 +46,9 @@ const OwnerMenu = () => {
         setShowModal(false);
     }
 
+
+    
+
     const filteredItems = items.filter(
         (item) => item.category === activeCategory._id
     );
@@ -63,29 +68,29 @@ const OwnerMenu = () => {
 
 
             <div className="flex items-center gap-4 mb-6">
-  
-  {/* Categories */}
-  <div className="flex gap-4 overflow-x-auto pr-2">
-    {category.map((cat) => (
-      <CategoryTabs
-        key={cat.c_name}
-        category={cat}
-        active={activeCategory === cat.c_name}
-        onClick={() => setActiveCategory(cat.c_name)}
-      />
-    ))}
-  </div>
 
-  {/* Add Category Button */}
-  <button
-    onClick={() => setShowAddCategory(true)}
-    className="min-w-[120px] h-28 rounded-2xl border border-dashed border-neutral-700 flex flex-col items-center justify-center text-gray-400 hover:text-yellow-400 hover:border-yellow-400 transition"
-  >
-    <span className="text-2xl">+</span>
-    <span className="text-xs mt-1">Add Category</span>
-  </button>
+                {/* Categories */}
+                <div className="flex gap-4 overflow-x-auto pr-2">
+                    {category.map((cat) => (
+                        <CategoryTabs
+                            key={cat.c_name}
+                            category={cat}
+                            active={activeCategory === cat.c_name}
+                            onClick={() => setActiveCategory(cat.c_name)}
+                        />
+                    ))}
+                </div>
 
-</div>
+                {/* Add Category Button */}
+                <button
+                    onClick={() => setShowAddCategory(true)}
+                    className="min-w-[120px] h-28 rounded-2xl border border-dashed border-neutral-700 flex flex-col items-center justify-center text-gray-400 hover:text-yellow-400 hover:border-yellow-400 transition"
+                >
+                    <span className="text-2xl">+</span>
+                    <span className="text-xs mt-1">Add Category</span>
+                </button>
+
+            </div>
 
 
 
@@ -117,6 +122,13 @@ const OwnerMenu = () => {
                     activeCategory={activeCategory}
                     onClose={() => setShowModal(false)}
                     onSave={addManuItem}
+                />
+            )}
+
+            {showAddCategory && (
+                <AddCategory
+                    
+                    onClose={() => setShowAddCategory(false)}
                 />
             )}
         </div>

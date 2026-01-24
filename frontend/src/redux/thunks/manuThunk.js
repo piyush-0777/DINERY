@@ -11,4 +11,17 @@ export const addFoodThunk =createAsyncThunk('addFoodThunk' ,async (data , thunkA
         console.log(error)
         return thunkAPI.rejectWithValue({status:error.status || 500 , message:error.data?.error || error.message});
     }
+});
+
+
+export const addCategoryThunk = createAsyncThunk('addCategoryThunk' ,
+     async (data, thunkAPI)=>{
+    try{
+        const res = await menuService.addCategory(data);
+       
+        return res;
+    } catch (error) {
+         console.log(error)
+        return thunkAPI.rejectWithValue({status:error.status || 500 , message:error.data?.error || error.message});
+    }
 })

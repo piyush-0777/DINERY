@@ -29,6 +29,7 @@ app.use(express.urlencoded({extended:true}))
 
 
  app.use("/api/restaurant" , require('./routes/restaurantRoutes'))
+ app.use("/api/category" , require('./routes/categoryRoutes'))
 // app.use("/api/tables" , require('./routes/tableRoutes'))
 app.use("/api/customer" , require('./routes/customerRoutes'))
  app.use("/api/food" , require('./routes/foodRoutes'))
