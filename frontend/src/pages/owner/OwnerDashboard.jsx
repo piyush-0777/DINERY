@@ -1,9 +1,17 @@
-import React from 'react'
+import React , {useState , useEffect} from 'react'
 import { StatCard } from "../../components/owner/StatCard";
 import { StatusCard } from "../../components/owner/StatusCard";
 import { OrdersTrend } from "../../components/owner/OrdersTrend";
+import Loader from '../../components/ui/Loader';
+
 
 const OwnerDashboard = () => {
+
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    setTimeout(() => setLoading(false), 30000); // simulate loading
+  }, []);
 
   const recentOrders = [
     { id: '#1021', table: 'Table 4', amount: '₹420', status: 'Preparing' },
@@ -18,7 +26,7 @@ const OwnerDashboard = () => {
     <div className="p-6 bg-black min-h-screen overflow-y-auto scrollbar-hide ">
       {/* <h1 className="text-3xl font-bold text-white mb-6">Dashboard</h1> */}
 
-
+    {loading && <Loader />}
       {/* Top Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCard title="Total Orders (Today)" value="128" icon="🧾" />
