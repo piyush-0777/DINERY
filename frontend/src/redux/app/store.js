@@ -5,6 +5,7 @@ import restauranreducer from '../features/owner/restaurantSlice'
 import authreducer from '../features/owner/authSlice'
 import addfoodreducer from '../features/food/addFoodSlice'
 import addcategoryreducer from '../features/food/addCategorySlice'
+import loarddashbordreducer from '../features/owner/loadDashbordSlice'
 
 export const store = configureStore({
     reducer: {
@@ -14,5 +15,6 @@ export const store = configureStore({
         auth: authreducer,
         addfoodstatus:addfoodreducer,
         addcategory:addcategoryreducer,
+        loardDashbordState:loarddashbordreducer,
     }
 });

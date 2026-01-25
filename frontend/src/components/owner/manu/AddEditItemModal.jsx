@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useSelector, useDispatch } from 'react-redux'
 import { addFoodThunk } from '../../../redux/thunks/manuThunk'
+import {resetAddFoodState} from '../../../redux/features/food/addFoodSlice'
 import { toast } from "react-toastify";
 
 const AddEditItemModal = ({ categories, activeCategory, onClose }) => {
@@ -10,10 +11,13 @@ const AddEditItemModal = ({ categories, activeCategory, onClose }) => {
     useEffect(() => {
         if (error) {
             toast.error(error.message || "Something went wrong");
+            dispatch(resetAddFoodState())
+            onClose();
         }
 
         if (success) {
             toast.success("Food item saved successfully");
+            dispatch(resetAddFoodState())
             onClose();
         }
     }, [error, success]);
@@ -94,7 +98,7 @@ const AddEditItemModal = ({ categories, activeCategory, onClose }) => {
                     >
                         {categories.map((cat) => (
                             <option key={cat._id} value={cat._id}>
-                                {cat.c_name}
+                                {cat.name}
                             </option>
                         ))}
                     </select>

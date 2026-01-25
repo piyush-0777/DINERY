@@ -13,8 +13,8 @@ const CategoryTabs = ({ category, active, onClick , onEdit, onDelete  }) => (
 
     {/* Image */}
     <img
-      src={category.c_img}
-      alt={category.c_name}
+      src={category.image}
+      alt={category.name}
       onError={(e) => (e.currentTarget.style.display = "none")}
       className="relative z-10 w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
     />
@@ -52,7 +52,7 @@ const CategoryTabs = ({ category, active, onClick , onEdit, onDelete  }) => (
 
     {/* Category name */}
     <p className="absolute bottom-2 left-1/2 z-30 -translate-x-1/2 text-sm font-semibold text-white">
-      {category.c_name}
+      {category.name}
     </p>
   </div>
 );

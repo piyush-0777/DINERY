@@ -8,8 +8,9 @@ export const ownerService = {
     request("/owner/profile", "PUT", data),
 
   getRestaurantDashboard: () =>
-    request("/owner/dashboard", "GET"),
+    request("/restaurant/dashboard", "GET"),
 
   uploadRestaurantImage: (formData) =>
     request("/owner/upload", "POST", formData, true),
+  
 };

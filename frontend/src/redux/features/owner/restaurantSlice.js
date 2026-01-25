@@ -1,11 +1,11 @@
-import { createSlice , createAsyncThunk } from "@reduxjs/toolkit";
-import {registerRestaurnatThunk} from "../../thunks/authThunk"
+import { createSlice  } from "@reduxjs/toolkit";
+
+import {loadDashbordThunk} from '../../thunks/loardDashbordThunk'
 
 
 const initialState = {
     restaurant: null,
-    loading: false,
-    error: null,
+   
 }
 
 export const restaurantSlice = createSlice({
@@ -14,9 +14,16 @@ export const restaurantSlice = createSlice({
     reducers: {
         logout: (state , action) =>{
             state.restaurant = null;
-            state.token = null;
         }
     },
+     extraReducers:(builder) => {
+            builder
+              
+              .addCase(loadDashbordThunk.fulfilled, (state , action) => {
+               state.restaurant = action.payload.restaurant
+              })
+             
+          },
     
 })
 

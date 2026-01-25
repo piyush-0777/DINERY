@@ -14,10 +14,10 @@ const OwnerMenu = () => {
     console.log(items)
 
     const [activeCategory, setActiveCategory] = useState({
-        _id: 1,
-        c_name: 'All',
-        c_img: 'https://images.pexels.com/photos/958545/pexels-photo-958545.jpeg?auto=compress&cs=tinysrgb&w=600'
-    });
+        _id: '6974a0be080c5f5094ccb05d', 
+        restaurant: '697230667057c928400d4d4b', 
+        name: 'All', 
+        image: 'https://res.cloudinary.com/dylqjvfkf/image/upload/v1769251004/dinery/uec2qdyghzcfpsq4m5vv.jpg', __v: 0});
     const [showModal, setShowModal] = useState(false);
     const [showAddCategory, setShowAddCategory] = useState(false)
     const[ editCategory ,setEditCategory] = useState()
@@ -29,10 +29,10 @@ const OwnerMenu = () => {
     useEffect(() => {
         setfilteredItems(items.filter(
             (item) => {
-                if (activeCategory.c_name == 'All') {
+                if (activeCategory.name == 'All') {
                     return true;
                 } else {
-                    return item.category === activeCategory.c_name
+                    return true
                 }
             }
         ))
@@ -73,9 +73,9 @@ const OwnerMenu = () => {
                 <div className="flex gap-4 overflow-x-auto pr-2">
                     {category.map((cat) => (
                         <CategoryTabs
-                            key={cat.c_name}
+                            key={cat.name}
                             category={cat}
-                            active={activeCategory === cat.c_name}
+                            active={activeCategory === cat.name}
                             onClick={() => setActiveCategory(cat)}
                             onEdit={(cat) => setEditCategory(cat)}
                             onDelete={(id) => setDeleteCategory(id)}

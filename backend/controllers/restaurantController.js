@@ -2,6 +2,8 @@ const jwt = require('jsonwebtoken')
 const Restaurant = require('../models/restaurant-model')
 const bcrypt = require('bcrypt')
 const { hashPasswordGenerater, hashPasswordChecker } = require('../utils/hashPassword')
+const foodsModel = require('../models/food-model')
+const categoryModel = require('../models/categories-model')
 
 
 
@@ -125,3 +127,19 @@ exports.registerRestaurant = async (req, res) => {
     });
   }
 };
+
+exports.getDashBord = async (req , res) => {
+  try {
+    const restaurant = req.restaurant;
+    if(!restaurant) {
+      return res.status(404).json({error: "restaurant is not found"})
+    }
+    const foods = await foodsModel.find({restaurant:restaurant._id})
+    const category = await categoryModel.find({restaurant:restaurant._id})
+    res.status(200).json({ restaurant,foods , category});
+
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({error: "server error" })
+  }
+}
