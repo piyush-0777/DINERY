@@ -3,7 +3,7 @@ import customerReducer from "../features/customer/customerSlice";
 import foodreducer from '../features/food/foodSlice'
 import restauranreducer from '../features/owner/restaurantSlice'
 import authreducer from '../features/owner/authSlice'
-import addfoodreducer from '../features/food/addFoodSlice'
+import loadfoodreducer from '../features/food/loadFoodSlice'
 import addcategoryreducer from '../features/food/addCategorySlice'
 import loarddashbordreducer from '../features/owner/loadDashbordSlice'
 
@@ -13,7 +13,7 @@ export const store = configureStore({
         foodObject: foodreducer,
         restaurant: restauranreducer,
         auth: authreducer,
-        addfoodstatus:addfoodreducer,
+        loadfoodstatus:loadfoodreducer,
         addcategory:addcategoryreducer,
         loardDashbordState:loarddashbordreducer,
     }

@@ -1,6 +1,19 @@
 import { Pencil, Trash2 } from "lucide-react";
+import { useState } from "react";
+import { useSelector , useDispatch } from "react-redux";
+import { deletFoodThunk } from "../../../redux/thunks/manuThunk";
 
-const MenuItemCard = ({ item, onToggleAvailability, onDelete, onEdit }) => (
+const MenuItemCard = ({ item, onToggleAvailability,  onEdit}) =>{
+const dispatch = useDispatch()
+ const { reqtype, loading, success, error, } = useSelector(state => state.loadfoodstatus);
+ console.log( 'delet' , { reqtype, loading, success, error, })
+  const onDelete = () => {
+    const isdelet =confirm('you wont to delet item')
+    if(isdelet) dispatch(deletFoodThunk(item._id))
+      
+  }
+
+return (
   <div
     className="group relative bg-neutral-950 border border-neutral-800 rounded-2xl p-4 max-w-3xl w-full
       flex transition-all duration-300 hover:border-yellow-400/40
@@ -66,5 +79,6 @@ const MenuItemCard = ({ item, onToggleAvailability, onDelete, onEdit }) => (
     </div>
   </div>
 );
+}
 
 export default MenuItemCard;

@@ -11,7 +11,7 @@ const OwnerMenu = () => {
 
     const category = useSelector(state => state.foodObject.category)
     const items = useSelector(state => state.foodObject.foods)
-    console.log(items)
+ 
 
     const [activeCategory, setActiveCategory] = useState({
         _id: '6974a0be080c5f5094ccb05d', 
@@ -36,7 +36,7 @@ const OwnerMenu = () => {
                 }
             }
         ))
-    }, [activeCategory])
+    }, [activeCategory, items])
 
 
 
@@ -44,10 +44,10 @@ const OwnerMenu = () => {
 
     const [filteredItems, setfilteredItems] = useState(items.filter(
         (item) => {
-            if (activeCategory.c_name == 'All') {
+            if (activeCategory.name == 'All') {
                 return true;
             } else {
-                return item.category === activeCategory.c_name
+                return item.category === activeCategory.name
             }
         }
     ))
@@ -110,9 +110,7 @@ const OwnerMenu = () => {
                                 )
                             )
                         }
-                        onDelete={() =>
-                            setItems((prev) => prev.filter((i) => i._id !== item._id))
-                        }
+                        
                         onEdit={() =>{console.log('add')}}
                     />
                 ))}

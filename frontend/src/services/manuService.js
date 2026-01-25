@@ -11,7 +11,7 @@ export const menuService = {
     request(`/menu/${menuId}`, "PUT", data),
 
   deleteMenuItem: (menuId) =>
-    request(`/menu/${menuId}`, "DELETE"),
+    request(`/food/deletfood/${menuId}`, "DELETE"),
 
   addCategory: (data) =>
     request('/category/addcategory' , 'POST' , data , true),   // return thsi

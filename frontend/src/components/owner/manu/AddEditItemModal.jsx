@@ -1,24 +1,26 @@
 import { useState, useEffect } from "react";
 import { useSelector, useDispatch } from 'react-redux'
 import { addFoodThunk } from '../../../redux/thunks/manuThunk'
-import {resetAddFoodState} from '../../../redux/features/food/addFoodSlice'
+import { resetAddFoodState } from '../../../redux/features/food/loadFoodSlice'
 import { toast } from "react-toastify";
 
 const AddEditItemModal = ({ categories, activeCategory, onClose }) => {
     const dispatch = useDispatch();
-    const { loading, success, error, } = useSelector(state => state.addfoodstatus);
+    const { reqtype, loading, success, error, } = useSelector(state => state.loadfoodstatus);
 
     useEffect(() => {
-        if (error) {
-            toast.error(error.message || "Something went wrong");
-            dispatch(resetAddFoodState())
-            onClose();
-        }
+        if (reqtype == 'addfood') {
+            if (error) {
+                toast.error(error.message || "Something went wrong");
+                dispatch(resetAddFoodState())
+                onClose();
+            }
 
-        if (success) {
-            toast.success("Food item saved successfully");
-            dispatch(resetAddFoodState())
-            onClose();
+            if (success) {
+                toast.success("Food item saved successfully");
+                dispatch(resetAddFoodState())
+                onClose();
+            }
         }
     }, [error, success]);
 

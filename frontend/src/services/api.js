@@ -9,6 +9,7 @@ const request = async (endpoint, method = "GET", body = null, isFormData = false
   if (!isFormData) {
     headers["Content-Type"] = "application/json";
   }
+  console.log(`${BASE_URL}${endpoint}`);
 
   const response = await fetch(`${BASE_URL}${endpoint}`, {
     method,
