@@ -16,6 +16,15 @@ export const addFoodThunk =createAsyncThunk('addFoodThunk' ,async (data , thunkA
 export const deletFoodThunk = createAsyncThunk('deletFoodThunk', async (data , thunkAPI)=>{
     try {
 const res = await menuService.deleteMenuItem(data);
+    return data;
+    } catch (error){
+         return thunkAPI.rejectWithValue({status:error.status || 500 , message:error.data?.error || error.message});
+    }
+})
+
+export const updateFoodThunk = createAsyncThunk('updateFoodThunk', async (data , thunkAPI)=>{
+    try {
+const res = await menuService.updateMenuItem(data._id , data);
     return res;
     } catch (error){
          return thunkAPI.rejectWithValue({status:error.status || 500 , message:error.data?.error || error.message});

@@ -8,7 +8,7 @@ export const menuService = {
     request("/food/create", "POST", data, true),   // true for form data 
 
   updateMenuItem: (menuId, data) =>
-    request(`/menu/${menuId}`, "PUT", data),
+    request(`/food/updatefood/${menuId}`, "PUT", data),
 
   deleteMenuItem: (menuId) =>
     request(`/food/deletfood/${menuId}`, "DELETE"),

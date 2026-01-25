@@ -1,10 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import {loadDashbordThunk} from '../../thunks/loardDashbordThunk'
-import {addFoodThunk} from '../../thunks/manuThunk'
+import {addFoodThunk , deletFoodThunk} from '../../thunks/manuThunk'
 
-const fetchFoods = async () =>{
-  
-}
 
 
 const initialState = {
@@ -27,6 +24,9 @@ export const foodSlice = createSlice({
           })
           .addCase(addFoodThunk.fulfilled, (state , action) => {
             state.foods.push(action.payload.food)
+          })
+          .addCase(deletFoodThunk.fulfilled, (state , action) => {
+            state.foods.filter(item=> item._id !== action.payload);
           })
          
       },

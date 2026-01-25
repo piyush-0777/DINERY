@@ -19,6 +19,7 @@ try {
     
     await session.commitTransaction();
     session.endSession();
+    return true;
 
 } catch (error) {
     await session.abortTransaction();
