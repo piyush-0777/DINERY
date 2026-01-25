@@ -26,7 +26,6 @@ const OwnerDashboard = () => {
     <div className="p-6 bg-black min-h-screen overflow-y-auto scrollbar-hide ">
       {/* <h1 className="text-3xl font-bold text-white mb-6">Dashboard</h1> */}
 
-    {loading && <Loader />}
       {/* Top Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCard title="Total Orders (Today)" value="128" icon="🧾" />
