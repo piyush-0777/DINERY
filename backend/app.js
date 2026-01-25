@@ -44,5 +44,5 @@ app.use("/api/customer" , require('./routes/customerRoutes'))
 
 
 server.listen(process.env.EXPRESS_PORT , () =>{
-    console.log(`server + socket.io app is runing on port ${process.env.EXPRESS_PORT} `);
+    console.log(`server + socket.io app is runing on port ${process.env.EXPRESS_PORT}`);
 })

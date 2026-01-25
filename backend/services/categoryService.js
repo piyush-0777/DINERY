@@ -3,14 +3,14 @@ const foodModel = require('../models/food-model')
 const restaurantModel = require('../models/restaurant-model')
 const deleteImage = require('../utils/deletImg')
 
-const deletFood = async (food_id , res_id)=>{
+const deletCategory = async (category_id , res_id)=>{
 const session = await mongoose.startSession()
 try {
     session.startTransaction()
 
-    const food = await foodModel.findByIdAndDelete(food_id , {session});
+    const category = await foodModel.findByIdAndDelete(category_id , {session});
 
-    if(!food) {
+    if(!category) {
         throw new Error("food not found");
     }
 
@@ -31,4 +31,4 @@ try {
 }
 }
 
-module.exports = {deletFood}
+module.exports = {deletCategory}
