@@ -3,32 +3,37 @@ const foodModel = require('../models/food-model')
 const restaurantModel = require('../models/restaurant-model')
 const deleteImage = require('../utils/deletImg')
 
-const deletFood = async (food_id , res_id)=>{
-const session = await mongoose.startSession()
-try {
-    session.startTransaction()
+const deletFood = async (food_id, res_id) => {
+    const session = await mongoose.startSession()
+    try {
+        session.startTransaction()
 
-    const food = await foodModel.findByIdAndDelete(food_id , {session});
+        const food = await foodModel.findByIdAndDelete(food_id, { session });
 
-    if(!food) {
-        throw new Error("food not found");
+        if (!food) {
+            throw new Error("food not found");
+        }
+
+    //    const resf =  await restaurantModel.updateOne({ _id: res_id },
+    //         { $pull: { foods: food_id } }, { session }
+    //     )
+    // console.log('piyu',resf)
+    console.log(food)
+        const result = await deleteImage(food.publicId);
+        console.log(result)
+        if (result == 'ok') {
+            await session.commitTransaction();
+            session.endSession()
+            return true;
+        } else {
+            throw new Error('image delection error');
+        }
+
+    } catch (error) {
+        await session.abortTransaction();
+        session.endSession()
+        throw new Error (error)
     }
-
-    await restaurantModel.updateOne({_id:res_id} ,
-         {  $pull : {  foods: food_id  }} , {session} 
-    )
-    
-    await session.commitTransaction();
-    session.endSession();
-    const result = await deleteImage(food.foodImg)
-    console.log(result)
-    return true;
-
-} catch (error) {
-    await session.abortTransaction();
-    session.endSession()
-    throw error
-}
 }
 
-module.exports = {deletFood}
+module.exports = { deletFood }

@@ -1,34 +1,35 @@
 const mongoose = require('../config/mongoDB-connection')
 const foodModel = require('../models/food-model')
-const restaurantModel = require('../models/restaurant-model')
 const deleteImage = require('../utils/deletImg')
+const foodService = require('./foodService')
+const categoryModel = require('../models/categories-model')
 
-const deletCategory = async (category_id , res_id)=>{
-const session = await mongoose.startSession()
-try {
-    session.startTransaction()
+const deletCategory = async (category_id, res_id) => {
+    const session = await mongoose.startSession()
+    try {
+        session.startTransaction()
+        const dFoods = await foodModel.find({ category: category_id }, { session })
+        console.log(dFoods);
+        dFoods.map(async (food) => {
+            await foodService.deletFood(food._id, res_id)
+        })
 
-    const category = await foodModel.findByIdAndDelete(category_id , {session});
+        const dCategory = await categoryModel.findByIdAndDelete(category_id, { session });
 
-    if(!category) {
-        throw new Error("food not found");
+        const result = await deleteImage(dCategory.publicId)
+        if (result == 'ok') {
+            await session.commitTransaction()
+            await session.endSession()
+            return true
+        } else {
+            throw new Error('ime delection error');
+        }
+
+    } catch (error) {
+        await session.abortTransaction();
+        await session.endSession()
+        throw error
     }
-
-    await restaurantModel.updateOne({_id:res_id} ,
-         {  $pull : {  foods: food_id  }} , {session} 
-    )
-    
-    await session.commitTransaction();
-    session.endSession();
-    const result = await deleteImage(food.foodImg)
-    console.log(result)
-    return true;
-
-} catch (error) {
-    await session.abortTransaction();
-    session.endSession()
-    throw error
-}
 }
 
-module.exports = {deletCategory}
+module.exports = { deletCategory }

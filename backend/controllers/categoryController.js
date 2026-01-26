@@ -1,4 +1,5 @@
 const categories = require('../models/categories-model')
+const categoryService = require('../services/categoryService')
 
 
 exports.addCategory = async (req, res) => {
@@ -12,7 +13,8 @@ exports.addCategory = async (req, res) => {
         const category = await categories.create({
             restaurant: resid,
             name: name,
-            image: image
+            image: image,
+            publicId:req.file.filename ,
         });
         console.log('this is' , category);
         return res.status(200).json({message:'category added' , category});
@@ -22,4 +24,22 @@ exports.addCategory = async (req, res) => {
         res.status(500).json({error: 'server error'});
     }
 
+}
+
+exports.deletCategory = async (req , res) => {
+    try{
+    const category_id = req.params.categoryId;
+    const res = req.restaurant;
+    if(!res || category_id) {
+        return res.status(404).json({error: 'res or cat id is not found'})
+    }
+
+    const result = await categoryService.deletCategory(category_id , res._id)
+    if(result) {
+        return res.status(200).json({message:'category deleted.'})
+    }
+} catch (error) {
+    console.log(error);
+    return res.status(500).json({error:'internal server error'})
+}
 }
