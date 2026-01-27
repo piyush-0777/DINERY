@@ -46,7 +46,7 @@ export const addCategoryThunk = createAsyncThunk('addCategoryThunk' ,
 
 export const deletCategoryThunk = createAsyncThunk('deletCategoryThunk', async (data , thunkAPI)=>{
     try {
-const res = await menuService.deleteMenuItem(data);
+const res = await menuService.deleteCategory(data);
     return data;
     } catch (error){
          return thunkAPI.rejectWithValue({status:error.status || 500 , message:error.data?.error || error.message});

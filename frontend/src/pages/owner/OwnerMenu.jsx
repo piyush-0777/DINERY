@@ -1,96 +1,83 @@
-import React, { useEffect } from 'react'
-import CategoryTabs from '../../components/owner/manu/CategoryTabs'
-import MenuItemCard from '../../components/owner/manu/MenuItemCard'
-import AddEditItemModal from '../../components/owner/manu/AddEditItemModal'
-import { useState } from 'react'
-import { useSelector, useDispatch } from 'react-redux'
-import AddCategory from '../../components/owner/manu/AddCategory'
-import {resetAddFoodState} from '../../redux/features/food/loadFoodSlice'
-import { deletFoodThunk , deletCategoryThunk } from "../../redux/thunks/manuThunk";
-import {toast} from 'react-toastify'
+import React, { useEffect, useMemo, useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { toast } from "react-toastify";
 
+import CategoryTabs from "../../components/owner/manu/CategoryTabs";
+import MenuItemCard from "../../components/owner/manu/MenuItemCard";
+import AddEditItemModal from "../../components/owner/manu/AddEditItemModal";
+import AddCategory from "../../components/owner/manu/AddCategory";
+
+import { resetAddFoodState } from "../../redux/features/food/loadFoodSlice";
+import { resetAddCategoryState } from "../../redux/features/food/addCategorySlice";
+import { deletFoodThunk, deletCategoryThunk } from "../../redux/thunks/manuThunk";
 
 const OwnerMenu = () => {
-    const dispatch = useDispatch()
-    const category = useSelector(state => state.foodObject.category)
-    const items = useSelector(state => state.foodObject.foods)
-     const loadfoodstatus = useSelector(state => state.loadfoodstatus);
- //{ reqtype, loading, success, error, }
+    const dispatch = useDispatch();
 
-    const [activeCategory, setActiveCategory] = useState({
-        _id: '6974a0be080c5f5094ccb05d', 
-        restaurant: '697230667057c928400d4d4b', 
-        name: 'All', 
-        image: 'https://res.cloudinary.com/dylqjvfkf/image/upload/v1769251004/dinery/uec2qdyghzcfpsq4m5vv.jpg', __v: 0});
+    const categories = useSelector(state => state.foodObject.category);
+    const items = useSelector(state => state.foodObject.foods);
+
+    const foodStatus = useSelector(state => state.loadfoodstatus);
+    const categoryStatus = useSelector(state => state.addcategory);
+
+    const [activeCategory, setActiveCategory] = useState(null);
     const [showModal, setShowModal] = useState(false);
-    const [showAddCategory, setShowAddCategory] = useState(false)
-    const[ ItemId ,setItemId] = useState()
-    const[ categoryId ,setCategoryId] = useState()
+    const [showAddCategory, setShowAddCategory] = useState(false);
+    const [deletingItemId, setDeletingItemId] = useState(null);
+    const [deletingCategoryId, setDeletingCategoryId] = useState(null);
 
-
-
-
-     useEffect(() => {
-    if (loadfoodstatus.success == true && loadfoodstatus.reqtype == "deletfood") {
-      toast.success("Item deleted successfully");
-      dispatch(resetAddFoodState());
-    }
-    if (loadfoodstatus.success == true && loadfoodstatus.reqtype == "editfood") {
-      toast.success("Item deleted successfully");
-      dispatch(resetAddFoodState());
-    }
-  }, [loadfoodstatus.success]);
-
+    // 🔹 set default category
     useEffect(() => {
-        setfilteredItems(items.filter(
-            (item) => {
-                if (activeCategory.name == 'All') {
-                    return true;
-                } else {
-                    return true
-                }
-            }
-        ))
-    }, [activeCategory, items])
-
-
-
-
-
-    const [filteredItems, setfilteredItems] = useState(items.filter(
-        (item) => {
-            if (activeCategory.name == 'All') {
-                return true;
-            } else {
-                return item.category === activeCategory.name
-            }
+        if (categories?.length && !activeCategory) {
+            setActiveCategory(categories[0]);
         }
-    ))
-    console.log(filteredItems)
+    }, [categories]);
 
+    // 🔹 derived items (NO STATE)
+    const filteredItems = useMemo(() => {
+        if (!activeCategory || activeCategory.name === "All") return items;
+        return items.filter(item => item.category === activeCategory._id);
+    }, [items, activeCategory]);
 
+    // 🔹 food delete/edit feedback
+    useEffect(() => {
+        if (!foodStatus.success) return;
+
+        if (foodStatus.reqtype === "deletfood") {
+            toast.success("Food deleted successfully");
+        }
+
+        dispatch(resetAddFoodState());
+    }, [foodStatus.success, foodStatus.reqtype]);
+
+    // 🔹 category delete/edit feedback
+    useEffect(() => {
+        if (!categoryStatus.success) return;
+
+        if (categoryStatus.reqtype === "delete") {
+            toast.success("Category deleted successfully");
+        }
+
+        dispatch(resetAddCategoryState());
+    }, [categoryStatus.success, categoryStatus.reqtype]);
 
     const onDeleteItem = async (id) => {
-    const isdelet = confirm('you wont to delet item')
-            setItemId(id);
-            if (isdelet) await dispatch(deletFoodThunk(id))
-        
-     
+        if (!window.confirm("Do you want to delete this item?")) return;
+        setDeletingItemId(id);
+        dispatch(deletFoodThunk(id));
+    };
 
-  }
-  const onDeleteCategory = async (id) => {
-        const isdelet = confirm('you wont to delet category its outo matic delet all food ')
-            setCategoryId(id);
-            if (isdelet) await dispatch(deletCategoryThunk(id))
-  }
+     const onEditItem = async (id) => {
 
-   const onEditItem = async (id) => {
-    console.log('edititem')
-        
-     
+    }
 
-  }
+    const onDeleteCategory = async (id) => {
+        if (!window.confirm("Deleting category will delete all foods. Continue?")) return;
+        setDeletingCategoryId(id);
+        dispatch(deletCategoryThunk(id));
+    };
 
+   
 
     return (
         <div className="min-h-screen bg-black p-6">
@@ -98,83 +85,62 @@ const OwnerMenu = () => {
                 <h1 className="text-2xl font-semibold text-white">Menu</h1>
                 <button
                     onClick={() => setShowModal(true)}
-                    className="bg-gradient-to-r from-yellow-400 to-yellow-500 text-black px-5 py-2 rounded-xl font-medium hover:opacity-90"
+                    className="bg-gradient-to-r from-yellow-400 to-yellow-500 text-black px-5 py-2 rounded-xl font-medium"
                 >
                     + Add Food
                 </button>
             </div>
 
+            <div className="flex gap-4 mb-6 overflow-x-auto">
+                {categories.map(cat => (
+                    <CategoryTabs
+                        key={cat._id}
+                        category={cat}
+                        active={activeCategory?._id === cat._id}
+                        onClick={() => setActiveCategory(cat)}
+                        onDelete={onDeleteCategory}
+                        deletingId={deletingCategoryId}
+                    />
+                ))}
 
-            <div className="flex items-center gap-4 mb-6">
-
-                {/* Categories */}
-                <div className="flex gap-4 overflow-x-auto pr-2">
-                    {category.map((cat) => (
-                        <CategoryTabs
-                            key={cat.name}
-                            category={cat}
-                            active={activeCategory === cat.name}
-                            onClick={() => setActiveCategory(cat)}
-                            onEdit={(cat) => console.log(cat)}
-                            onDelete={onDeleteCategory}
-                            categoryId={categoryId}
-                        />
-                    ))}
-                </div>
-
-                {/* Add Category Button */}
                 <button
                     onClick={() => setShowAddCategory(true)}
-                    className="min-w-[120px] h-28 rounded-2xl border border-dashed border-neutral-700 flex flex-col items-center justify-center text-gray-400 hover:text-yellow-400 hover:border-yellow-400 transition"
+                    className="min-w-[120px] h-28 rounded-2xl border border-dashed border-neutral-700 flex flex-col items-center justify-center text-gray-400 hover:text-yellow-400"
                 >
                     <span className="text-2xl">+</span>
                     <span className="text-xs mt-1">Add Category</span>
                 </button>
-
             </div>
 
-
-
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                {filteredItems.map((item) => (
+                {filteredItems.map(item => (
                     <MenuItemCard
                         key={item._id}
                         item={item}
                         onToggleAvailability={() =>
-                            setItems((prev) =>
-                                prev.map((i) =>
-                                    i._id === item._id
-                                        ? { ...i, isAvailable: !i.isAvailable }
-                                        : i
-                                )
-                            )
+                           console.log('this this')
                         }
+                        onEdit={() => onEditItem(item)}
                         onDelete={onDeleteItem}
-                        ItemId={ItemId}
-                        
-                        onEdit={onEditItem}
+                        deletingId={deletingItemId}
                     />
+
                 ))}
             </div>
 
-
             {showModal && (
                 <AddEditItemModal
-                    categories={category}
+                    categories={categories}
                     activeCategory={activeCategory}
                     onClose={() => setShowModal(false)}
-
                 />
             )}
 
             {showAddCategory && (
-                <AddCategory
-
-                    onClose={() => setShowAddCategory(false)}
-                />
+                <AddCategory onClose={() => setShowAddCategory(false)} />
             )}
         </div>
-    )
-}
+    );
+};
 
-export default OwnerMenu
+export default OwnerMenu;

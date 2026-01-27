@@ -26,20 +26,26 @@ exports.addCategory = async (req, res) => {
 
 }
 
-exports.deletCategory = async (req , res) => {
-    try{
+exports.deletCategory = async (req, res) => {
+  try {
     const category_id = req.params.categoryId;
-    const res = req.restaurant;
-    if(!res || category_id) {
-        return res.status(404).json({error: 'res or cat id is not found'})
+    const restaurant = req.restaurant; // ✅ renamed
+
+    if (!restaurant || !category_id) {
+      return res.status(404).json({ error: 'res or cat id is not found' });
     }
 
-    const result = await categoryService.deletCategory(category_id , res._id)
-    if(result) {
-        return res.status(200).json({message:'category deleted.'})
+    const result = await categoryService.deletCategory(
+      category_id,
+      restaurant._id
+    );
+
+    if (result) {
+      return res.status(200).json({ message: 'category deleted.' });
     }
-} catch (error) {
+
+  } catch (error) {
     console.log(error);
-    return res.status(500).json({error:'internal server error'})
-}
-}
+    return res.status(500).json({ error: 'internal server error' });
+  }
+};

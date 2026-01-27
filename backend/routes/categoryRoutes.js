@@ -7,6 +7,6 @@ const router = express.Router()
 
 
 router.post('/addcategory', authenticateResturant,uploadSingle , addCategory)
-router.post('/deletcategory/:categoryId',authenticateResturant ,deletCategory )
+router.delete('/deletcategory/:categoryId',authenticateResturant ,deletCategory )
 
 module.exports = router;

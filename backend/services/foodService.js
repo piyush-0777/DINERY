@@ -1,41 +1,45 @@
-const mongoose = require('../config/mongoDB-connection')
-const foodModel = require('../models/food-model')
-const restaurantModel = require('../models/restaurant-model')
-const deleteImage = require('../utils/deletImg')
+const mongoose = require('../config/mongoDB-connection');
+const foodModel = require('../models/food-model');
+const restaurantModel = require('../models/restaurant-model');
+const deleteImage = require('../utils/deletImg');
 
-const deletFood = async (food_id, res_id) => {
-    const session = await mongoose.startSession()
-    try {
-        session.startTransaction()
+const deletFood = async (food_id, res_id, session = null) => {
+  let localSession = session;
 
-        const food = await foodModel.findByIdAndDelete(food_id, { session });
-
-        if (!food) {
-            throw new Error("food not found");
-        }
-
-    //    const resf =  await restaurantModel.updateOne({ _id: res_id },
-    //         { $pull: { foods: food_id } }, { session }
-    //     )
-    // console.log('piyu',resf)
-   
-        const result = await deleteImage(food.publicId);
-        console.log(result)
-        if (result == 'ok') {
-            await session.commitTransaction();
-            session.endSession()
-            console.log('okkkkkkk')
-            return true;
-        } else {
-            console.log('this is now now')
-            throw new Error('image delection error');
-        }
-
-    } catch (error) {
-        await session.abortTransaction();
-        session.endSession()
-        throw new Error (error)
+  try {
+    // start session only if not provided
+    if (!localSession) {
+      localSession = await mongoose.startSession();
+      localSession.startTransaction();
     }
-}
 
-module.exports = { deletFood }
+    const food = await foodModel.findByIdAndDelete(
+      food_id,
+      { session: localSession }
+    );
+
+    if (!food) {
+      throw new Error('Food not found');
+    }
+
+    // 🔹 DB changes done → commit first
+    if (!session) {
+      await localSession.commitTransaction();
+      localSession.endSession();
+    }
+
+    // 🔹 external service AFTER DB commit
+    await deleteImage(food.publicId);
+
+    return true;
+
+  } catch (error) {
+    if (!session && localSession) {
+      await localSession.abortTransaction();
+      localSession.endSession();
+    }
+    throw error;
+  }
+};
+
+module.exports = { deletFood };

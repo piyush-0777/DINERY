@@ -1,26 +1,32 @@
 import { Pencil, Trash2 } from "lucide-react";
-import { useState, useEffect } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
+import Spinner from "../../ui/Spiner";
 
-import Spinner from '../../ui/Spiner'
+const MenuItemCard = ({
+  item,
+  onToggleAvailability,
+  onEdit,
+  onDelete,
+  deletingId
+}) => {
 
+  const { loading, reqtype } = useSelector(state => state.loadfoodstatus);
 
-const MenuItemCard = ({ item, onToggleAvailability, onEdit , onDelete , ItemId ,  }) => {
-  
-  const { reqtype, loading, success, error, } = useSelector(state => state.loadfoodstatus);
- 
-  console.log('delet', { reqtype, loading, success, error, })
+  const isDeleting =
+    loading &&
+    reqtype === "deletfood" &&
+    deletingId === item._id;
 
-
- 
-
-  
+  const isEditing =
+    loading &&
+    reqtype === "editfood" &&
+    deletingId === item._id;
 
   return (
     <div
-      className="group relative bg-neutral-950 border border-neutral-800 rounded-2xl p-4 max-w-3xl w-full
-      flex transition-all duration-300 hover:border-yellow-400/40
-      hover:shadow-[0_0_30px_-10px_rgba(234,179,8,0.4)]"
+      className="group relative bg-neutral-950 border border-neutral-800 rounded-2xl p-4 w-full
+        flex transition-all duration-300 hover:border-yellow-400/40
+        hover:shadow-[0_0_30px_-10px_rgba(234,179,8,0.4)]"
     >
       {/* Image */}
       <div className="w-24 h-24 flex-shrink-0 relative">
@@ -34,53 +40,63 @@ const MenuItemCard = ({ item, onToggleAvailability, onEdit , onDelete , ItemId ,
 
       {/* Content */}
       <div className="flex-1 flex flex-col justify-between ml-4 relative">
-        {/* Top-left: Edit/Delete icons */}
-        <div className={`absolute top-0 right-0 flex gap-2 opacity-0 group-hover:opacity-100 transition-all duration-300 z-20
-          ${loading == true &&  ItemId == item._id  ?'opacity-100':''}
-        `}>
+        {/* Actions */}
+        <div
+          className={`absolute top-0 right-0 flex gap-2 z-20
+            opacity-0 group-hover:opacity-100 transition
+            ${isDeleting || isEditing ? "opacity-100" : ""}
+          `}
+        >
+          {/* Edit */}
           <button
             onClick={(e) => {
               e.stopPropagation();
               onEdit(item);
             }}
-            className={`p-2 rounded-full backdrop-blur-md border transition
-              ${loading == true && reqtype == "editfood" && ItemId == item._id
-                ? "bg-black/40 border-gray-600 text-gray-500 cursor-not-allowed"
-                : "bg-black/70 border-yellow-400/40 text-yellow-400 hover:bg-yellow-500 hover:text-black"
-              }`}
+            disabled={loading}
+            className="p-2 rounded-full backdrop-blur-md border
+              bg-black/70 border-yellow-400/40 text-yellow-400
+              hover:bg-yellow-500 hover:text-black
+              disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {loading == true && reqtype == "editfood"&& ItemId == item._id  ? <Spinner /> : <Pencil size={14} />}
+            {isEditing ? <Spinner size={14} /> : <Pencil size={14} />}
           </button>
 
+          {/* Delete */}
           <button
             onClick={(e) => {
               e.stopPropagation();
               onDelete(item._id);
             }}
-
-            className={`p-2 rounded-full backdrop-blur-md border transition
-            ${loading === true && reqtype == "deletfood" && deleteCategoryId == item._id
-                ? "bg-black/40 border-gray-600 text-gray-500 cursor-not-allowed"
-                : "bg-black/70 border-red-400/40 text-red-400 hover:bg-red-500 hover:text-white"
-              }`}
+            disabled={isDeleting}
+            className="p-2 rounded-full backdrop-blur-md border
+              bg-black/70 border-red-400/40 text-red-400
+              hover:bg-red-500 hover:text-white
+              disabled:bg-black/40 disabled:border-gray-600
+              disabled:text-gray-500 disabled:cursor-not-allowed"
           >
-            {loading === true && reqtype == "deletfood" && deleteCategoryId == item._id ? <Spinner /> : <Trash2 size={14} />}
+            {isDeleting ? <Spinner size={14} /> : <Trash2 size={14} />}
           </button>
         </div>
 
-        {/* Name & description */}
+        {/* Text */}
         <div className="flex flex-col gap-2">
           <h3 className="text-white font-semibold text-lg">{item.name}</h3>
-          <p className="text-gray-400 text-sm line-clamp-2">{item.description}</p>
+          <p className="text-gray-400 text-sm line-clamp-2">
+            {item.description}
+          </p>
         </div>
 
-        {/* Price + Availability */}
+        {/* Price & Availability */}
         <div className="flex items-center justify-between mt-2">
-          <p className="text-yellow-400 font-semibold text-lg">₹{item.price}</p>
+          <p className="text-yellow-400 font-semibold text-lg">
+            ₹{item.price}
+          </p>
+
           <button
             onClick={onToggleAvailability}
             className={`px-4 py-1.5 text-xs rounded-full border transition
-            ${item.isAvailable
+              ${item.isAvailable
                 ? "border-green-500/40 text-green-400 hover:bg-green-500/10"
                 : "border-gray-500/40 text-gray-400 hover:bg-gray-500/10"
               }`}
@@ -91,6 +107,6 @@ const MenuItemCard = ({ item, onToggleAvailability, onEdit , onDelete , ItemId ,
       </div>
     </div>
   );
-}
+};
 
 export default MenuItemCard;
