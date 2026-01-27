@@ -26,7 +26,9 @@ export const foodSlice = createSlice({
             state.foods.push(action.payload.food)
           })
           .addCase(deletFoodThunk.fulfilled, (state , action) => {
-            state.foods.filter(item=> item._id !== action.payload);
+            console.log('filter is run' ,action.payload )
+            state.foods = state.foods.filter(item=> item._id !== action.payload);
+            console.log(state.foods)
           })
          
       },

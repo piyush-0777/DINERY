@@ -18,14 +18,16 @@ const deletFood = async (food_id, res_id) => {
     //         { $pull: { foods: food_id } }, { session }
     //     )
     // console.log('piyu',resf)
-    console.log(food)
+   
         const result = await deleteImage(food.publicId);
         console.log(result)
         if (result == 'ok') {
             await session.commitTransaction();
             session.endSession()
+            console.log('okkkkkkk')
             return true;
         } else {
+            console.log('this is now now')
             throw new Error('image delection error');
         }
 

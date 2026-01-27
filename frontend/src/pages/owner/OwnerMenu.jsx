@@ -5,13 +5,17 @@ import AddEditItemModal from '../../components/owner/manu/AddEditItemModal'
 import { useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import AddCategory from '../../components/owner/manu/AddCategory'
+import {resetAddFoodState} from '../../redux/features/food/loadFoodSlice'
+import { deletFoodThunk , deletCategoryThunk } from "../../redux/thunks/manuThunk";
+import {toast} from 'react-toastify'
 
 
 const OwnerMenu = () => {
-
+    const dispatch = useDispatch()
     const category = useSelector(state => state.foodObject.category)
     const items = useSelector(state => state.foodObject.foods)
- 
+     const loadfoodstatus = useSelector(state => state.loadfoodstatus);
+ //{ reqtype, loading, success, error, }
 
     const [activeCategory, setActiveCategory] = useState({
         _id: '6974a0be080c5f5094ccb05d', 
@@ -20,11 +24,22 @@ const OwnerMenu = () => {
         image: 'https://res.cloudinary.com/dylqjvfkf/image/upload/v1769251004/dinery/uec2qdyghzcfpsq4m5vv.jpg', __v: 0});
     const [showModal, setShowModal] = useState(false);
     const [showAddCategory, setShowAddCategory] = useState(false)
-    const[ editCategory ,setEditCategory] = useState()
-    const[ deleteCategory ,setDeleteCategory] = useState()
+    const[ ItemId ,setItemId] = useState()
+    const[ categoryId ,setCategoryId] = useState()
 
 
 
+
+     useEffect(() => {
+    if (loadfoodstatus.success == true && loadfoodstatus.reqtype == "deletfood") {
+      toast.success("Item deleted successfully");
+      dispatch(resetAddFoodState());
+    }
+    if (loadfoodstatus.success == true && loadfoodstatus.reqtype == "editfood") {
+      toast.success("Item deleted successfully");
+      dispatch(resetAddFoodState());
+    }
+  }, [loadfoodstatus.success]);
 
     useEffect(() => {
         setfilteredItems(items.filter(
@@ -54,6 +69,29 @@ const OwnerMenu = () => {
     console.log(filteredItems)
 
 
+
+    const onDeleteItem = async (id) => {
+    const isdelet = confirm('you wont to delet item')
+            setItemId(id);
+            if (isdelet) await dispatch(deletFoodThunk(id))
+        
+     
+
+  }
+  const onDeleteCategory = async (id) => {
+        const isdelet = confirm('you wont to delet category its outo matic delet all food ')
+            setCategoryId(id);
+            if (isdelet) await dispatch(deletCategoryThunk(id))
+  }
+
+   const onEditItem = async (id) => {
+    console.log('edititem')
+        
+     
+
+  }
+
+
     return (
         <div className="min-h-screen bg-black p-6">
             <div className="flex justify-between items-center mb-6">
@@ -77,8 +115,9 @@ const OwnerMenu = () => {
                             category={cat}
                             active={activeCategory === cat.name}
                             onClick={() => setActiveCategory(cat)}
-                            onEdit={(cat) => setEditCategory(cat)}
-                            onDelete={(id) => setDeleteCategory(id)}
+                            onEdit={(cat) => console.log(cat)}
+                            onDelete={onDeleteCategory}
+                            categoryId={categoryId}
                         />
                     ))}
                 </div>
@@ -110,8 +149,10 @@ const OwnerMenu = () => {
                                 )
                             )
                         }
+                        onDelete={onDeleteItem}
+                        ItemId={ItemId}
                         
-                        onEdit={() =>{console.log('add')}}
+                        onEdit={onEditItem}
                     />
                 ))}
             </div>

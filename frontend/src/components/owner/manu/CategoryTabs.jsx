@@ -1,7 +1,7 @@
 import { Pencil, Trash2 } from "lucide-react";
 
 
-const CategoryTabs = ({ category, active, onClick , onEdit, onDelete  }) => (
+const CategoryTabs = ({ category, active, onClick , onEdit, onDelete , categoryId  }) => (
      <div
     onClick={onClick}
     className={`relative min-w-[120px] h-28 shrink-0 rounded-2xl overflow-hidden cursor-pointer group transition
@@ -24,18 +24,22 @@ const CategoryTabs = ({ category, active, onClick , onEdit, onDelete  }) => (
 
     {/* Hover actions */}
     <div
-      className="absolute top-2 right-2 z-30 flex gap-2
-      opacity-0 group-hover:opacity-100 transition-all duration-300"
+      className={`absolute top-2 right-2 z-30 flex gap-2
+      opacity-0 group-hover:opacity-100 transition-all duration-300
+      ${loading == true &&  ItemId == item._id  ?'opacity-100':''}`}
     >
       <button
         onClick={(e) => {
           e.stopPropagation();
           onEdit(category);
         }}
-        className="p-2 rounded-full bg-black border border-white/30
-        shadow-xl text-white hover:bg-yellow-500 hover:text-black transition"
+        className={`p-2 rounded-full backdrop-blur-md border transition
+              ${loading == true && reqtype == "editfood" && ItemId == item._id
+                ? "bg-black/40 border-gray-600 text-gray-500 cursor-not-allowed"
+                : "bg-black/70 border-yellow-400/40 text-yellow-400 hover:bg-yellow-500 hover:text-black"
+              }`}
       >
-        <Pencil size={14} />
+        {loading == true && reqtype == "editfood"&& ItemId == item._id  ? <Spinner /> : <Pencil size={14} />}
       </button>
 
       <button
@@ -43,10 +47,13 @@ const CategoryTabs = ({ category, active, onClick , onEdit, onDelete  }) => (
           e.stopPropagation();
           onDelete(category._id);
         }}
-        className="p-2 rounded-full bg-black border border-white/30
-        shadow-xl text-white hover:bg-red-500 transition"
+         className={`p-2 rounded-full backdrop-blur-md border transition
+            ${loading === true && reqtype == "deletfood" && deleteCategoryId == item._id
+                ? "bg-black/40 border-gray-600 text-gray-500 cursor-not-allowed"
+                : "bg-black/70 border-red-400/40 text-red-400 hover:bg-red-500 hover:text-white"
+              }`}
       >
-        <Trash2 size={14} />
+        {loading === true && reqtype == "deletfood" && deleteCategoryId == item._id ? <Spinner /> : <Trash2 size={14} />}
       </button>
     </div>
 

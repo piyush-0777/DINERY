@@ -1,12 +1,6 @@
 const cloudinary = require('../config/cloudConfig')
 
 
-function getPublicIdFromUrl(url) {
-  const parts = url.split("/upload/")[1]; // v123/menu/burger_123.jpg
-  const withoutVersion = parts.replace(/^v\d+\//, ""); // menu/burger_123.jpg
-  const publicId = withoutVersion.replace(/\.[^/.]+$/, ""); // menu/burger_123
-  return publicId;
-}
 
 async function deleteImage (imageUrl) {
   try {
@@ -16,8 +10,8 @@ async function deleteImage (imageUrl) {
     resource_type: "image",
     invalidate: true,
   });
-    console.log(result)
-    return result;
+    console.log('this is img status',result.result)
+    return result.result;
   } catch (error) {
     console.error("Cloudinary delete error:", error);
     throw error;
