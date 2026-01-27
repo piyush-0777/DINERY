@@ -6,7 +6,7 @@ import { resetAddCategoryState } from "../../../redux/features/food/addCategoryS
 import { useRef } from "react";
 
 
-const AddCategory = ({ onClose }) => {
+const AddCategory = ({ onClose , data }) => {
     const dispatch = useDispatch()
     const toastShown = useRef(false);
     const { reqtyp , loading, success, error } = useSelector(state => state.addcategory)
@@ -45,11 +45,10 @@ const AddCategory = ({ onClose }) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!name || !image) {
-            console.log('image and name is require')
+            toast.error('image and name is require')
             return;
         }
-        console.log(name)
-        console.log(image);
+        
 
         const formData = new FormData();
         formData.append("name", name);

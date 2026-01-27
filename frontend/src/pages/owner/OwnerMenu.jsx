@@ -71,7 +71,7 @@ const OwnerMenu = () => {
 
     // on edit item
 
-     const onEditItem = async (id) => {
+    const onEditItem = async (id) => {
 
     }
 
@@ -83,7 +83,7 @@ const OwnerMenu = () => {
         dispatch(deletCategoryThunk(id));
     };
 
-   
+
 
     return (
         <div className="min-h-screen bg-black p-6">
@@ -119,12 +119,18 @@ const OwnerMenu = () => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                {filteredItems?.length === 0 && !foodStatus.loading && (
+                    <div className="col-span-full text-center text-gray-400 py-20">
+                        <p className="text-lg">No food items found 🍽️</p>
+                        <p className="text-sm mt-2">Add your first item to get started</p>
+                    </div>
+                )}
                 {filteredItems.map(item => (
                     <MenuItemCard
                         key={item._id}
                         item={item}
                         onToggleAvailability={() =>
-                           console.log('this this')
+                            console.log('this this')
                         }
                         onEdit={() => onEditItem(item)}
                         onDelete={onDeleteItem}
