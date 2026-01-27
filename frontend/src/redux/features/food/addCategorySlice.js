@@ -23,6 +23,7 @@ const addCategorySlice = createSlice({
     extraReducers: (builder) => {
             builder
                 .addCase(addCategoryThunk.pending, (state) => {
+                    state.reqtyp = 'add'
                     state.loading = true;
                     state.error = null;
                     

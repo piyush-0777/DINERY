@@ -11,11 +11,12 @@ const CategoryTabs = ({
   deletingId
 }) => {
 
-  const { loading, reqtype } = useSelector(state => state.addcategory);
+  const { loading, reqtyp } = useSelector(state => state.addcategory);
+
 
   const isDeleting =
     loading &&
-    reqtype === "delete" &&
+    reqtyp === "delete" &&
     deletingId === category._id;
 
   return (
@@ -43,7 +44,7 @@ const CategoryTabs = ({
       <div
         className={`absolute top-2 right-2 z-30 flex gap-2
           opacity-0 group-hover:opacity-100 transition
-          ${isDeleting ? "opacity-100" : ""}
+          ${loading && reqtyp === "delete" && deletingId === category._id ? "opacity-100" : ""}
         `}
       >
         {/* edit */}
@@ -74,7 +75,7 @@ const CategoryTabs = ({
             disabled:bg-black/40 disabled:border-gray-600
             disabled:text-gray-500 disabled:cursor-not-allowed"
         >
-          {isDeleting ? <Spinner size={14} /> : <Trash2 size={14} />}
+          {loading && reqtyp === "delete" && deletingId === category._id ? <Spinner size={14} /> : <Trash2 size={14} />}
         </button>
       </div>
 

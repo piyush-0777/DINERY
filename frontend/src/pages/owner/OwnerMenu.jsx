@@ -54,12 +54,14 @@ const OwnerMenu = () => {
     useEffect(() => {
         if (!categoryStatus.success) return;
 
-        if (categoryStatus.reqtype === "delete") {
+        if (categoryStatus.reqtyp === "delete") {
             toast.success("Category deleted successfully");
         }
 
         dispatch(resetAddCategoryState());
     }, [categoryStatus.success, categoryStatus.reqtype]);
+
+    //on delete item
 
     const onDeleteItem = async (id) => {
         if (!window.confirm("Do you want to delete this item?")) return;
@@ -67,9 +69,13 @@ const OwnerMenu = () => {
         dispatch(deletFoodThunk(id));
     };
 
+    // on edit item
+
      const onEditItem = async (id) => {
 
     }
+
+    // on delete category
 
     const onDeleteCategory = async (id) => {
         if (!window.confirm("Deleting category will delete all foods. Continue?")) return;

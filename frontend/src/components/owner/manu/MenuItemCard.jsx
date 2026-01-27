@@ -7,7 +7,7 @@ const MenuItemCard = ({
   onToggleAvailability,
   onEdit,
   onDelete,
-  deletingId
+  deletingId 
 }) => {
 
   const { loading, reqtype } = useSelector(state => state.loadfoodstatus);

@@ -1,19 +1,25 @@
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from 'react-redux'
 import { addCategoryThunk } from '../../../redux/thunks/manuThunk'
-import {toast} from "react-toastify";
+import { toast } from "react-toastify";
 import { resetAddCategoryState } from "../../../redux/features/food/addCategorySlice";
+import { useRef } from "react";
+
 
 const AddCategory = ({ onClose }) => {
     const dispatch = useDispatch()
-    const { loading, success, error } = useSelector(state => state.addcategory)
+    const toastShown = useRef(false);
+    const { reqtyp , loading, success, error } = useSelector(state => state.addcategory)
 
     const [name, setName] = useState("");
     const [image, setImage] = useState(null);
     const [preview, setPreview] = useState(null);
 
     useEffect(() => {
-        if (success) {
+        if(reqtyp === 'add') {
+        if (success && !toastShown.current) {
+            toastShown.current = true;
+
             toast.success("Category added successfully");
             dispatch(resetAddCategoryState());
             onClose();
@@ -23,6 +29,7 @@ const AddCategory = ({ onClose }) => {
             toast.error(error.message || "Something went wrong");
             dispatch(resetAddCategoryState());
         }
+    }
     }, [success, error]);
 
 

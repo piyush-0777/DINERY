@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import {loadDashbordThunk} from '../../thunks/loardDashbordThunk'
-import {addFoodThunk , deletFoodThunk} from '../../thunks/manuThunk'
+import {addFoodThunk , deletFoodThunk , updateFoodThunk , addCategoryThunk , deletCategoryThunk} from '../../thunks/manuThunk'
 
 
 
@@ -28,6 +28,16 @@ export const foodSlice = createSlice({
           .addCase(deletFoodThunk.fulfilled, (state , action) => {
             console.log('filter is run' ,action.payload )
             state.foods = state.foods.filter(item=> item._id !== action.payload);
+            console.log(state.foods)
+          })
+
+          .addCase(addCategoryThunk.fulfilled, (state , action) => {
+            state.category.push(action.payload.category)
+          })
+          .addCase(deletCategoryThunk.fulfilled, (state , action) => {
+            console.log('filter is run cate' ,action.payload )
+            state.foods  = state.foods.filter (item => item.category !==action.payload);
+            state.category = state.category.filter(item=> item._id !== action.payload);
             console.log(state.foods)
           })
          
