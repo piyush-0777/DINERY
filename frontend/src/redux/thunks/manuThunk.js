@@ -53,3 +53,12 @@ const res = await menuService.deleteCategory(data);
          return thunkAPI.rejectWithValue({status:error.status || 500 , message:error.data?.error || error.message});
     }
 })
+
+export const editCategoryThunk = createAsyncThunk('editCategoryThunk' , async ({id , data} , thunkAPI)=>{
+    try {
+    const res = await menuService.updateCategory(id ,  data);
+     return res;
+    } catch (error){
+         return thunkAPI.rejectWithValue({status:error.status || 500 , message:error.data?.error || error.message});
+    }
+})

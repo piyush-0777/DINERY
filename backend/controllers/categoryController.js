@@ -1,6 +1,6 @@
 const categories = require('../models/categories-model')
 const categoryService = require('../services/categoryService')
-
+const deleteImage = require('../utils/deletImg')
 
 exports.addCategory = async (req, res) => {
     try {
@@ -49,3 +49,37 @@ exports.deletCategory = async (req, res) => {
     return res.status(500).json({ error: 'internal server error' });
   }
 };
+
+exports.editCategory = async (req , res) => {
+  try {
+    const category = await categories.findById(req.params.categoryId)
+
+     if (!category) {
+      return res.status(404).json({ message: "category not found" });
+    }
+
+    category.name = req.body.name;
+
+    if (req.file) {
+          console.log("Image changed");
+    
+          // 🧹 delete old image
+          if (category.publicId) {
+            await deleteImage(category.publicId);
+          }
+    
+          // multer-storage-cloudinary already uploaded it
+          category.image = req.file.path;        // secure_url
+          category.publicId = req.file.filename; // public_id
+        }
+   res.status(200).json({
+      status: "success",
+      message: "category updated successfully",
+      data: category
+    });
+  } catch (error) {
+    console.log(error)
+    res.status(500).json({ message: error.message });
+  }
+
+}

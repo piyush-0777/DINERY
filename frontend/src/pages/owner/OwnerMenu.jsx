@@ -26,6 +26,7 @@ const OwnerMenu = () => {
     const [deletingItemId, setDeletingItemId] = useState(null);
     const [deletingCategoryId, setDeletingCategoryId] = useState(null);
     const [editingItem , setEditingItem] = useState(null)
+    const [editingCategory , setEditingCategory] = useState(null)
 
     // 🔹 set default category
     useEffect(() => {
@@ -76,6 +77,11 @@ const OwnerMenu = () => {
             setEditingItem(item)
             setShowModal(true)
     }
+
+    const onEditCategory = async (category) => {
+        setEditingCategory(category)
+        setShowAddCategory(true);
+    }
     // on delete category
 
     const onDeleteCategory = async (id) => {
@@ -106,6 +112,7 @@ const OwnerMenu = () => {
                         active={activeCategory?._id === cat._id}
                         onClick={() => setActiveCategory(cat)}
                         onDelete={onDeleteCategory}
+                        onEdit={()=>onEditCategory(cat)}
                         deletingId={deletingCategoryId}
                     />
                 ))}
@@ -154,9 +161,13 @@ const OwnerMenu = () => {
             )}
 
             {showAddCategory && (
-                <AddCategory onClose={() =>{ 
-                    setShowAddCategory(false)
-                    }} />
+                <AddCategory 
+                onClose={() =>{ 
+                setShowAddCategory(false)
+                setEditingCategory(null)
+                    }}
+                    editingCategory={editingCategory}
+                     />
             )}
         </div>
     );

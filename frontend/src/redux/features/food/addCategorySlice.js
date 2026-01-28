@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { addCategoryThunk , deletCategoryThunk } from '../../thunks/manuThunk'
+import { addCategoryThunk , deletCategoryThunk , editCategoryThunk } from '../../thunks/manuThunk'
 
 
 const initialState = {
@@ -47,6 +47,20 @@ const addCategorySlice = createSlice({
                     state.success = true;
                 })
                 .addCase(deletCategoryThunk.rejected, (state, action) => {
+                    state.loading = false;
+                    state.error = action.payload;
+                })
+                    .addCase(editCategoryThunk.pending, (state) => {
+                    state.reqtyp='edit'
+                    state.loading = true;
+                    state.error = null;
+                    
+                })
+                .addCase(editCategoryThunk.fulfilled, (state , action) => {
+                    state.loading = false;
+                    state.success = true;
+                })
+                .addCase(editCategoryThunk.rejected, (state, action) => {
                     state.loading = false;
                     state.error = action.payload;
                 })

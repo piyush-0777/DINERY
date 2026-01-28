@@ -90,7 +90,7 @@ exports.editFood = async (req , res ) => {
 
     await food.save();
 
-    res.json({
+    res.status(200).json({
       status: "success",
       message: "Food updated successfully",
       data: food

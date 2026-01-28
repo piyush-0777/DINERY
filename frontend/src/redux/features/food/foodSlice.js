@@ -1,6 +1,12 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { loadDashbordThunk } from '../../thunks/loardDashbordThunk'
-import { addFoodThunk, deletFoodThunk, updateFoodThunk, addCategoryThunk, deletCategoryThunk } from '../../thunks/manuThunk'
+import { 
+  addFoodThunk, 
+  deletFoodThunk, 
+  updateFoodThunk, 
+  addCategoryThunk, 
+  deletCategoryThunk,
+ editCategoryThunk} from '../../thunks/manuThunk'
 
 
 
@@ -46,6 +52,14 @@ export const foodSlice = createSlice({
         state.foods = state.foods.filter(item => item.category !== action.payload);
         state.category = state.category.filter(item => item._id !== action.payload);
 
+      })
+      .addCase(editCategoryThunk.fulfilled, (state, action) => {
+
+        state.category = state.category.map(item =>
+          item._id === action.payload.data._id
+            ?  action.payload.data
+            : item
+        );
       })
 
   },

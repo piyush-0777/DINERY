@@ -16,6 +16,7 @@ export const menuService = {
   addCategory: (data) =>
     request('/category/addcategory' , 'POST' , data , true), 
   deleteCategory: (categoryId) => 
-    request(`/category/deletcategory/${categoryId}` , "DELETE")  // return thsi
-  
+    request(`/category/deletcategory/${categoryId}` , "DELETE"),  // return thsi
+  updateCategory: (categoryId, data) => 
+     request(`/category/editcategory/${categoryId}`, "PUT", data , true),
 };
