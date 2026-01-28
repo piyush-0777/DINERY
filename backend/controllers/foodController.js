@@ -22,11 +22,11 @@ if (!req.file) {
  const food = await foodModel.create({
     restaurant:resId ,name , description, price, category , foodImg , publicId:req.file.filename
  })
- console.log(food)
+ 
 
  return res.status(200).json({message: 'done' , food});
 } catch(err) {
-  console.log(err)
+
   return res.status(500).json({error: 'server error 121' })
 }
 
@@ -60,9 +60,9 @@ exports.deletFood = async (req , res) => {
 exports.editFood = async (req , res ) => {
   
   try {
-    console.log(req.params.foodId);
+    
     const food = await foodModel.findById(req.params.foodId);
-    console.log('food', food)
+    
     if (!food) {
       return res.status(404).json({ message: "Food not found" });
     }
@@ -106,9 +106,9 @@ exports.editFood = async (req , res ) => {
 
 exports.changeAvailablity = async (req , res ) => {
   try {
-    console.log(req.params.foodId)
+    
     const food = await foodModel.findById(req.params.foodId);
-    console.log(food)
+   
     if (!food) {
       return res.status(404).json({ message: "Food not found" });
     }

@@ -16,11 +16,11 @@ exports.addCategory = async (req, res) => {
             image: image,
             publicId:req.file.filename ,
         });
-        console.log('this is' , category);
+        
         return res.status(200).json({message:'category added' , category});
     } catch (err) {
 
-        console.log(error);
+        console.log(err);
         res.status(500).json({error: 'server error'});
     }
 

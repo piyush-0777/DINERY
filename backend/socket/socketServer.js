@@ -22,7 +22,7 @@ const initSocket = (server) => {
             if (!room) {
                 socket.emit("service Unavailable");
             } else {
-                socket.jion(room)
+                socket.join(room)
             }
         } else {
             socket.emit("this roll is unavailable")
