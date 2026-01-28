@@ -22,9 +22,10 @@ const res = await menuService.deleteMenuItem(data);
     }
 })
 
-export const updateFoodThunk = createAsyncThunk('updateFoodThunk', async (data , thunkAPI)=>{
+export const updateFoodThunk = createAsyncThunk('updateFoodThunk', async ({id , data} , thunkAPI)=>{
     try {
-const res = await menuService.updateMenuItem(data._id , data);
+        console.log('data' , { id , data})
+const res = await menuService.updateMenuItem(id ,  data);
     return res;
     } catch (error){
          return thunkAPI.rejectWithValue({status:error.status || 500 , message:error.data?.error || error.message});

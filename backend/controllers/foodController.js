@@ -1,5 +1,6 @@
 const foodModel = require('../models/food-model')
 const foodService = require('../services/foodService')
+const deleteImage = require('../utils/deletImg')
 
 exports.createFood = async(req , res) =>{
 try {
@@ -54,4 +55,51 @@ exports.deletFood = async (req , res) => {
     console.log(error)
   return res.status(500).json({error: 'server error' })
   }
+}
+
+exports.editFood = async (req , res ) => {
+  
+  try {
+    console.log(req.params.foodId);
+    const food = await foodModel.findById(req.params.foodId);
+    console.log('food', food)
+    if (!food) {
+      return res.status(404).json({ message: "Food not found" });
+    }
+
+    // Update normal fields
+    food.name = req.body.name;
+    food.description = req.body.description;
+    food.price = req.body.price;
+    food.category = req.body.category;
+    food.isAvailable = req.body.isAvailable;
+
+    // ✅ IMAGE CHANGE CHECK
+    if (req.file) {
+      console.log("Image changed");
+
+      // 🧹 delete old image
+      if (food.publicId) {
+        await deleteImage(food.publicId);
+      }
+
+      // multer-storage-cloudinary already uploaded it
+      food.foodImg = req.file.path;        // secure_url
+      food.publicId = req.file.filename; // public_id
+    }
+
+    await food.save();
+
+    res.json({
+      status: "success",
+      message: "Food updated successfully",
+      data: food
+    });
+
+  } catch (error) {
+    console.log(error)
+    res.status(500).json({ message: error.message });
+  }
+
+
 }

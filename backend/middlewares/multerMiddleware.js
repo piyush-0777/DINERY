@@ -26,9 +26,6 @@ const uploadSingle = (req, res, next) => {
       return res.status(500).json({ error: "File upload failed" });
     }
 
-    if (!req.file) {
-      return res.status(400).json({ error: "No file uploaded" });
-    }
 
     next();
   });

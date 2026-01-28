@@ -9,7 +9,7 @@ import AddCategory from "../../components/owner/manu/AddCategory";
 
 import { resetAddFoodState } from "../../redux/features/food/loadFoodSlice";
 import { resetAddCategoryState } from "../../redux/features/food/addCategorySlice";
-import { deletFoodThunk, deletCategoryThunk } from "../../redux/thunks/manuThunk";
+import { deletFoodThunk, deletCategoryThunk , updateFoodThunk } from "../../redux/thunks/manuThunk";
 
 const OwnerMenu = () => {
     const dispatch = useDispatch();
@@ -25,6 +25,7 @@ const OwnerMenu = () => {
     const [showAddCategory, setShowAddCategory] = useState(false);
     const [deletingItemId, setDeletingItemId] = useState(null);
     const [deletingCategoryId, setDeletingCategoryId] = useState(null);
+    const [editingItem , setEditingItem] = useState(null)
 
     // 🔹 set default category
     useEffect(() => {
@@ -71,10 +72,10 @@ const OwnerMenu = () => {
 
     // on edit item
 
-    const onEditItem = async (id) => {
-
+    const onEditItem = async (item) => {
+            setEditingItem(item)
+            setShowModal(true)
     }
-
     // on delete category
 
     const onDeleteCategory = async (id) => {
@@ -144,12 +145,18 @@ const OwnerMenu = () => {
                 <AddEditItemModal
                     categories={categories}
                     activeCategory={activeCategory}
-                    onClose={() => setShowModal(false)}
+                    onClose={() => {
+                            setShowModal(false)
+                            setEditingItem(null)
+                    } }
+                    editingItem={editingItem}
                 />
             )}
 
             {showAddCategory && (
-                <AddCategory onClose={() => setShowAddCategory(false)} />
+                <AddCategory onClose={() =>{ 
+                    setShowAddCategory(false)
+                    }} />
             )}
         </div>
     );

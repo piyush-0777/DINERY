@@ -1,49 +1,69 @@
 import { useState, useEffect } from "react";
 import { useSelector, useDispatch } from 'react-redux'
-import { addFoodThunk } from '../../../redux/thunks/manuThunk'
+import { addFoodThunk, updateFoodThunk } from '../../../redux/thunks/manuThunk'
 import { resetAddFoodState } from '../../../redux/features/food/loadFoodSlice'
 import { toast } from "react-toastify";
 
-const AddEditItemModal = ({ categories, activeCategory, onClose }) => {
+const AddEditItemModal = ({ categories, activeCategory, onClose, editingItem }) => {
     const dispatch = useDispatch();
     const { reqtype, loading, success, error, } = useSelector(state => state.loadfoodstatus);
+    console.log({ reqtype, loading, success, error, })
 
     useEffect(() => {
-        if (reqtype == 'addfood') {
+        if (reqtype === 'addfood' || reqtype === 'editfood') {
             if (error) {
                 toast.error(error.message || "Something went wrong");
-                dispatch(resetAddFoodState())
+                dispatch(resetAddFoodState());
                 onClose();
             }
 
             if (success) {
-                toast.success("Food item saved successfully");
-                dispatch(resetAddFoodState())
+                toast.success(
+                    editingItem ? "Food item updated successfully" : "Food item saved successfully"
+                );
+                dispatch(resetAddFoodState());
                 onClose();
             }
         }
     }, [error, success]);
 
-    const [form, setForm] = useState({
-        name: "",
-        foodImg: null,          // File object (for multer)
-        previewImg: null,       // UI preview only
-        description: "",
-        price: "",
-        category: activeCategory._id,
-        isAvailable: true,
+
+    const [form, setForm] = useState(() => {
+        if (editingItem) {
+            return {
+                name: editingItem.name,
+                foodImg: editingItem.foodImg,          // File object (for multer)
+                previewImg: editingItem.foodImg,       // UI preview only
+                description: editingItem.description,
+                price: editingItem.price,
+                category: activeCategory._id,
+                isAvailable: true,
+            }
+        } else {
+            return {
+                name: "",
+                foodImg: null,          // File object (for multer)
+                previewImg: null,       // UI preview only
+                description: "",
+                price: null,
+                category: activeCategory._id,
+                isAvailable: true,
+            }
+        }
     });
+
 
 
     return (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50">
             <div className="bg-neutral-950 border border-neutral-800 rounded-2xl p-6 w-full max-w-lg">
-                <h2 className="text-white font-semibold text-lg mb-5">Add Food Item</h2>
+                <h2 className="text-white font-semibold text-lg mb-5"> {editingItem ? "Edit Food Item" : "Add Food Item"}</h2>
 
 
                 <div className="space-y-3">
                     <input
                         placeholder="Food name"
+                        value={form.name}
                         className="w-full bg-neutral-900 border border-neutral-800 rounded-xl px-4 py-2 text-white focus:border-yellow-400 outline-none"
                         onChange={(e) => setForm({ ...form, name: e.target.value })}
                     />
@@ -80,6 +100,7 @@ const AddEditItemModal = ({ categories, activeCategory, onClose }) => {
 
                     <textarea
                         placeholder="Description"
+                        value={form.description}
                         className="w-full bg-neutral-900 border border-neutral-800 rounded-xl px-4 py-2 text-white focus:border-yellow-400 outline-none"
                         rows={3}
                         onChange={(e) => setForm({ ...form, description: e.target.value })}
@@ -88,6 +109,7 @@ const AddEditItemModal = ({ categories, activeCategory, onClose }) => {
 
                     <input
                         type="number"
+                        value={form.price}
                         placeholder="Price"
                         className="w-full bg-neutral-900 border border-neutral-800 rounded-xl px-4 py-2 text-white focus:border-yellow-400 outline-none"
                         onChange={(e) => setForm({ ...form, price: e.target.value })}
@@ -95,6 +117,7 @@ const AddEditItemModal = ({ categories, activeCategory, onClose }) => {
 
 
                     <select
+                        value={form.category}
                         className="w-full bg-neutral-900 border border-neutral-800 rounded-xl px-4 py-2 text-white focus:border-yellow-400 outline-none"
                         onChange={(e) => setForm({ ...form, category: e.target.value })}
                     >
@@ -131,20 +154,27 @@ const AddEditItemModal = ({ categories, activeCategory, onClose }) => {
                         onClick={() => {
                             const formData = new FormData();
                             formData.append("name", form.name);
-                            formData.append("image", form.foodImg);
                             formData.append("description", form.description);
                             formData.append("price", form.price);
                             formData.append("category", form.category);
                             formData.append("isAvailable", form.isAvailable);
 
-                            dispatch(addFoodThunk(formData));
+                            if (form.foodImg instanceof File) {
+                                formData.append("image", form.foodImg);
+                            }
+
+                            if (editingItem) {
+                                dispatch(updateFoodThunk({ id: editingItem._id, data: formData }));
+                            } else {
+                                dispatch(addFoodThunk(formData));
+                            }
                         }}
                         className="bg-gradient-to-r from-yellow-400 to-yellow-500 text-black px-5 py-2 rounded-xl font-medium hover:opacity-90 disabled:opacity-60 disabled:cursor-not-allowed flex items-center gap-2"
                     >
                         {loading && (
                             <span className="w-4 h-4 border-2 border-black border-t-transparent rounded-full animate-spin"></span>
                         )}
-                        {loading ? "Saving..." : "Save Item"}
+                        {loading ? "Saving..." : editingItem ? "Update Item" : "Save Item"}
                     </button>
 
                 </div>

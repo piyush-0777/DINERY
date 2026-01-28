@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import {addFoodThunk , deletFoodThunk} from '../../thunks/manuThunk'
+import {addFoodThunk , deletFoodThunk , updateFoodThunk} from '../../thunks/manuThunk'
 
 
 const initialState = {
@@ -49,6 +49,20 @@ const loadFoodSlice = createSlice({
         state.success = true;
       })
       .addCase(deletFoodThunk.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(updateFoodThunk.pending, (state) => {
+        state.reqtype = 'editfood';
+        state.loading = true;
+        state.error = null;
+        state.success = false;
+      })
+      .addCase(updateFoodThunk.fulfilled, (state) => {
+        state.loading = false;
+        state.success = true;
+      })
+      .addCase(updateFoodThunk.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });
