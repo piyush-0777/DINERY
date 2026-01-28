@@ -7,6 +7,7 @@ import DashboardSkeleton from "../components/ui/DashboardSkeleton";
 
 import OwnerDashboard from "../pages/owner/OwnerDashboard";
 import OwnerMenu from "../pages/owner/OwnerMenu";
+import OwnerTables from "../pages/owner/OwnerTables"
 import { loadDashbordThunk } from '../redux/thunks/loardDashbordThunk'
 import { useSelector, useDispatch } from "react-redux";
 
@@ -49,6 +50,7 @@ const OwnerRoutes = () => {
           <Routes>
             <Route path="dashboard" element={<OwnerDashboard />} />
             <Route path="menu" element={<OwnerMenu />} />
+            <Route path="tables" element={<OwnerTables />} />
             {/* <Route path="dashboard" element={<OwnerDashboard />} />
         <Route path="products" element={<ManageProducts />} />
         <Route path="orders" element={<ManageOrders />} />

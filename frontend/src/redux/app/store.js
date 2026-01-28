@@ -6,6 +6,7 @@ import authreducer from '../features/owner/authSlice'
 import loadfoodreducer from '../features/food/loadFoodSlice'
 import addcategoryreducer from '../features/food/addCategorySlice'
 import loarddashbordreducer from '../features/owner/loadDashbordSlice'
+import tablesreducer from '../features/table/tablesSlice'
 
 export const store = configureStore({
     reducer: {
@@ -16,5 +17,6 @@ export const store = configureStore({
         loadfoodstatus:loadfoodreducer,
         addcategory:addcategoryreducer,
         loardDashbordState:loarddashbordreducer,
+        tables:tablesreducer
     }
 });
