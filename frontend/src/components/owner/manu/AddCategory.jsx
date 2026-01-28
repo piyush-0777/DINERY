@@ -7,11 +7,11 @@ import { useRef } from "react";
 
 
 const AddCategory = ({ onClose, editingCategory }) => {
-    console.log(editingCategory)
+    
     const dispatch = useDispatch()
     const toastShown = useRef(false);
     const { reqtyp, loading, success, error } = useSelector(state => state.addcategory)
-    console.log({ reqtyp, loading, success, error })
+   
 
     const [name, setName] = useState(() => {
         if (editingCategory) {

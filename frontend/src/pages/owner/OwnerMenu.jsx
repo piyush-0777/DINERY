@@ -9,7 +9,7 @@ import AddCategory from "../../components/owner/manu/AddCategory";
 
 import { resetAddFoodState } from "../../redux/features/food/loadFoodSlice";
 import { resetAddCategoryState } from "../../redux/features/food/addCategorySlice";
-import { deletFoodThunk, deletCategoryThunk , updateFoodThunk } from "../../redux/thunks/manuThunk";
+import { deletFoodThunk, deletCategoryThunk ,changeAvailablity } from "../../redux/thunks/manuThunk";
 
 const OwnerMenu = () => {
     const dispatch = useDispatch();
@@ -27,6 +27,7 @@ const OwnerMenu = () => {
     const [deletingCategoryId, setDeletingCategoryId] = useState(null);
     const [editingItem , setEditingItem] = useState(null)
     const [editingCategory , setEditingCategory] = useState(null)
+    const [changingAvailablityId , setChangingAvailablityId] = useState(null)
 
     // 🔹 set default category
     useEffect(() => {
@@ -40,16 +41,17 @@ const OwnerMenu = () => {
         if (!activeCategory || activeCategory.name === "All") return items;
         return items.filter(item => item.category === activeCategory._id);
     }, [items, activeCategory]);
-
+    
     // 🔹 food delete/edit feedback
     useEffect(() => {
         if (!foodStatus.success) return;
 
         if (foodStatus.reqtype === "deletfood") {
             toast.success("Food deleted successfully");
+            dispatch(resetAddFoodState());
         }
 
-        dispatch(resetAddFoodState());
+        
     }, [foodStatus.success, foodStatus.reqtype]);
 
     // 🔹 category delete/edit feedback
@@ -58,10 +60,22 @@ const OwnerMenu = () => {
 
         if (categoryStatus.reqtyp === "delete") {
             toast.success("Category deleted successfully");
+            dispatch(resetAddCategoryState());
         }
 
-        dispatch(resetAddCategoryState());
+        
     }, [categoryStatus.success, categoryStatus.reqtype]);
+
+     useEffect(() => {
+        if (!categoryStatus.success) return;
+
+        if (categoryStatus.reqtyp === "changeavailablity") {
+             dispatch(resetAddCategoryState());
+        }
+
+       
+    }, [categoryStatus.success, categoryStatus.reqtype]);
+
 
     //on delete item
 
@@ -90,6 +104,11 @@ const OwnerMenu = () => {
         dispatch(deletCategoryThunk(id));
     };
 
+    const onToggleAvailabilityItem = async (item) => {
+        setChangingAvailablityId(item._id)
+        await dispatch(changeAvailablity(item._id))
+    }
+
 
 
     return (
@@ -104,7 +123,8 @@ const OwnerMenu = () => {
                 </button>
             </div>
 
-            <div className="flex gap-4 mb-6 overflow-x-auto">
+            <div className="flex gap-4 mb-6 ">
+                <div className="flex gap-4 mb-6 overflow-x-auto">
                 {categories.map(cat => (
                     <CategoryTabs
                         key={cat._id}
@@ -114,8 +134,10 @@ const OwnerMenu = () => {
                         onDelete={onDeleteCategory}
                         onEdit={()=>onEditCategory(cat)}
                         deletingId={deletingCategoryId}
+                        
                     />
                 ))}
+                </div>
 
                 <button
                     onClick={() => setShowAddCategory(true)}
@@ -138,11 +160,12 @@ const OwnerMenu = () => {
                         key={item._id}
                         item={item}
                         onToggleAvailability={() =>
-                            console.log('this this')
+                            onToggleAvailabilityItem(item)
                         }
                         onEdit={() => onEditItem(item)}
                         onDelete={onDeleteItem}
                         deletingId={deletingItemId}
+                        changingAvailablityId={changingAvailablityId}
                     />
 
                 ))}

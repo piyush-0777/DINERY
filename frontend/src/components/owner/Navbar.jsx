@@ -35,7 +35,6 @@ const Navbar = () => {
     const [mobileMenu, setMobileMenu] = useState(false);
 
     useEffect(()=>{
-        console.log(active.toLowerCase())
         navigate(`/owner/${active.toLowerCase()}`);
     }, [active]);
 

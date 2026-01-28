@@ -7,7 +7,7 @@ import { toast } from "react-toastify";
 const AddEditItemModal = ({ categories, activeCategory, onClose, editingItem }) => {
     const dispatch = useDispatch();
     const { reqtype, loading, success, error, } = useSelector(state => state.loadfoodstatus);
-    console.log({ reqtype, loading, success, error, })
+
 
     useEffect(() => {
         if (reqtype === 'addfood' || reqtype === 'editfood') {

@@ -7,7 +7,8 @@ const MenuItemCard = ({
   onToggleAvailability,
   onEdit,
   onDelete,
-  deletingId 
+  deletingId ,
+  changingAvailablityId
 }) => {
 
   const { loading, reqtype } = useSelector(state => state.loadfoodstatus);
@@ -21,6 +22,10 @@ const MenuItemCard = ({
     loading &&
     reqtype === "editfood" &&
     deletingId === item._id;
+    const isChangeAvailablity = 
+    loading &&
+    reqtype === "changeavailablity" &&
+    changingAvailablityId === item._id;
 
   return (
     <div
@@ -101,7 +106,7 @@ const MenuItemCard = ({
                 : "border-gray-500/40 text-gray-400 hover:bg-gray-500/10"
               }`}
           >
-            {item.isAvailable ? "Available" : "Out of Stock"}
+            {isChangeAvailablity ? 'processing...': item.isAvailable ? "Available" : "Out of Stock"}
           </button>
         </div>
       </div>

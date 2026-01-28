@@ -103,3 +103,33 @@ exports.editFood = async (req , res ) => {
 
 
 }
+
+exports.changeAvailablity = async (req , res ) => {
+  try {
+    console.log(req.params.foodId)
+    const food = await foodModel.findById(req.params.foodId);
+    console.log(food)
+    if (!food) {
+      return res.status(404).json({ message: "Food not found" });
+    }
+
+    // Update normal fields
+    
+    food.isAvailable = !food.isAvailable;
+
+    // ✅ IMAGE CHANGE CHECK
+    
+
+    await food.save();
+
+    res.status(200).json({
+      status: "success",
+      message: "chang togle updated successfully",
+      data: food
+    });
+
+  } catch (error) {
+    console.log(error)
+    res.status(500).json({ message: error.message });
+  }
+}

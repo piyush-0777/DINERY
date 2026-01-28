@@ -12,6 +12,8 @@ export const menuService = {
 
   deleteMenuItem: (menuId) =>
     request(`/food/deletfood/${menuId}`, "DELETE"),
+  changeAvailablity:(menuId) =>
+    request(`/food/changeavailablity/${menuId}`, "PUT"),
 
   addCategory: (data) =>
     request('/category/addcategory' , 'POST' , data , true), 

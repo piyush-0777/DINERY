@@ -1,5 +1,8 @@
 import { createSlice } from "@reduxjs/toolkit";
-import {addFoodThunk , deletFoodThunk , updateFoodThunk} from '../../thunks/manuThunk'
+import {addFoodThunk ,   
+  deletFoodThunk , 
+  updateFoodThunk ,
+changeAvailablity} from '../../thunks/manuThunk'
 
 
 const initialState = {
@@ -63,6 +66,20 @@ const loadFoodSlice = createSlice({
         state.success = true;
       })
       .addCase(updateFoodThunk.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(changeAvailablity.pending, (state) => {
+        state.reqtype = 'changeavailablity';
+        state.loading = true;
+        state.error = null;
+        state.success = false;
+      })
+      .addCase(changeAvailablity.fulfilled, (state) => {
+        state.loading = false;
+        state.success = true;
+      })
+      .addCase(changeAvailablity.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
       });
