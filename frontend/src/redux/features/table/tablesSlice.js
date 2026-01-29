@@ -1,65 +1,58 @@
+// tablesSlice.js
 import { createSlice } from "@reduxjs/toolkit";
-
-/**
- * Dummy data for preview (remove later when API is connected)
- */
-const initialTables = [
-    { id: 1, number: 1, status: "available" },
-    { id: 2, number: 2, status: "occupied" },
-    { id: 3, number: 3, status: "reserved" },
-    { id: 4, number: 4, status: "available" },
-    { id: 5, number: 5, status: "occupied" },
-    { id: 6, number: 6, status: "reserved" },
-];
+import { TABLE_STATUS } from "../../../components/owner/table/TableStatus";
 
 const initialState = {
-    tables: initialTables,
-    loading: false,
-    error: null,
+    tables: [
+        {
+            id: "t1",
+            number: 1,
+            capacity: 4,
+            status: TABLE_STATUS.AVAILABLE,
+        },
+        {
+            id: "t2",
+            number: 2,
+            capacity: 2,
+            status: TABLE_STATUS.ORDERED,
+            total: 840,
+            time: "12 min",
+        },
+        {
+            id: "t3",
+            number: 3,
+            capacity: 6,
+            status: TABLE_STATUS.BILL_PENDING,
+            total: 1620,
+            time: "25 min",
+        },
+    ],
 };
 
 const tablesSlice = createSlice({
     name: "tables",
     initialState,
     reducers: {
-        assignOrderToTable: (state, action) => {
-            const table = state.tables.find(t => t.id === action.payload);
-            if (table) table.status = "occupied";
+        updateTableStatus(state, action) {
+            const table = state.tables.find(t => t.id === action.payload.id);
+            if (table) table.status = action.payload.status;
         },
+        mergeTables(state, action) {
+            const { sourceIds, targetId } = action.payload;
 
-        clearTable: (state, action) => {
-            const table = state.tables.find(t => t.id === action.payload);
-            if (table) table.status = "available";
-        },
+            const target = state.tables.find(t => t.id === targetId);
 
-        reserveTable: (state, action) => {
-            const table = state.tables.find(t => t.id === action.payload);
-            if (table) table.status = "reserved";
-        },
-        addTable: (state) => {
-            const nextNumber = state.tables.length + 1;
-
-            state.tables.push({
-                id: Date.now(),
-                number: nextNumber,
-                status: "available",
+            sourceIds.forEach(id => {
+                const t = state.tables.find(tb => tb.id === id);
+                if (t && t.items) {
+                    target.items = [...(target.items || []), ...t.items];
+                    t.status = "available";
+                    t.items = [];
+                }
             });
-        },
-
-        deleteTable: (state, action) => {
-            state.tables = state.tables.filter(
-                (table) => table.id !== action.payload
-            );
-        },
+        }
     },
 });
 
-export const {
-    assignOrderToTable,
-    clearTable,
-    reserveTable,
-    addTable,
-  deleteTable,
-} = tablesSlice.actions;
-
+export const { updateTableStatus , mergeTables } = tablesSlice.actions;
 export default tablesSlice.reducer;

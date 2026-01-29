@@ -1,30 +1,30 @@
-// Table status constants
+// TableStatus.js
 export const TABLE_STATUS = {
   AVAILABLE: "available",
   OCCUPIED: "occupied",
-  RESERVED: "reserved",
+  ORDERED: "ordered",
+  BILL_PENDING: "bill_pending",
 };
 
-// UI configuration for each status (premium black theme)
-export const TABLE_STATUS_CONFIG = {
-  [TABLE_STATUS.AVAILABLE]: {
+export const TABLE_STATUS_UI = {
+  available: {
     label: "Available",
-    dotColor: "bg-green-500",
-    ringColor: "ring-green-500/40",
-    textColor: "text-green-400",
+    color: "border-green-500 text-green-400",
+    dot: "bg-green-500",
   },
-
-  [TABLE_STATUS.OCCUPIED]: {
+  occupied: {
     label: "Occupied",
-    dotColor: "bg-yellow-500",
-    ringColor: "ring-yellow-500/40",
-    textColor: "text-yellow-400",
+    color: "border-yellow-500 text-yellow-400",
+    dot: "bg-yellow-500",
   },
-
-  [TABLE_STATUS.RESERVED]: {
-    label: "Reserved",
-    dotColor: "bg-red-500",
-    ringColor: "ring-red-500/40",
-    textColor: "text-red-400",
+  ordered: {
+    label: "Ordered",
+    color: "border-blue-500 text-blue-400",
+    dot: "bg-blue-500",
+  },
+  bill_pending: {
+    label: "Bill Pending",
+    color: "border-red-500 text-red-400",
+    dot: "bg-red-500",
   },
 };
