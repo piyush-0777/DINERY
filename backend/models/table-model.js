@@ -5,6 +5,7 @@ const TableSchema = mongoose.Schema({
     tableNumber: String,
     tableId: {type:Number , require:true},
     qrCode: String,
+    capacity:{type:Number , require:true , default: 2},
     status: { type: String, enum: ["available","occupied"], default: "available" }
 })
 
