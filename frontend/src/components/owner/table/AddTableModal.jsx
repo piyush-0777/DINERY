@@ -3,6 +3,7 @@ import { useState } from "react";
 const AddTableModal = ({ onAdd, onClose }) => {
   const [number, setNumber] = useState("");
   const [capacity, setCapacity] = useState("");
+   
 
   return (
     <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50">
@@ -29,7 +30,7 @@ const AddTableModal = ({ onAdd, onClose }) => {
         />
 
         <button
-          onClick={() => onAdd(number, capacity)}
+          onClick={() => onAdd({tableNumber:number, capacity})}
           className="w-full py-2 rounded-xl
                      bg-green-600 text-black font-medium
                      hover:bg-green-500 transition"

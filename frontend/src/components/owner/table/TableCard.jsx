@@ -1,6 +1,6 @@
 import { TABLE_STATUS_UI, TABLE_STATUS } from "./TableStatus";
 
-const TableCard = ({ table, onOpen, onAddOrder, onShowQR, onBill }) => {
+const TableCard = ({ table, onOpen, onAddOrder, onShowQR, onBill , onDelete }) => {
   const ui = TABLE_STATUS_UI[table.status];
 
   return (
@@ -111,7 +111,7 @@ const TableCard = ({ table, onOpen, onAddOrder, onShowQR, onBill }) => {
   <button
     onClick={(e) => {
       e.stopPropagation();
-      onDelete(table.id);
+      onDelete(table._id);
     }}
     className="px-4 py-2 rounded-xl
                bg-red-600 text-white

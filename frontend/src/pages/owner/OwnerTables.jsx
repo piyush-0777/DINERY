@@ -1,4 +1,4 @@
-import { useSelector } from "react-redux";
+import { useSelector , useDispatch} from "react-redux";
 import { useState } from "react";
 
 import TableCard from "../../components/owner/table/TableCard";
@@ -8,8 +8,17 @@ import MergeSplitModal from "../../components/owner/table/MergeSplitModal";
 import AddTableModal from "../../components/owner/table/AddTableModal"
 
 
+import {addTableThunk , deleteTableThunk} from '../../redux/thunks/tableThunk'
+
+
 export default function TablesPage() {
+
+  const dispatch = useDispatch() 
+
   const tables = useSelector(state => state.tables.tables);
+  console.log(tables)
+  const loardTable = useSelector(state => state.loardtables)
+  console.log('table',loardTable)
 
   const [selectedTable, setSelectedTable] = useState(null);
   const [qrImage, setQrImage] = useState(null);
@@ -17,8 +26,11 @@ export default function TablesPage() {
   const [showAddModal, setShowAddModal] = useState(false);
 
 
-  const handleAddTable = () => {
-    console.log('piyush')
+  const handleAddTable = (data) => {
+    dispatch(addTableThunk(data))
+  }
+  const onDeleteTable = (id) =>{
+    dispatch(deleteTableThunk(id))
   }
 
 
@@ -59,7 +71,8 @@ export default function TablesPage() {
             key={table.id}
             table={table}
             onOpen={() => setSelectedTable(table)}
-            onShowQR={() => setQrImage(table.qr)}
+            onShowQR={() => setQrImage(table.qrImage)}
+            onDelete={onDeleteTable}
           />
         ))}
       </div>
