@@ -6,7 +6,7 @@ const router = express.Router();
 router.get('/getalltable' ,authenticateResturant, )
 router.post('/createtable',authenticateResturant , createTable)
 router.delete('/deletetable/:tableId' ,authenticateResturant, deleteTable )
-router.put('/updatetablestatus/:tableId',authenticateResturant ,updateStatus )
+router.put('/updatetablestatus/:tableId',authenticateResturant ,updateStatus)
 
 
 module.exports = router

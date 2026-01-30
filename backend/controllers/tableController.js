@@ -15,7 +15,7 @@ exports.getAllTable = async (req, res) => {
         let tablesWithQrimage = [];
         for (let table of tables) {
             const qrImage = await generateQR(table, restaurant.name)
-            tablesWithQrimage.push({ ...tables, qrImage: qrImage })
+            tablesWithQrimage.push({ ...tables._doc, qrImage: qrImage })
         }
         return res.status(200).json({
             tables: tablesWithQrimage
@@ -47,9 +47,10 @@ exports.createTable = async (req, res) => {
         })
 
         const qrImage = await generateQR(table, restaurant.name)
+       const data = {...table._doc, qrImage:qrImage}
         return res.status(200).json({
-            table,
-            qrImage
+            message:'table is added',
+            table:data
         })
     } catch (error) {
         console.log(error)
@@ -69,13 +70,14 @@ exports.deleteTable = async (req, res) => {
                 error: 'restaurant is not found'
             })
         }
-        const table = tableModel.findOne(tableId)
+        const table = await tableModel.findById(tableId)
         if (!table) {
             res.status(404).json({
                 error: 'table is not found'
             })
         }
-        if (table.status !== "available") {
+        console.log(table)
+        if (table.status != "available") {
             return res.status(400).json({
                 error: 'table cannot be deleted while occupied or reserved',
             })

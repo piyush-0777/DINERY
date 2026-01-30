@@ -4,50 +4,52 @@ const bcrypt = require('bcrypt')
 const { hashPasswordGenerater, hashPasswordChecker } = require('../utils/hashPassword')
 const foodsModel = require('../models/food-model')
 const categoryModel = require('../models/categories-model')
+const tableModel = require('../models/table-model')
+const generateQR = require('../utils/generateQR')
 
 
 
 exports.login = async (req, res) => {
-    try {
+  try {
 
-        const { restaurantName, ownerName, ownerEmail, password } = req.body
+    const { restaurantName, ownerName, ownerEmail, password } = req.body
 
-        // find user deteal using  resturnt model
-        const restaurant = await Restaurant.findOne({ ownerEmail });
+    // find user deteal using  resturnt model
+    const restaurant = await Restaurant.findOne({ ownerEmail });
 
-        if (!restaurant) {
-            res.status(401).json({ error: 'invalid email or password' })
-            return;
-        }
-
-        const isMatchPassword = await hashPasswordChecker(password, restaurant.password);
-
-        if (!isMatchPassword) {
-            return res.status(401).json({
-                error: "Invalid email or password"
-            });
-        }
-
-        const token = jwt.sign({ ownerEmail }, process.env.JWT_SECRET_KEY, { expiresIn: "48h" })
-
-
-        res.cookie("token", token, {
-            httpOnly: true,
-            secure: false, // set true in production (HTTPS)
-            sameSite: "lax",
-            maxAge: 48 * 60 * 60 * 1000 // 48 hour
-
-        })
-
-
-
-        res.status(200).json({ massage: 'logged in' })
-    } catch (error) {
-        console.error("Login error:", error);
-        res.status(500).json({
-            error: "Internal server error"
-        });
+    if (!restaurant) {
+      res.status(401).json({ error: 'invalid email or password' })
+      return;
     }
+
+    const isMatchPassword = await hashPasswordChecker(password, restaurant.password);
+
+    if (!isMatchPassword) {
+      return res.status(401).json({
+        error: "Invalid email or password"
+      });
+    }
+
+    const token = jwt.sign({ ownerEmail }, process.env.JWT_SECRET_KEY, { expiresIn: "48h" })
+
+
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: false, // set true in production (HTTPS)
+      sameSite: "lax",
+      maxAge: 48 * 60 * 60 * 1000 // 48 hour
+
+    })
+
+
+
+    res.status(200).json({ massage: 'logged in' })
+  } catch (error) {
+    console.error("Login error:", error);
+    res.status(500).json({
+      error: "Internal server error"
+    });
+  }
 
 
 
@@ -128,18 +130,25 @@ exports.registerRestaurant = async (req, res) => {
   }
 };
 
-exports.getDashBord = async (req , res) => {
+exports.getDashBord = async (req, res) => {
   try {
     const restaurant = req.restaurant;
-    if(!restaurant) {
-      return res.status(404).json({error: "restaurant is not found"})
+    if (!restaurant) {
+      return res.status(404).json({ error: "restaurant is not found" })
     }
-    const foods = await foodsModel.find({restaurant:restaurant._id})
-    const category = await categoryModel.find({restaurant:restaurant._id})
-    res.status(200).json({ restaurant,foods , category});
+    const foods = await foodsModel.find({ restaurant: restaurant._id })
+    const category = await categoryModel.find({ restaurant: restaurant._id })
+
+    const tables = await tableModel.find({ restaurant: restaurant._id })
+    let tablesWithQrimage = [];
+    for (let table of tables) {
+      const qrImage = await generateQR(table, restaurant.name)
+      tablesWithQrimage.push({ ...table._doc, qrImage: qrImage })
+    }
+    res.status(200).json({ restaurant, foods, category , tables:tablesWithQrimage });
 
   } catch (error) {
     console.log(error);
-    return res.status(500).json({error: "server error" })
+    return res.status(500).json({ error: "server error" })
   }
 }
