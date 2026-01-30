@@ -35,15 +35,13 @@ const AddCategory = ({ onClose, editingCategory }) => {
         }
     });
 
-    useEffect(() => {
-    toastShown.current = false;
-}, [editingCategory]);
+  
 
     useEffect(() => {
-        if ( reqtyp === 'edit') {
+        if ( reqtyp === 'edit' || reqtyp === 'add') {
 
-            if (success && !toastShown.current) {
-                toastShown.current = true;
+            if (success ) {
+               
 
                 toast.success(
                     editingCategory
@@ -61,6 +59,7 @@ const AddCategory = ({ onClose, editingCategory }) => {
             }
         }
     }, [success, error]);
+
 
 
 
