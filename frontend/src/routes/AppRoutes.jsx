@@ -40,7 +40,7 @@ const AppRoutes = () => {
         
         
         <Route path="/customer" element={<CustomerLayout />}>
-          <Route path="CustomerLogin/:tableID" element={<CustomerLogin />} />
+          <Route path=":resturantName/login" element={<CustomerLogin />} />
         </Route>
 
         {/* Protected Routes */}

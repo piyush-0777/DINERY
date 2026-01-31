@@ -3,7 +3,7 @@ const QRCode = require('qrcode')
 
 const generateQR =async (table , res_name) =>{
     try {
-    const qrUrl = `http://localhost:5173${res_name}/customer/login/?token=${table.qrCode}`
+    const qrUrl = `http://10.102.40.29:5173/customer/${res_name}/login/?token=${table.qrCode}`
     const qrImage = await QRCode.toDataURL(qrUrl);
     return qrImage
     } catch (error) {

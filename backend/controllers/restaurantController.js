@@ -142,7 +142,7 @@ exports.getDashBord = async (req, res) => {
     const tables = await tableModel.find({ restaurant: restaurant._id })
     let tablesWithQrimage = [];
     for (let table of tables) {
-      const qrImage = await generateQR(table, restaurant.name)
+      const qrImage = await generateQR(table, restaurant.restaurantName)
       tablesWithQrimage.push({ ...table._doc, qrImage: qrImage })
     }
     res.status(200).json({ restaurant, foods, category , tables:tablesWithQrimage });
