@@ -10,6 +10,7 @@ const dispatch = useDispatch()
 const { list, loading, error } = useSelector(s => s.orders)
 console.log({ list, loading, error })
 const [filter, setFilter] = useState('Today')
+const [selectedOrder , setSelectedOrder] = useState();
 
 
 // useEffect(() => {
@@ -29,7 +30,7 @@ return (
 
 <div className="grid gap-4">
 {list.map(order => (
-<OrderCard key={order._id} order={order} />
+<OrderCard key={order._id} order={order} setSelectedOrder={setSelectedOrder} />
 ))}
 </div>
 </div>

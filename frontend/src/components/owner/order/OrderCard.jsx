@@ -3,12 +3,12 @@ import { Eye, Printer } from "lucide-react";
 import { motion } from "framer-motion";
 
 
-export default function OrderCard({ order, onClick }) {
+export default function OrderCard({ order, onClick , setSelectedOrder }) {
 const statusBorder = {
-Pending: 'border-yellow-400',
-Preparing: 'border-blue-400',
-Served: 'border-green-400',
-Delayed: 'border-red-500 animate-pulse',
+Pending: 'border-yellow-400/40',
+Preparing: 'border-blue-400/40',
+Served: 'border-green-400/40',
+Delayed: 'border-red-500/40 ',
 }
 
 const isDelayed =
@@ -27,11 +27,12 @@ return (
 <motion.div
 key={order._id}
 whileHover={{ scale: 1.02 }}
-className={`bg-neutral-900 rounded-xl p-4 border border-gray-800 hover:border-yellow-400 transition-all duration-300 ${glow}`}
+className={` rounded-xl p-4 border bg-neutral-950  border-neutral-800 hover:border-yellow-400/40
+hover:shadow-[0_0_30px_-10px_rgba(234,179,8,0.4)] transition-all duration-300 ${glow}`}
 >
 <div className="flex justify-between items-center">
 <div>
-<p className="font-semibold">{order._id}</p>
+<p className="text-white font-semibold text-lg">{order._id}</p>
 <p className="text-sm text-gray-400">
 {order.orderType} • {order.createdAt}
 </p>
@@ -39,12 +40,12 @@ className={`bg-neutral-900 rounded-xl p-4 border border-gray-800 hover:border-ye
 
 
 <span
-className={`px-3 py-1 text-xs rounded-full ${
+className={`px-3 py-1 text-xs rounded-full border cursor-pointer ${
 order.status === "Completed"
-? "bg-green-900 text-green-400"
+? "border-green-500/40 text-green-400 hover:bg-green-500/10"
 : order.status === "Preparing"
-? "bg-yellow-900 text-yellow-300"
-: "bg-red-900 text-red-400"
+? "border-yellow-500/40  text-yellow-300 hover:bg-green-500/10"
+: "border-red-500/40  text-red-300 hover:bg-red-500/10"
 }`}
 >
 {order.status}
