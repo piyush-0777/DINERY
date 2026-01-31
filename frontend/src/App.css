@@ -59,5 +59,16 @@
   animation: shimmer 1.4s infinite;
 }
 
+@keyframes yellowPulse {
+0% { box-shadow: 0 0 0px #facc15; }
+50% { box-shadow: 0 0 20px #facc15; }
+100% { box-shadow: 0 0 0px #facc15; }
+}
+
+
+.new-order {
+animation: yellowPulse 1.5s infinite;
+}
+
 
 
