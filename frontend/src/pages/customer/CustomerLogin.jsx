@@ -20,6 +20,7 @@ const [searchParams] = useSearchParams()
 useEffect(()=>{
 const token = searchParams.get('token')
 dispatch(addToken(token))
+localStorage.setItem("token" , token);
 } , [])
 
   // use to navigate user to other paje

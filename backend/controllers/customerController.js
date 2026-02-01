@@ -3,7 +3,7 @@ const customer = require('../models/customer-model')
 
 exports.customerLogin = async (req , res) =>{
 const {name , phone} = req.body
-const {restaurantId , tableId} = req.params;
+const {restaurantId } = req.params;
 console.log("Original URL:", req.originalUrl);
 console.log("Path:", req.path);
 console.log("Method:", req.method);
