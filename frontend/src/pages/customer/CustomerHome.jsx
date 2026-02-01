@@ -11,6 +11,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 
 
 const CustomerHome = () => {
+  
 
   // use to get user tabel id
   const {id} = useParams();
@@ -23,11 +24,13 @@ const dispatch = useDispatch()
 
 // get foods manu from redux foods storge
 const foods = useSelector(state => state.foodObject.foods)
+console.log(foods)
 
 //get all foods category which is available in restaurant
 const category = useSelector(state => state.foodObject.category)
 // get customer details
 const customer = useSelector(state => state.customer.customer)
+console.log(customer);
 
 // filter  foods based on foods category 
 const [filterfoods, setfilerFoods] = useState(useSelector(state => state.foodObject.foods))

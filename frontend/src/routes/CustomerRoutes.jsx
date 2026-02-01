@@ -11,8 +11,8 @@ const CustomerRoutes = () => {
   return (
     <CustomerLayout>
       <Routes>
-        <Route path="CustomerHome/:tableId" element={<CustomerHome />} />
-        <Route path="CustomerBill/:tableId" element={<CustomerBill />} />
+        <Route path="CustomerHome" element={<CustomerHome />} />
+        <Route path="CustomerBill" element={<CustomerBill />} />
         
       </Routes>
     </CustomerLayout>

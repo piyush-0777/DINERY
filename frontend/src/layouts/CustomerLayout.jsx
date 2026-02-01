@@ -5,7 +5,7 @@ const CustomerLayout = ({ children }) => {
   return (
     <div>
       {/* <Navbar /> */}
-      <div className="p-4">
+      <div>
         {children || <Outlet />}
       </div>
     </div>

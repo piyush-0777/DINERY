@@ -1,12 +1,12 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 // import Dinery from '../../assets/dinery.png'
 import Dinery from '../../assets/dinery.png'
 import { useForm } from 'react-hook-form'
 import Button from '../../components/customer/Button'
-import {useNavigate, useParams} from 'react-router-dom'
+import {useNavigate, useParams , useSearchParams} from 'react-router-dom'
 import { useSelector , useDispatch } from 'react-redux'
 //import { addCustomer } from '../features/customer/customerSlice'
-import { addCustomer } from '../../redux/features/customer/customerSlice'
+import { addCustomer , addToken } from '../../redux/features/customer/customerSlice'
 import { toast } from 'react-toastify'
 
 const CustomerLogin = () => {
@@ -14,11 +14,19 @@ const CustomerLogin = () => {
   // use to change and save new data in redux store
   const dispatch = useDispatch();
 
+  //for get search params
+const [searchParams] = useSearchParams()
+
+useEffect(()=>{
+const token = searchParams.get('token')
+dispatch(addToken(token))
+} , [])
+
   // use to navigate user to other paje
    const navigate = useNavigate();
 
    // use to get table id
-   const {id} = useParams()
+   const {resturantName} = useParams()
 
    // form data struct
    const {
@@ -32,11 +40,9 @@ const CustomerLogin = () => {
   const onSubmit = (data) => {
     if(data.number.toString().length != 10) {
     toast.error('enter valid number');
-      console.log(data.number.toString());
     } else {
-    console.log("the data is /n" , data);
     dispatch(addCustomer({customerName:data.name ,CustomerMobile:data.number}))
-     navigate(`/customer/customerHome/${id}`)
+     navigate(`/customer/${resturantName}/customerHome`)
      toast.success("login success!")
     }
   }

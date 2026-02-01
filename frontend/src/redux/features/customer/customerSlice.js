@@ -1,13 +1,16 @@
 import { createSlice , nanoid } from "@reduxjs/toolkit";
 
 const initialState = {
-    customer:{customerName:'' , CustomerMobile:'' , order:[]}
+    customer:{customerName:'' , CustomerMobile:'' , order:[] , token:null}
 }
 
 export const customerSlice = createSlice({
     name: 'customer' , 
     initialState,
     reducers: {
+        addToken: (state , action) => {
+            state.customer.token = action.payload
+        },
         // use to add customer
         addCustomer: (state , action) => {
             state.customer.customerName = action.payload.customerName;
@@ -60,6 +63,6 @@ export const customerSlice = createSlice({
         }
     }
 })
-export const {addCustomer , addOrder, deleteAllOrder , incresContityOfOrder , dicresContityOfOrder , deletOrder } =customerSlice.actions
+export const { addToken, addCustomer , addOrder, deleteAllOrder , incresContityOfOrder , dicresContityOfOrder , deletOrder } =customerSlice.actions
 
 export default customerSlice.reducer;

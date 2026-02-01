@@ -2,6 +2,8 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 // import MainLayout from "../layouts/MainLayout";
 import CustomerLayout from "../layouts/CustomerLayout";
 import CustomerLogin from "../pages/customer/CustomerLogin"
+
+
  import OwnerRoutes from "./OwnerRoutes";
  import CustomerRoutes from "./CustomerRoutes";
 import { ToastContainer } from "react-toastify";
@@ -10,6 +12,7 @@ import Home from "../pages/public/Home";
 import About from "../pages/public/About";
 import Login from "../pages/auth/Login";
 import Register from "../pages/auth/Register";
+
 
 
 // Auth Pages
@@ -41,11 +44,12 @@ const AppRoutes = () => {
         
         <Route path="/customer" element={<CustomerLayout />}>
           <Route path=":resturantName/login" element={<CustomerLogin />} />
+
         </Route>
 
         {/* Protected Routes */}
         <Route path="/owner/*" element={<OwnerRoutes />} />
-        <Route path="/customer/*" element={<CustomerRoutes />} />
+        <Route path="/customer/:resturantName/*" element={<CustomerRoutes />} />
       </Routes>
     </Router>
   );
