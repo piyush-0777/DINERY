@@ -7,12 +7,26 @@ import {useNavigate, useParams , useSearchParams} from 'react-router-dom'
 import { useSelector , useDispatch } from 'react-redux'
 //import { addCustomer } from '../features/customer/customerSlice'
 import { addCustomer , addToken } from '../../redux/features/customer/customerSlice'
+import {customerLoginThunk} from '../../redux/thunks/customerThunk'
 import { toast } from 'react-toastify'
 
 const CustomerLogin = () => {
 
   // use to change and save new data in redux store
   const dispatch = useDispatch();
+
+  const {resturantName} = useParams()
+   console.log('res name ' , resturantName)
+
+  const customerDeteal = useSelector(state => state.customer)
+  console.log(customerDeteal.success);
+
+  useEffect(()=>{
+    if(customerDeteal.success=== true) {
+navigate(`/customer/${resturantName}/customerHome`)
+     toast.success("login success!")
+    }
+  },[customerDeteal.success])
 
   //for get search params
 const [searchParams] = useSearchParams()
@@ -27,7 +41,7 @@ localStorage.setItem("token" , token);
    const navigate = useNavigate();
 
    // use to get table id
-   const {resturantName} = useParams()
+   
 
    // form data struct
    const {
@@ -38,13 +52,12 @@ localStorage.setItem("token" , token);
   } = useForm()
 
   // submit customer data
-  const onSubmit = (data) => {
+  const onSubmit = async (data) => {
     if(data.number.toString().length != 10) {
     toast.error('enter valid number');
     } else {
-    dispatch(addCustomer({customerName:data.name ,CustomerMobile:data.number}))
-     navigate(`/customer/${resturantName}/customerHome`)
-     toast.success("login success!")
+    dispatch(customerLoginThunk({resturantName:resturantName ,customerName:data.name ,CustomerMobile:data.number}))
+     
     }
   }
 
