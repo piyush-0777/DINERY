@@ -12,3 +12,14 @@ const data = {name:customerName ,phone:CustomerMobile}
     return thunkAPI.rejectWithValue({status:error.status || 500 , message:error.data?.error || error.message});
 }
 })
+
+export const LoadCustomerDashbord = createAsyncThunk('LoadCustomerDashbord' , async (restaurantName , thunkAPI) =>{
+    try {
+        const res = await customerService.getCustomerDashbord(restaurantName);
+        console.log(res);
+        return res;
+    } catch (error) {
+        console.log(error);
+        return thunkAPI.rejectWithValue({status:error.status || 500 , message:error.data?.error || error.message})
+    }
+})

@@ -1,5 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { loadDashbordThunk } from '../../thunks/loardDashbordThunk'
+
+// for owner
 import {
   addFoodThunk,
   deletFoodThunk,
@@ -9,6 +11,11 @@ import {
   editCategoryThunk,
   changeAvailablity
 } from '../../thunks/manuThunk'
+
+//for customer 
+import {
+  LoadCustomerDashbord,
+} from '../../thunks/customerThunk'
 
 
 
@@ -69,6 +76,13 @@ export const foodSlice = createSlice({
             ? action.payload.data
             : item
         );
+      })
+
+      // for customer
+
+       .addCase(LoadCustomerDashbord.fulfilled, (state, action) => {
+       state.foods = action.payload.food;
+        state.category = action.payload.category;
       })
 
 

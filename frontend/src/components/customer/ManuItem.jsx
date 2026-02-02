@@ -11,7 +11,7 @@ const [isFoodOrder , setIsfoodOrder] = useState(false);
 
 useEffect(()=>{
 customerOrder.map((order)=>{
-  if(order.f_name == food?.f_name ) {
+  if(order.name == food?.name ) {
     setIsfoodOrder(true);
   } else {
     setIsfoodOrder(false);
@@ -21,7 +21,7 @@ customerOrder.map((order)=>{
 
 const hendalDicresContity = (e) => {
      setContityOforder(contityOforder -1)
-     dispatch(dicresContityOfOrder({id:1 , f_name:food.f_name }));
+     dispatch(dicresContityOfOrder({id:food._id , name:food.name }));
      console.log(e);
    }
 
@@ -49,7 +49,7 @@ const [contityOforder , setContityOforder] = useState(()=>{
 
           {/* Food Name */}
           <h3 className="text-gray-900 font-semibold leading-tight">
-            {food?.f_name}
+            {food?.name}
           </h3>
 
           {/* Description */}
@@ -57,11 +57,11 @@ const [contityOforder , setContityOforder] = useState(()=>{
             {/* <span className="w-16 bg-green-200 h-2 rounded-md">
               <span className="block bg-green-700 w-2/3 h-2 rounded-md"></span>
             </span> */}
-            {food?.f_about}
+            {food?.description}
           </p>
 
           {/* Price */}
-          <p className="text-gray-800 font-semibold mt-2">₹{food?.f_price}</p>
+          <p className="text-gray-800 font-semibold mt-2">₹{food?.price}</p>
 
           {/* Action Icons */}
           <div className="flex gap-3 mt-3">
@@ -104,23 +104,23 @@ const [contityOforder , setContityOforder] = useState(()=>{
         {/* Right side - Image and Add button */}
         <div className="relative">
           <img
-            src={food?.f_img}
+            src={food?.foodImg}
             alt="Pizza"
             className="w-32 h-32 rounded-xl object-cover"
           />
 
           {/* Add Button */}
           <button
-          id={food?.f_name}
+          id={food?.name}
           onClick={placeOrder}
            className={`absolute -bottom-5 right-2 
             ${contityOforder!==0 ? 'bg-green-800 text-white':'bg-green-50 border text-green-800'}
             border-green-600  font-bold text-sm px-6 py-1.5 
             rounded-lg flex items-center gap-1 shadow-sm hover:bg-green-100 transition`}>
-              {contityOforder !=0 ? <span onClick={hendalDicresContity} id={food?.f_name} className="text-lg font-bold">-</span>:''}
+              {contityOforder !=0 ? <span onClick={hendalDicresContity} id={food?.name} className="text-lg font-bold">-</span>:''}
               
             {contityOforder==0 ? 'ADD' :`${contityOforder}`} 
-            <span onClick={()=>setContityOforder(contityOforder +1)} id={food?.f_name} className="text-lg font-bold">+</span>
+            <span onClick={()=>setContityOforder(contityOforder +1)} id={food?.name} className="text-lg font-bold">+</span>
           </button>
         </div>
       </div>

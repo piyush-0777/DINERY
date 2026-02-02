@@ -1,5 +1,5 @@
 import { createSlice, nanoid } from "@reduxjs/toolkit";
-import { customerLoginThunk } from "../../thunks/customerThunk"
+import { customerLoginThunk , LoadCustomerDashbord } from "../../thunks/customerThunk"
 
 const initialState = {
     customer: { 
@@ -9,7 +9,9 @@ const initialState = {
         customerName: '', 
         CustomerMobile: '', 
         order: [], 
-        token: null },
+        token: null 
+    },
+    reqtype: null ,
     loading: false,
     message: null,
     success: false,
@@ -45,7 +47,7 @@ export const customerSlice = createSlice({
         //incress contity of order
         incresContityOfOrder: (state, action) => {
 
-            const index = state.customer.order.findIndex((e) => action.payload.f_name == e.f_name)
+            const index = state.customer.order.findIndex((e) => action.payload.name == e.name)
             if (index !== -1) {
                 state.customer.order[index].number_of_item = state.customer.order[index].number_of_item + 1;
             } else {
@@ -78,6 +80,7 @@ export const customerSlice = createSlice({
     extraReducers: (builder) => {
         builder
             .addCase(customerLoginThunk.pending, (state) => {
+                state.reqtype = 'login'
                 state.loading = true;
                 state.error = null;
             })
@@ -92,6 +95,22 @@ export const customerSlice = createSlice({
                 state.success = true;
             })
             .addCase(customerLoginThunk.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload ?? {
+                    status: 500,
+                    message: action.error.message,
+                };
+            })
+            .addCase(LoadCustomerDashbord.pending, (state) => {
+                state.reqtype = 'dashbord'
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(LoadCustomerDashbord.fulfilled, (state, action) => {
+                state.loading = false;
+                state.success = true;
+            })
+            .addCase(LoadCustomerDashbord.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload ?? {
                     status: 500,

@@ -1,6 +1,6 @@
 import React from 'react'
 
-const ManuCategory = ({changCategory ,selectedCategory ,CategoryLogo , CategoryName }) => {
+const ManuCategory = ({changCategory ,selectedCategory ,CategoryLogo , CategoryName , CategoryId }) => {
 
   
   
@@ -13,7 +13,7 @@ const ManuCategory = ({changCategory ,selectedCategory ,CategoryLogo , CategoryN
 
 
      <div 
-        id={CategoryName}
+        id={CategoryId}
           className={`
             flex flex-col items-center rounded-xl p-4 shadow-md w-[150px] hover:scale-105 transition-transform 
             ${selectedCategory==CategoryName? 'bg-[#e2eedd]':'bg-white'}`}
@@ -21,14 +21,14 @@ const ManuCategory = ({changCategory ,selectedCategory ,CategoryLogo , CategoryN
      >
       {/* Yellow circular image */}
       <img
-       id={CategoryName}
+       id={CategoryId}
         src={CategoryLogo} // replace with your yellow image link
         alt="Dinery Feast"
         className="w-[50px] h-[50px] rounded-full object-cover"
       />
 
       {/* Text below */}
-      <span  id={CategoryName} className="text-gray-600 text-sm w-[100px] text-center font-medium mt-2">{CategoryName}</span>
+      <span  id={CategoryId} className="text-gray-600 text-sm w-[100px] text-center font-medium mt-2">{CategoryName}</span>
     </div>
   )
 }

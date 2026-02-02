@@ -7,6 +7,9 @@ export const customerService = {
   customerLogin:(restaurantName , data)=>
     request(`/customer/${restaurantName}/login` , "POST" , data),
 
+  getCustomerDashbord: (restaurantName)=>
+    request(`/customer/${restaurantName}/loadCustomerDashbord` , 'GET') ,
+
   updateCustomerProfile: (data) =>
     request("/customer/profile", "PUT", data),
 
