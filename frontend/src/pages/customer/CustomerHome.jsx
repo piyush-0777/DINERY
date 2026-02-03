@@ -12,7 +12,6 @@ import { LoadCustomerDashbord } from '../../redux/thunks/customerThunk'
 
 
 const CustomerHome = () => {
-  // hello this is for me
 
   const { id } = useParams();
 
