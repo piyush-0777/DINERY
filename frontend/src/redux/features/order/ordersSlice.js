@@ -6,80 +6,128 @@ const ordersSlice = createSlice({
 name: 'orders',
 initialState: {
 list:  [
-  {
-    _id: "ORD-201",
-    orderType: "TABLE",
-    tableNo: 4,
+  
+   {
+    _id:'120' , 
+    restaurant: "65f1a1a1a1a1a1a1a1a1a1a1",
+    table: "65f2b2b2b2b2b2b2b2b2b2b2",
     status: "Pending",
     totalAmount: 560,
-    createdAt: Date.now() - 5 * 60 * 1000, // 5 mins ago
-    items: [
-      { name: "Gujarati Thali", qty: 1, price: 180 },
-      { name: "Butter Roti", qty: 4, price: 40 },
-      { name: "Dal Fry", qty: 1, price: 120 },
-    ],
-    isPaid: false,
-  },
-
-  {
-    _id: "ORD-202",
-    orderType: "ONLINE",
-    customerName: "Rahul",
-    status: "Preparing",
-    totalAmount: 420,
-    createdAt: Date.now() - 18 * 60 * 1000, // delayed order
-    items: [
-      { name: "Paneer Butter Masala", qty: 1, price: 220 },
-      { name: "Butter Naan", qty: 3, price: 40 },
-    ],
-    isPaid: true,
-  },
-
-  {
-    _id: "ORD-203",
-    orderType: "TABLE",
-    tableNo: 1,
-    status: "Served",
-    totalAmount: 850,
     createdAt: Date.now() - 25 * 60 * 1000,
     items: [
-      { name: "Punjabi Thali", qty: 2, price: 250 },
-      { name: "Sweet Lassi", qty: 2, price: 75 },
+      {
+        name: "Gujarati Thali",
+        price: 180,
+        quantity: 1,
+        subtotal: 180,
+      },
+      {
+        name: "Butter Roti",
+        price: 40,
+        quantity: 4,
+        subtotal: 160,
+      },
+      {
+        name: "Dal Fry",
+        price: 120,
+        quantity: 1,
+        subtotal: 120,
+      },
     ],
-    isPaid: false,
   },
 
   {
-    _id: "ORD-204",
-    orderType: "ONLINE",
-    customerName: "Swiggy",
+    _id:'121',
+    restaurant: "65f1a1a1a1a1a1a1a1a1a1a1",
+    customer: "65f3c3c3c3c3c3c3c3c3c3c3",
+    status: "Preparing",
+    totalAmount: 420,
+    createdAt: Date.now() - 25 * 60 * 1000,
+    items: [
+      {
+        name: "Paneer Butter Masala",
+        price: 220,
+        quantity: 1,
+        subtotal: 220,
+      },
+      {
+        name: "Butter Naan",
+        price: 40,
+        quantity: 3,
+        subtotal: 120,
+      },
+    ],
+  },
+
+  {
+    _id:'122',
+    restaurant: "65f1a1a1a1a1a1a1a1a1a1a1",
+    table: "65f2d4d4d4d4d4d4d4d4d4d4",
+    status: "Completed",
+    totalAmount: 850,
+    createdAt:Date.now() - 25 * 60 * 1000,
+    items: [
+      {
+        name: "Punjabi Thali",
+        price: 250,
+        quantity: 2,
+        subtotal: 500,
+      },
+      {
+        name: "Sweet Lassi",
+        price: 75,
+        quantity: 2,
+        subtotal: 150,
+      },
+    ],
+  },
+
+  {
+    _id:'124' ,
+    restaurant: "65f1a1a1a1a1a1a1a1a1a1a1",
+    customer: "65f3e5e5e5e5e5e5e5e5e5e5",
     status: "Completed",
     totalAmount: 1200,
     createdAt: Date.now() - 45 * 60 * 1000,
     items: [
-      { name: "Rajasthani Thali", qty: 2, price: 399 },
-      { name: "Ghee Bajra Roti", qty: 4, price: 50 },
+      {
+        name: "Rajasthani Thali",
+        price: 399,
+        quantity: 2,
+        subtotal: 798,
+      },
+      {
+        name: "Ghee Bajra Roti",
+        price: 50,
+        quantity: 4,
+        subtotal: 200,
+      },
     ],
-    isPaid: true,
   },
 
   {
-    _id: "ORD-205",
-    orderType: "TABLE",
-    tableNo: 7,
+    _id:'125',
+    restaurant: "65f1a1a1a1a1a1a1a1a1a1a1",
+    table: "65f2f6f6f6f6f6f6f6f6f6f6",
     status: "Pending",
     totalAmount: 300,
-    createdAt: Date.now() - 2 * 60 * 1000, // new order (pulse)
+    createdAt: Date.now() - 2 * 60 * 1000,
     items: [
-      { name: "Masala Dosa", qty: 2, price: 150 },
+      {
+        name: "Masala Dosa",
+        price: 150,
+        quantity: 2,
+        subtotal: 300,
+      },
     ],
-    isPaid: false,
   },
 ],
 loading: false,
 error: null,
 },
-reducers: {},
+reducers: {
+  
+},
 extraReducers: (builder) => {
 builder
 .addCase(fetchOrdersThunk.pending, (state) => {

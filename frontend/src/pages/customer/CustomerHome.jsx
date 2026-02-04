@@ -62,19 +62,19 @@ const CustomerHome = () => {
   // add user order and save to redux customer order store 
   const placeOrder = element => {
 
-    const order = foods.filter((food) => food.name === element.target.id)[0]
-    const isOrder = customer.order.find((item) => order.name == item.name)
+    const orderFood = foods.filter((food) => food.name === element.target.id)[0]
+    const isOrder = customer.order.items.find((item) => orderFood._id == item.id)
 
 
     if (isOrder) {
 
       // if order is already added then incres the contity of order
 
-      dispatch(incresContityOfOrder({ id: 1, f_name: order.name }))
+      dispatch(incresContityOfOrder(orderFood._id))
     } else {
 
       // else add order
-      dispatch(addOrder({ id: 1, f_name: order.name, number_of_item: 1, f_price: order.price }))
+      dispatch(addOrder({ food:orderFood._id, name: orderFood.name, quantity: 1, price: orderFood.price , subtotal:orderFood.price }))
     }
 
   }

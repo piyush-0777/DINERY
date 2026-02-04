@@ -1,17 +1,17 @@
 import { createSlice, nanoid } from "@reduxjs/toolkit";
-import { customerLoginThunk , LoadCustomerDashbord } from "../../thunks/customerThunk"
+import { customerLoginThunk, LoadCustomerDashbord } from "../../thunks/customerThunk"
 
 const initialState = {
-    customer: { 
-        resturantId:null , 
-        _id:null , 
-        createdAt:null, 
-        customerName: '', 
-        CustomerMobile: '', 
-        order: [], 
-        token: null 
+    customer: {
+        resturantId: null,
+        _id: null,
+        createdAt: null,
+        customerName: '',
+        CustomerMobile: '',
+        order: null,
+        token: null
     },
-    reqtype: null ,
+    reqtype: null,
     loading: false,
     message: null,
     success: false,
@@ -29,7 +29,7 @@ export const customerSlice = createSlice({
         addCustomer: (state, action) => {
             state.customer.customerName = action.payload.customerName;
             state.customer.CustomerMobile = action.payload.CustomerMobile
-            console.log("addCustomer");
+
 
         },
 
@@ -40,16 +40,16 @@ export const customerSlice = createSlice({
 
         //delet one order
         deletOrder: (state, action) => {
-            const neworder = state.customer.order.filter(order => order.f_name !== action.payload.f_name);
-            state.customer.order = neworder;
+            const newItems = state.customer.order.items.filter(item => item._id !== action.payload);
+            state.customer.order.items = newItems;
         },
 
         //incress contity of order
         incresContityOfOrder: (state, action) => {
 
-            const index = state.customer.order.findIndex((e) => action.payload.name == e.name)
+            const index = state.customer.order.items.findIndex((e) => action.payload == e._id)
             if (index !== -1) {
-                state.customer.order[index].number_of_item = state.customer.order[index].number_of_item + 1;
+                state.customer.order.items[index].quantity = state.customer.order[index].quantity + 1;
             } else {
                 console.log(index, 'this index is not found in stroge');
             }
@@ -57,13 +57,13 @@ export const customerSlice = createSlice({
 
         //dicress contity of order
         dicresContityOfOrder: (state, action) => {
-            const index = state.customer.order.findIndex((e) => action.payload.f_name == e.f_name)
+            const index = state.customer.order.items.findIndex((e) => action.payload == e._id)
             if (index !== -1) {
-                if (state.customer.order[index].number_of_item === 1) {
-                    const neworder = state.customer.order.filter(order => order.f_name !== action.payload.f_name);
-                    state.customer.order = neworder;
+                if (state.customer.order.items[index].quantity === 1) {
+                    const newItems = state.customer.order.items.filter(item => item._id !== action.payload);
+                    state.customer.order.items = newItems;
                 } else {
-                    state.customer.order[index].number_of_item = state.customer.order[index].number_of_item - 1;
+                    state.customer.order.items[index].quantity = state.customer.order.items[index].quantity - 1;
                 }
 
             } else {
@@ -90,7 +90,7 @@ export const customerSlice = createSlice({
                 state.customer.resturantId = action.payload.data.restaurant;
                 state.customer._id = action.payload.data._id
                 state.customer.customerName = action.payload.data.name
-                state.customer.CustomerMobile =action.payload.data.phone
+                state.customer.CustomerMobile = action.payload.data.phone
                 state.customer.createdAt = action.payload.data.createdAt
                 state.success = true;
             })

@@ -16,11 +16,7 @@ Date.now() - order.createdAt > 90000 * 60000 &&
 order.status !== "Completed";
 
 
-const glow = order.isNew
-? "shadow-[0_0_25px_rgba(250,204,21,0.6)]"
-: isDelayed
-? "shadow-[0_0_25px_rgba(239,68,68,0.6)]"
-: "";
+
 
 
 return (
@@ -28,13 +24,13 @@ return (
 key={order._id}
 whileHover={{ scale: 1.02 }}
 className={` rounded-xl p-4 border bg-neutral-950  border-neutral-800 hover:border-yellow-400/40
-hover:shadow-[0_0_30px_-10px_rgba(234,179,8,0.4)] transition-all duration-300 ${glow}`}
+hover:shadow-[0_0_30px_-10px_rgba(234,179,8,0.4)] transition-all duration-300 `}
 >
 <div className="flex justify-between items-center">
 <div>
 <p className="text-white font-semibold text-lg">{order._id}</p>
 <p className="text-sm text-gray-400">
-{order.orderType} • {order.createdAt}
+{order.table} • {order.createdAt}
 </p>
 </div>
 
