@@ -24,13 +24,10 @@ const CustomerHome = () => {
 
 
   const category = useSelector(state => state.foodObject.category)
-
   const customer = useSelector(state => state.customer.customer)
   console.log(useSelector(state => state.customer));
 
   const [filterfoods, setfilerFoods] = useState(useSelector(state => state.foodObject.foods))
-
-
   const [selectedCategory, setSelectedCategory] = useState('All');
 
 
@@ -54,9 +51,9 @@ const CustomerHome = () => {
 
     setSelectedCategory(element.target.id)
     if (element.target.id != 'All') {
-      console.log('filter',element.target.id);
+      
       setfilerFoods(foods.filter((food) => food.category == element.target.id));
-      console.log('filter',filterfoods);
+   
     } else {
       setfilerFoods(foods);
     }
