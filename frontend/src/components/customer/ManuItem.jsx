@@ -1,137 +1,32 @@
-import React, { useEffect, useState } from 'react'
-import { useSelector , useDispatch} from 'react-redux';
-import { dicresContityOfOrder } from '../../redux/features/customer/customerSlice';
+import { useDispatch } from "react-redux";
+import { dicresContityOfOrder, incresContityOfOrder } from "../../redux/features/customer/customerSlice";
 
-const ManuItem = ({food , placeOrder , customerOrder  }) => {
+const ManuItem = ({ food, addOrder, customerOrder }) => {
 
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
-const [isFoodOrder , setIsfoodOrder] = useState(false);
+  const orderItem = customerOrder.items.find(
+    item => item.food === food._id
+  );
 
-
-useEffect(()=>{
-customerOrder.map((order)=>{
-  if(order.name == food?.name ) {
-    setIsfoodOrder(true);
-  } else {
-    setIsfoodOrder(false);
-  }
-})
-},[customerOrder])
-
-const hendalDicresContity = (e) => {
-     setContityOforder(contityOforder -1)
-     dispatch(dicresContityOfOrder({id:food._id , name:food.name }));
-     console.log(e);
-   }
-
-
-const [contityOforder , setContityOforder] = useState(()=>{
-  if(isFoodOrder == true) return customerOrder.number_of_item
-  else return 0;
-});
-
-
+  const quantity = orderItem ? orderItem.quantity : 0;
 
   return (
-    <div className="max-w-md mx-auto bg-white rounded-xl shadow-sm p-4 border border-gray-100">
-      {/* Title Section */}
-     
-
-      {/* Food Item Section */}
-      <div className="flex justify-between items-start">
-        {/* Left side */}
-        <div className="flex flex-col justify-start w-1/2">
-          {/* Veg/Non-Veg indicator */}
-          <div className="w-5 h-5 border-2 border-green-600 rounded-sm flex justify-center items-center mb-1">
-            <div className="w-2 h-2 bg-green-600 rounded-full"></div>
-          </div>
-
-          {/* Food Name */}
-          <h3 className="text-gray-900 font-semibold leading-tight">
-            {food?.name}
-          </h3>
-
-          {/* Description */}
-          <p className="text-sm text-gray-500 flex items-center gap-1 mt-1">
-            {/* <span className="w-16 bg-green-200 h-2 rounded-md">
-              <span className="block bg-green-700 w-2/3 h-2 rounded-md"></span>
-            </span> */}
-            {food?.description}
-          </p>
-
-          {/* Price */}
-          <p className="text-gray-800 font-semibold mt-2">₹{food?.price}</p>
-
-          {/* Action Icons */}
-          <div className="flex gap-3 mt-3">
-            <button className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-100">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={2}
-                stroke="currentColor"
-                className="w-5 h-5 text-gray-600"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M5 13l4 4L19 7"
-                />
-              </svg>
-            </button>
-
-            <button className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-100">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={2}
-                stroke="currentColor"
-                className="w-5 h-5 text-gray-600"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M4 12v.01M12 12v.01M20 12v.01M4 6h16M4 18h16"
-                />
-              </svg>
-            </button>
-          </div>
-        </div>
-
-        {/* Right side - Image and Add button */}
-        <div className="relative">
-          <img
-            src={food?.foodImg}
-            alt="Pizza"
-            className="w-32 h-32 rounded-xl object-cover"
-          />
-
-          {/* Add Button */}
-          <button
-          id={food?.name}
-          onClick={placeOrder}
-           className={`absolute -bottom-5 right-2 
-            ${contityOforder!==0 ? 'bg-green-800 text-white':'bg-green-50 border text-green-800'}
-            border-green-600  font-bold text-sm px-6 py-1.5 
-            rounded-lg flex items-center gap-1 shadow-sm hover:bg-green-100 transition`}>
-              {contityOforder !=0 ? <span onClick={hendalDicresContity} id={food?.name} className="text-lg font-bold">-</span>:''}
-              
-            {contityOforder==0 ? 'ADD' :`${contityOforder}`} 
-            <span onClick={()=>setContityOforder(contityOforder +1)} id={food?.name} className="text-lg font-bold">+</span>
-          </button>
-        </div>
+    <div className="bg-white p-4 rounded-lg shadow flex justify-between">
+      <div>
+        <h3 className="font-semibold">{food.name}</h3>
+        <p className="text-gray-600">₹{food.price}</p>
       </div>
-      
 
-      {/* Customisable Text */}
-      <p className="text-gray-400 text-sm mt-8 ml-auto text-right">
-        customisable
-      </p>
+      <button
+        id={food._id}
+        onClick={addOrder}
+        className="bg-green-600 text-white px-4 py-1 rounded"
+      >
+        {quantity === 0 ? "ADD" : quantity}
+      </button>
     </div>
-  )
-}
+  );
+};
 
-export default ManuItem
+export default ManuItem;

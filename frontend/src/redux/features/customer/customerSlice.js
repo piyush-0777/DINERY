@@ -3,20 +3,14 @@ import { customerLoginThunk, LoadCustomerDashbord } from "../../thunks/customerT
 
 const initialState = {
     customer: {
-        resturantId: null,
-        _id: null,
-        createdAt: null,
         customerName: '',
         CustomerMobile: '',
-        order: null,
-        token: null
+        order: {
+            items: [],
+        },
     },
-    reqtype: null,
-    loading: false,
-    message: null,
-    success: false,
-    error: null,
-}
+};
+
 
 export const customerSlice = createSlice({
     name: 'customer',
@@ -35,46 +29,45 @@ export const customerSlice = createSlice({
 
         // add new order
         addOrder: (state, action) => {
-            state.customer.order.push(action.payload);
+            state.customer.order.items.push(action.payload);
         },
 
-        //delet one order
-        deletOrder: (state, action) => {
-            const newItems = state.customer.order.items.filter(item => item._id !== action.payload);
-            state.customer.order.items = newItems;
-        },
-
-        //incress contity of order
         incresContityOfOrder: (state, action) => {
+            const index = state.customer.order.items.findIndex(
+                item => item.food === action.payload
+            );
 
-            const index = state.customer.order.items.findIndex((e) => action.payload == e._id)
             if (index !== -1) {
-                state.customer.order.items[index].quantity = state.customer.order[index].quantity + 1;
-            } else {
-                console.log(index, 'this index is not found in stroge');
+                state.customer.order.items[index].quantity += 1;
+                state.customer.order.items[index].subtotal =
+                    state.customer.order.items[index].quantity *
+                    state.customer.order.items[index].price;
             }
         },
 
-        //dicress contity of order
         dicresContityOfOrder: (state, action) => {
-            const index = state.customer.order.items.findIndex((e) => action.payload == e._id)
+            const index = state.customer.order.items.findIndex(
+                item => item.food === action.payload
+            );
+
             if (index !== -1) {
                 if (state.customer.order.items[index].quantity === 1) {
-                    const newItems = state.customer.order.items.filter(item => item._id !== action.payload);
-                    state.customer.order.items = newItems;
+                    state.customer.order.items =
+                        state.customer.order.items.filter(
+                            item => item.food !== action.payload
+                        );
                 } else {
-                    state.customer.order.items[index].quantity = state.customer.order.items[index].quantity - 1;
+                    state.customer.order.items[index].quantity -= 1;
+                    state.customer.order.items[index].subtotal =
+                        state.customer.order.items[index].quantity *
+                        state.customer.order.items[index].price;
                 }
-
-            } else {
-                console.log(index, 'this index is not found in stroge ');
             }
         },
 
-        // delete all order
-        deleteAllOrder: (state, action) => {
-            state.customer.order = [];
-        }
+        deleteAllOrder: (state) => {
+            state.customer.order.items = [];
+        },
     },
 
     extraReducers: (builder) => {
@@ -119,6 +112,11 @@ export const customerSlice = createSlice({
             })
     }
 })
-export const { addToken, addCustomer, addOrder, deleteAllOrder, incresContityOfOrder, dicresContityOfOrder, deletOrder } = customerSlice.actions
+export const { addToken, 
+    addCustomer, 
+    addOrder,
+  incresContityOfOrder,
+  dicresContityOfOrder,
+  deleteAllOrder, } = customerSlice.actions
 
 export default customerSlice.reducer;

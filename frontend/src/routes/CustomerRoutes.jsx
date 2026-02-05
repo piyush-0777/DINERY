@@ -12,7 +12,7 @@ const CustomerRoutes = () => {
     <CustomerLayout>
       <Routes>
         <Route path="CustomerHome" element={<CustomerHome />} />
-        <Route path="CustomerBill" element={<CustomerBill />} />
+        {/* <Route path="CustomerBill" element={<CustomerBill />} /> */}
         
       </Routes>
     </CustomerLayout>

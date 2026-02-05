@@ -24,7 +24,7 @@ const CartBar = ({order, deletAllOrder}) => {
             
           </h2>
           <p className="text-sm text-gray-500 flex items-center gap-1">
-           {order?.length} item added<span className="text-green-600 font-bold">›</span>
+           {order.items?.length} item added<span className="text-green-600 font-bold">›</span>
           </p>
         </div>
       </div>

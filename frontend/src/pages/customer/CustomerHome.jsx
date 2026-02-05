@@ -9,156 +9,115 @@ import { addOrder, deleteAllOrder, incresContityOfOrder } from '../../redux/feat
 import { useNavigate, useParams } from 'react-router-dom';
 import { LoadCustomerDashbord } from '../../redux/thunks/customerThunk'
 
-
-
 const CustomerHome = () => {
 
-  const { id } = useParams();
+  const { id, resturantName } = useParams();
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
+  const foods = useSelector(state => state.foodObject.foods);
+  const category = useSelector(state => state.foodObject.category);
+  const customer = useSelector(state => state.customer.customer);
 
-  const navigate = useNavigate()
-  const dispatch = useDispatch()
-  const { resturantName } = useParams()
-  const foods = useSelector(state => state.foodObject.foods)
-
-
-
-  const category = useSelector(state => state.foodObject.category)
-  const customer = useSelector(state => state.customer.customer)
-  console.log(useSelector(state => state.customer));
-
-  const [filterfoods, setfilerFoods] = useState(useSelector(state => state.foodObject.foods))
+  const [filterfoods, setFilterFoods] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('All');
 
-
-
-
-
   useEffect(() => {
-    if (customer.customerName === '' || customer.CustomerMobile === '') {
-      navigate(`/customer/login/${id}`)
+    if (!customer.customerName || !customer.CustomerMobile) {
+      navigate(`/customer/login/${id}`);
     }
-  }, [])
+  }, [customer]);
 
   useEffect(() => {
-    dispatch(LoadCustomerDashbord(resturantName))
-  }, [])
+    dispatch(LoadCustomerDashbord(resturantName));
+  }, []);
 
+  useEffect(() => {
+    setFilterFoods(foods);
+  }, [foods]);
 
+  const changCategory = (e) => {
+    const categoryId = e.currentTarget.id;
+    setSelectedCategory(categoryId);
 
-
-  const changCategory = element => {
-
-    setSelectedCategory(element.target.id)
-    if (element.target.id != 'All') {
-      
-      setfilerFoods(foods.filter((food) => food.category == element.target.id));
-   
+    if (categoryId === 'All') {
+      setFilterFoods(foods);
     } else {
-      setfilerFoods(foods);
+      setFilterFoods(foods.filter(food => food.category === categoryId));
     }
-  }
+  };
 
-  // add user order and save to redux customer order store 
-  const placeOrder = element => {
+  // ✅ FIXED ADD ORDER
+  const addOrderHandler = (e) => {
+    const foodId = e.currentTarget.id;
 
-    const orderFood = foods.filter((food) => food.name === element.target.id)[0]
-    const isOrder = customer.order.items.find((item) => orderFood._id == item.id)
+    const orderFood = foods.find(food => food._id === foodId);
+    if (!orderFood) return;
 
+    const isOrder = customer.order.items.find(
+      item => item.food === orderFood._id
+    );
 
     if (isOrder) {
-
-      // if order is already added then incres the contity of order
-
-      dispatch(incresContityOfOrder(orderFood._id))
+      dispatch(incresContityOfOrder(orderFood._id));
     } else {
-
-      // else add order
-      dispatch(addOrder({ food:orderFood._id, name: orderFood.name, quantity: 1, price: orderFood.price , subtotal:orderFood.price }))
+      dispatch(addOrder({
+        food: orderFood._id,
+        name: orderFood.name,
+        quantity: 1,
+        price: orderFood.price,
+        subtotal: orderFood.price,
+      }));
     }
-
-  }
-
-
-
-
-  // for  delete all order 
-  const deletAllOrderFunction = element => {
-
-    dispatch(deleteAllOrder())
-  }
-
-
-
-
+  };
 
   return (
-    <div >
+    <div>
 
-      {/* header section */}
-      <div className='flex flex-row justify-between items-center pb-6  bg-[#f6c453] px-1'>
-        <img className='w-[50px]  rounded-full' src={DineryLogo} alt="hello" />
-        <div className='flex relative w-[60vw] h-8 '>
-          <input className='focus:border-none w-full h-full px-2
-                     focus:outline-none bg-[#e2eedd]  rounded-2xl' type="text" placeholder='search manu' />
-          <FaSearch className=' text-[#f0a04b] absolute top-[25%] right-2' />
-
+      {/* HEADER */}
+      <div className='flex justify-between items-center bg-[#f6c453] p-2'>
+        <img className='w-[50px] rounded-full' src={DineryLogo} />
+        <div className='relative w-[60vw]'>
+          <input className='w-full px-3 py-1 rounded-2xl' placeholder='search menu' />
+          <FaSearch className='absolute right-3 top-2' />
         </div>
       </div>
 
-      {/* category filter contaion */}
-
-      <div>
-        <div className='p-1 px-2 text-lg font-semibold text-gray-900 mb-3'>
-          <p>what's on your mind?</p>
-        </div>
-        <div className=' p-1 px-2 flex gap-2 items-center overflow-x-auto w-screen h-[120px]  scroll-smooth snap-x snap-mandatory '>
-          {category && category.map(item => {
-            return <ManuCategory
-              changCategory={changCategory}
-              selectedCategory={selectedCategory}
-              CategoryLogo={item?.image}
-              CategoryName={item?.name}
-              CategoryId={item?._id} />
-          })}
-
-
-        </div>
+      {/* CATEGORY */}
+      <div className='flex gap-2 overflow-x-auto p-2'>
+        {category.map(cat => (
+          <ManuCategory
+            key={cat._id}
+            changCategory={changCategory}
+            selectedCategory={selectedCategory}
+            CategoryLogo={cat.image}
+            CategoryName={cat.name}
+            CategoryId={cat._id}
+          />
+        ))}
       </div>
 
-      {/* food items */}
-
-      <div>
-        <h2 className="p-1 px-2  text-lg font-semibold text-gray-900 mb-3">
-          Recommended for you
-        </h2>
-        <div className=' p-1 px-2 flex flex-col gap-1  scroll-smooth snap-y snap-mandatory'>
-          {filterfoods.map(food => {
-            return <ManuItem
-              customerOrder={customer.order}
-              placeOrder={placeOrder}
-              food={food} />
-          })}
-
-
-
-
-        </div>
+      {/* FOOD ITEMS */}
+      <div className='p-2 flex flex-col gap-2'>
+        {filterfoods.map(food => (
+          <ManuItem
+            key={food._id}
+            food={food}
+            addOrder={addOrderHandler}
+            customerOrder={customer.order}
+          />
+        ))}
       </div>
 
-
-      {/* footer  */}
-      {
-        customer.order.length != 0 ? (
-          <div>
-
-            <CartBar order={customer.order} deletAllOrder={deletAllOrderFunction} />
-          </div>
-        ) : (<div></div>)
-      }
-
+      {/* CART BAR */}
+      {customer.order.items.length > 0 && (
+        <CartBar
+          order={customer.order}
+          deletAllOrder={() => dispatch(deleteAllOrder())}
+        />
+      )}
     </div>
-  )
-}
+  );
+};
 
-export default CustomerHome
+export default CustomerHome;
