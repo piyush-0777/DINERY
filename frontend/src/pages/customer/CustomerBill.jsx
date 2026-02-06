@@ -4,6 +4,7 @@ import { useSelector , useDispatch } from 'react-redux';
 import { incresContityOfOrder , dicresContityOfOrder , deletOrder } from '../../redux/features/customer/customerSlice';
 import { HiChevronLeft } from "react-icons/hi";
 import {useNavigate , useParams } from 'react-router-dom'
+import {CustomerPlaceOrder} from '../../redux/thunks/customerThunk'
 
 
 
@@ -17,12 +18,12 @@ const CustomerBill = () => {
   const navigate = useNavigate()
 
   //  use params to gat usesr table id
-  const {id} = useParams()
+  const {resturantName} = useParams()
 
 
   // get customer orders 
 const orders = useSelector(state => state.customer.order);
-
+const customer = useSelector(state => state.customer.customer);
 
 
     
@@ -62,6 +63,10 @@ const orders = useSelector(state => state.customer.order);
       total = total + order.subtotal;
     })
     return total;
+  }
+
+  const placeOrder = () =>{
+    dispatch(CustomerPlaceOrder({resturantName ,data: {orders ,customer } }))
   }
 
   return (
@@ -124,7 +129,7 @@ const orders = useSelector(state => state.customer.order);
           <span>₹{totalAmount()}</span>
         </div>
 
-        <button  className="w-full bg-green-600 text-white py-3 rounded-xl text-base font-semibold">
+        <button onClick={placeOrder}  className="w-full bg-green-600 text-white py-3 rounded-xl text-base font-semibold">
           Place Order
         </button>
       </div>

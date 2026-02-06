@@ -28,7 +28,6 @@ export const LoadCustomerDashbord = createAsyncThunk('LoadCustomerDashbord' , as
 
 export const CustomerPlaceOrder = createAsyncThunk('CustomerPlaceOrder' , async ({restaurantName , data} , thunkAPI)=>{
     try {
-
         const res = await customerService.placeCustomerOrder(restaurantName , data)
         return res;
     } catch (error) {

@@ -21,8 +21,6 @@ export const customerSlice = createSlice({
         addCustomer: (state, action) => {
             state.customer.customerName = action.payload.customerName;
             state.customer.CustomerMobile = action.payload.CustomerMobile
-
-
         },
 
         // add new order
@@ -123,6 +121,7 @@ export const { addToken,
     addOrder,
     incresContityOfOrder,
     dicresContityOfOrder,
-    deleteAllOrder, deletOrder , } = customerSlice.actions
+    deleteAllOrder, 
+    deletOrder , } = customerSlice.actions
 
 export default customerSlice.reducer;
