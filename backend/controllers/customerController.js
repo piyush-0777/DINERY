@@ -52,3 +52,24 @@ exports.loadCustomerDashbord = async (req, res) => {
         return res.status(401).json({ error: ' server error' });
     }
 }
+
+exports.customerPlaceOrder = async (req , res) => {
+    try {
+         const { restaurantName } = req.params;
+        const token = req.cookies?.token || req.headers.authorization?.split(" ")[1];
+        
+
+        if (!token) {
+            return res.status(401).json({ error: 'token is not provide' });
+        }
+        if (!restaurantName) {
+            return res.status(401).json({ error: 'restaurantName is not provide' });
+        }
+        const restaurant = await restaurantModel.findOne({ restaurantName })
+        const data = req.body
+        console.log(req.body)
+    }catch (error) {
+         return res.status(401).json({ error: ' server error' });
+        
+    }
+}
