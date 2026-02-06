@@ -4,6 +4,7 @@ const restaurantModel = require('../models/restaurant-model')
 const tableModel = require('../models/table-model')
 const foodModel = require('../models/food-model')
 const categoryModel = require('../models/categories-model')
+const orderModel = require('../models/order-model')
 
 exports.customerLogin = async (req, res) => {
     const { name, phone } = req.body
@@ -65,9 +66,28 @@ exports.customerPlaceOrder = async (req , res) => {
         if (!restaurantName) {
             return res.status(401).json({ error: 'restaurantName is not provide' });
         }
+        const table = await tableModel.findOne({qrCode:token})
         const restaurant = await restaurantModel.findOne({ restaurantName })
-        const data = req.body
-        console.log(req.body)
+        const {orders , customer} = req.body;
+       let totalAmount = 0;
+
+       
+       orders.items.map(e=>{
+        totalAmount += e.subtotal
+       })
+       const createdOrder = await orderModel.create({
+        restaurant: restaurant._id ,
+        customer: customer._id ,
+        table: table._id ,
+        items: orders.items ,
+        totalAmount
+       })
+       
+       res.status(200).json({
+        message:'order is plased' ,
+        data : createdOrder
+       })
+
     }catch (error) {
          return res.status(401).json({ error: ' server error' });
         

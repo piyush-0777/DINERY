@@ -1,6 +1,6 @@
 import {createAsyncThunk} from '@reduxjs/toolkit'
 import {customerService} from '../../services/customerService'
-import { data } from 'react-router-dom'
+
 
 
 export const customerLoginThunk = createAsyncThunk('customerLoginThunk' , async ({resturantName ,customerName ,CustomerMobile} , thunkAPI)=>{
@@ -26,9 +26,9 @@ export const LoadCustomerDashbord = createAsyncThunk('LoadCustomerDashbord' , as
 })
 
 
-export const CustomerPlaceOrder = createAsyncThunk('CustomerPlaceOrder' , async ({restaurantName , data} , thunkAPI)=>{
+export const CustomerPlaceOrder = createAsyncThunk('CustomerPlaceOrder' , async ({resturantName , data} , thunkAPI)=>{
     try {
-        const res = await customerService.placeCustomerOrder(restaurantName , data)
+        const res = await customerService.placeCustomerOrder(resturantName , data)
         return res;
     } catch (error) {
         console.log(error);

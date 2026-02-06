@@ -19,6 +19,7 @@ const CustomerBill = () => {
 
   //  use params to gat usesr table id
   const {resturantName} = useParams()
+ 
 
 
   // get customer orders 
@@ -129,7 +130,7 @@ const customer = useSelector(state => state.customer.customer);
           <span>₹{totalAmount()}</span>
         </div>
 
-        <button onClick={placeOrder}  className="w-full bg-green-600 text-white py-3 rounded-xl text-base font-semibold">
+        <button onClick={()=>placeOrder()}  className="w-full bg-green-600 text-white py-3 rounded-xl text-base font-semibold">
           Place Order
         </button>
       </div>
