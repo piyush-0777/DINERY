@@ -5,10 +5,11 @@ import { useParams } from 'react-router-dom'
 const CartBar = ({order, deletAllOrder}) => {
 
  const navigate = useNavigate()
- const {restaurantName} = useParams();
+ const {resturantName} = useParams();
+ console.log(resturantName)
 
   const goTOBillPaje = (e) =>{
-    navigate(`/customer/${restaurantName}/customerBill`);
+    navigate(`/customer/${resturantName}/customerBill`);
     console.log(e);
   }
 

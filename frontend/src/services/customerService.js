@@ -10,9 +10,6 @@ export const customerService = {
   getCustomerDashbord: (restaurantName)=>
     request(`/customer/${restaurantName}/loadCustomerDashbord` , 'GET') ,
 
-  updateCustomerProfile: (data) =>
-    request("/customer/profile", "PUT", data),
-
-  getTableInfo: (restaurantId, tableId) =>
-    request(`/customer/${restaurantId}/${tableId}`, "GET"),
+  placeCustomerOrder:(restaurantName , data) =>
+    request(`/customer/${restaurantName}/placeOrder` , 'POST' , data)
 };

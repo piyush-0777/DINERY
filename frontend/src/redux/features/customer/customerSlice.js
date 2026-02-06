@@ -2,12 +2,10 @@ import { createSlice, nanoid } from "@reduxjs/toolkit";
 import { customerLoginThunk, LoadCustomerDashbord } from "../../thunks/customerThunk"
 
 const initialState = {
-    customer: {
-        customerName: '',
-        CustomerMobile: '',
-        order: {
-            items: [],
-        },
+    token: null ,
+    customer: null,
+    order: {
+        items: [],
     },
 };
 
@@ -17,7 +15,7 @@ export const customerSlice = createSlice({
     initialState,
     reducers: {
         addToken: (state, action) => {
-            state.customer.token = action.payload
+            state.token = action.payload
         },
         // use to add customer
         addCustomer: (state, action) => {
@@ -29,44 +27,51 @@ export const customerSlice = createSlice({
 
         // add new order
         addOrder: (state, action) => {
-            state.customer.order.items.push(action.payload);
+            state.order.items.push(action.payload);
         },
 
         incresContityOfOrder: (state, action) => {
-            const index = state.customer.order.items.findIndex(
+            const index = state.order.items.findIndex(
                 item => item.food === action.payload
             );
 
             if (index !== -1) {
-                state.customer.order.items[index].quantity += 1;
-                state.customer.order.items[index].subtotal =
-                    state.customer.order.items[index].quantity *
-                    state.customer.order.items[index].price;
+                state.order.items[index].quantity += 1;
+                state.order.items[index].subtotal =
+                    state.order.items[index].quantity *
+                    state.order.items[index].price;
             }
         },
 
         dicresContityOfOrder: (state, action) => {
-            const index = state.customer.order.items.findIndex(
+            const index = state.order.items.findIndex(
                 item => item.food === action.payload
             );
 
             if (index !== -1) {
-                if (state.customer.order.items[index].quantity === 1) {
-                    state.customer.order.items =
-                        state.customer.order.items.filter(
+                if (state.order.items[index].quantity === 1) {
+                    state.order.items =
+                        state.order.items.filter(
                             item => item.food !== action.payload
                         );
                 } else {
-                    state.customer.order.items[index].quantity -= 1;
-                    state.customer.order.items[index].subtotal =
-                        state.customer.order.items[index].quantity *
-                        state.customer.order.items[index].price;
+                    state.order.items[index].quantity -= 1;
+                    state.order.items[index].subtotal =
+                        state.order.items[index].quantity *
+                        state.order.items[index].price;
                 }
             }
         },
 
+        deletOrder: (state, action) => {
+            state.order.items =
+                state.order.items.filter(
+                    item => item.food !== action.payload
+                );
+        },
+
         deleteAllOrder: (state) => {
-            state.customer.order.items = [];
+            state.order.items = [];
         },
     },
 
@@ -79,12 +84,13 @@ export const customerSlice = createSlice({
             })
             .addCase(customerLoginThunk.fulfilled, (state, action) => {
                 state.loading = false;
-                state.message = action.payload.message;
-                state.customer.resturantId = action.payload.data.restaurant;
-                state.customer._id = action.payload.data._id
-                state.customer.customerName = action.payload.data.name
-                state.customer.CustomerMobile = action.payload.data.phone
-                state.customer.createdAt = action.payload.data.createdAt
+                // state.message = action.payload.message;
+                // state.customer.resturantId = action.payload.data.restaurant;
+                // state.customer._id = action.payload.data._id
+                // state.customer.customerName = action.payload.data.name
+                // state.customer.CustomerMobile = action.payload.data.phone
+                // state.customer.createdAt = action.payload.data.createdAt
+                state.customer = action.payload.data
                 state.success = true;
             })
             .addCase(customerLoginThunk.rejected, (state, action) => {
@@ -112,11 +118,11 @@ export const customerSlice = createSlice({
             })
     }
 })
-export const { addToken, 
-    addCustomer, 
+export const { addToken,
+    addCustomer,
     addOrder,
-  incresContityOfOrder,
-  dicresContityOfOrder,
-  deleteAllOrder, } = customerSlice.actions
+    incresContityOfOrder,
+    dicresContityOfOrder,
+    deleteAllOrder, deletOrder , } = customerSlice.actions
 
 export default customerSlice.reducer;

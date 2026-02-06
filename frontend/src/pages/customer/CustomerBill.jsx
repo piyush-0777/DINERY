@@ -21,7 +21,8 @@ const CustomerBill = () => {
 
 
   // get customer orders 
-const orders = useSelector(state => state.customer.customer.order);
+const orders = useSelector(state => state.customer.order);
+
 
 
     
@@ -35,30 +36,30 @@ const orders = useSelector(state => state.customer.customer.order);
 
   //increas the contity of any order
 
-  const increaseQty = (f_name) => {
-    dispatch(incresContityOfOrder({id: 1 ,  f_name:f_name}))
+  const increaseQty = (food) => {
+    dispatch(incresContityOfOrder(food))
   };
 
 
   //decreas the contity of order
 
-  const decreaseQty = (f_name) => {
-    dispatch(dicresContityOfOrder({id: 1 ,  f_name:f_name}))
+  const decreaseQty = (food) => {
+    dispatch(dicresContityOfOrder(food))
   };
 
   // delete order
 
-  const deleteItem = (f_name) => {
-    dispatch(deletOrder({id: 1 , f_name:f_name}))
-    setItems(items.filter(i => i.id !== id));
+  const deleteItem = (food) => {
+    dispatch(deletOrder(food))
+    setItems(orders.items.filter(i => i.id !== id));
   };
 
   // return total amount of all aorder bill
 
   const totalAmount = ()=>{
     let total = 0;
-    orders.map(order=>{
-      total = total + order.f_price*order.number_of_item;
+    orders.items.map(order=>{
+      total = total + order.subtotal;
     })
     return total;
   }
@@ -79,31 +80,31 @@ const orders = useSelector(state => state.customer.customer.order);
 
       {/* Items List */}
       <div className="space-y-4">
-        {orders.map((item) => (
-          <div key={item.id} className="bg-white p-3 rounded-xl shadow flex justify-between items-center">
+        {orders.items.map((item) => (
+          <div key={item._id} className="bg-white p-3 rounded-xl shadow flex justify-between items-center">
             <div>
-              <p className="font-medium text-lg">{item?.f_name}</p>
-              <p className="text-gray-600 text-sm">₹{item?.f_price}</p>
+              <p className="font-medium text-lg">{item?.name}</p>
+              <p className="text-gray-600 text-sm">₹{item?.price}</p>
             </div>
 
             <div className="flex items-center space-x-2">
               {/* Decrease */}
               <button
-                onClick={() => decreaseQty(item?.f_name)}
+                onClick={() => decreaseQty(item?.food)}
                 className="px-3 py-1 bg-gray-200 rounded-lg"
               >-</button>
 
-              <span className="font-medium">{item?.number_of_item}</span>
+              <span className="font-medium">{item?.quantity}</span>
 
               {/* Increase */}
               <button
-                onClick={() => increaseQty(item?.f_name)}
+                onClick={() => increaseQty(item?.food)}
                 className="px-3 py-1 bg-gray-200 rounded-lg"
               >+</button>
 
               {/* Delete */}
               <button
-                onClick={() => deleteItem(item?.f_name)}
+                onClick={() => deleteItem(item?.food)}
                 className="ml-3 text-red-500 text-sm"
               >Delete</button>
             </div>
@@ -112,12 +113,7 @@ const orders = useSelector(state => state.customer.customer.order);
       
       </div>
       <div>
-        {/* <button
-  className="w-full mb-4 border border-green-600 text-green-600 py-2 rounded-xl text-base font-semibold"
-  onClick={() => console.log("Navigate to menu page")}
->
-  + Add More Items
-</button> */}
+       
 
       </div>
 
@@ -128,7 +124,7 @@ const orders = useSelector(state => state.customer.customer.order);
           <span>₹{totalAmount()}</span>
         </div>
 
-        <button className="w-full bg-green-600 text-white py-3 rounded-xl text-base font-semibold">
+        <button  className="w-full bg-green-600 text-white py-3 rounded-xl text-base font-semibold">
           Place Order
         </button>
       </div>

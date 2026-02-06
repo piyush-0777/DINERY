@@ -11,20 +11,24 @@ import { LoadCustomerDashbord } from '../../redux/thunks/customerThunk'
 
 const CustomerHome = () => {
 
-  const { id, resturantName } = useParams();
+  const {  resturantName } = useParams();
+  
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
+
+const token = useSelector(state => state.customer.token);
   const foods = useSelector(state => state.foodObject.foods);
   const category = useSelector(state => state.foodObject.category);
   const customer = useSelector(state => state.customer.customer);
+  const customerOrder = useSelector(state => state.customer.order)
 
   const [filterfoods, setFilterFoods] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('All');
 
   useEffect(() => {
-    if (!customer.customerName || !customer.CustomerMobile) {
-      navigate(`/customer/login/${id}`);
+    if (!customer) {
+      navigate(`/customer/${resturantName}/login/?token=${token}`);
     }
   }, [customer]);
 
@@ -49,12 +53,13 @@ const CustomerHome = () => {
 
   // ✅ FIXED ADD ORDER
   const addOrderHandler = (e) => {
-    const foodId = e.currentTarget.id;
+    console.log(e)
+    const foodId =e;
 
     const orderFood = foods.find(food => food._id === foodId);
     if (!orderFood) return;
 
-    const isOrder = customer.order.items.find(
+    const isOrder = customerOrder.items.find(
       item => item.food === orderFood._id
     );
 
@@ -104,15 +109,15 @@ const CustomerHome = () => {
             key={food._id}
             food={food}
             addOrder={addOrderHandler}
-            customerOrder={customer.order}
+            customerOrder={customerOrder}
           />
         ))}
       </div>
 
       {/* CART BAR */}
-      {customer.order.items.length > 0 && (
+      {customerOrder.items.length > 0 && (
         <CartBar
-          order={customer.order}
+          order={customerOrder}
           deletAllOrder={() => dispatch(deleteAllOrder())}
         />
       )}
