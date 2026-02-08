@@ -8,14 +8,14 @@ import { useSelector, useDispatch } from 'react-redux';
 import { addOrder, deleteAllOrder, incresContityOfOrder } from '../../redux/features/customer/customerSlice'
 import { useNavigate, useParams } from 'react-router-dom';
 import { LoadCustomerDashbord } from '../../redux/thunks/customerThunk'
-
+import useSocket from '../../hooks/useSocket'
 const CustomerHome = () => {
-
+ 
   const {  resturantName } = useParams();
   
   const navigate = useNavigate();
   const dispatch = useDispatch();
-
+//  useSocket(); 
 
 const token = useSelector(state => state.customer.token);
   const foods = useSelector(state => state.foodObject.foods);

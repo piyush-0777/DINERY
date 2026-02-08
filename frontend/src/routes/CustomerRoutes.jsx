@@ -1,6 +1,7 @@
 import { Routes, Route } from "react-router-dom";
 import CustomerLayout from "../layouts/CustomerLayout";
 
+
 import CustomerHome from "../pages/customer/CustomerHome";
 import CustomerBill from "../pages/customer/CustomerBill"
 // import MenuPage from "../pages/customer/MenuPage";
@@ -8,6 +9,7 @@ import CustomerBill from "../pages/customer/CustomerBill"
 // import OrderHistory from "../pages/customer/OrderHistory";
 
 const CustomerRoutes = () => {
+
   return (
     <CustomerLayout>
       <Routes>

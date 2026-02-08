@@ -1,11 +1,28 @@
-import React , {useState , useEffect} from 'react'
+import React, { useState, useEffect } from 'react'
 import { StatCard } from "../../components/owner/StatCard";
 import { StatusCard } from "../../components/owner/StatusCard";
 import { OrdersTrend } from "../../components/owner/OrdersTrend";
 import Loader from '../../components/ui/Loader';
-
+import useSocket from '../../hooks/useSocket';
+import { getSocket } from '../../consfig/socket'
 
 const OwnerDashboard = () => {
+  useSocket();
+  
+  useEffect(() => {
+
+    const socket = getSocket()
+    if (!socket) return;
+    socket.on("newOrder", (order) => {
+      console.log("📦 New Order Received:", order);
+      // show toast / play sound / update UI
+    });
+
+    return () => {
+      socket.off("newOrder");
+    };
+  }, []);
+
 
   const [loading, setLoading] = useState(true);
 
@@ -66,10 +83,10 @@ const OwnerDashboard = () => {
               <div className="text-right">
                 <p className="text-white">{order.amount}</p>
                 <span className={`text-xs font-semibold ${order.status === 'Completed'
-                    ? 'text-green-400'
-                    : order.status === 'Preparing'
-                      ? 'text-yellow-400'
-                      : 'text-red-400'
+                  ? 'text-green-400'
+                  : order.status === 'Preparing'
+                    ? 'text-yellow-400'
+                    : 'text-red-400'
                   }`}>
                   {order.status}
                 </span>
