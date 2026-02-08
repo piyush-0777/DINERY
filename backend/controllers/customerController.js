@@ -7,21 +7,31 @@ const categoryModel = require('../models/categories-model')
 const orderModel = require('../models/order-model')
 
 exports.customerLogin = async (req, res) => {
-    const { name, phone } = req.body
-    const { restaurantName } = req.params;
+    try {
+     
+    
+        const { name, phone } = req.body
+        const { restaurantName } = req.params;
 
-    const restaurant = await restaurantModel.findOne({ restaurantName })
+        const restaurant = await restaurantModel.findOne({ restaurantName })
 
-    const loginCustomer = await customer.create({
-        restaurant: restaurant._id,
-        name,
-        phone,
-    })
+        const loginCustomer = await customer.create({
+            restaurant: restaurant._id,
+            name,
+            phone,
+        })
 
-    if (loginCustomer) {
-        res.status(200).json({ message: 'loged in.', data: loginCustomer })
-    } else {
-        res.status(400).json({ error: 'error in login' })
+    
+
+        if (loginCustomer) {
+         
+            res.status(200).json({ message: 'loged in.', data: loginCustomer })
+        } else {
+            res.status(400).json({ error: 'error in login' })
+        }
+    } catch (error) {
+        console.log(error)
+        return res.status(401).json({ error: ' server error' });
     }
 
 }
@@ -54,11 +64,11 @@ exports.loadCustomerDashbord = async (req, res) => {
     }
 }
 
-exports.customerPlaceOrder = async (req , res) => {
+exports.customerPlaceOrder = async (req, res) => {
     try {
-         const { restaurantName } = req.params;
+        const { restaurantName } = req.params;
         const token = req.cookies?.token || req.headers.authorization?.split(" ")[1];
-        
+
 
         if (!token) {
             return res.status(401).json({ error: 'token is not provide' });
@@ -66,30 +76,30 @@ exports.customerPlaceOrder = async (req , res) => {
         if (!restaurantName) {
             return res.status(401).json({ error: 'restaurantName is not provide' });
         }
-        const table = await tableModel.findOne({qrCode:token})
+        const table = await tableModel.findOne({ qrCode: token })
         const restaurant = await restaurantModel.findOne({ restaurantName })
-        const {orders , customer} = req.body;
-       let totalAmount = 0;
+        const { orders, customer } = req.body;
+        let totalAmount = 0;
 
-       
-       orders.items.map(e=>{
-        totalAmount += e.subtotal
-       })
-       const createdOrder = await orderModel.create({
-        restaurant: restaurant._id ,
-        customer: customer._id ,
-        table: table._id ,
-        items: orders.items ,
-        totalAmount
-       })
-       
-       res.status(200).json({
-        message:'order is plased' ,
-        data : createdOrder
-       })
 
-    }catch (error) {
-         return res.status(401).json({ error: ' server error' });
-        
+        orders.items.map(e => {
+            totalAmount += e.subtotal
+        })
+        const createdOrder = await orderModel.create({
+            restaurant: restaurant._id,
+            customer: customer._id,
+            table: table._id,
+            items: orders.items,
+            totalAmount
+        })
+
+        res.status(200).json({
+            message: 'order is plased',
+            data: createdOrder
+        })
+
+    } catch (error) {
+        return res.status(401).json({ error: ' server error' });
+
     }
 }

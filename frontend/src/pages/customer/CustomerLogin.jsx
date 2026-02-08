@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { use, useEffect } from 'react'
 // import Dinery from '../../assets/dinery.png'
 import Dinery from '../../assets/dinery.png'
 import { useForm } from 'react-hook-form'
@@ -7,6 +7,7 @@ import {useNavigate, useParams , useSearchParams} from 'react-router-dom'
 import { useSelector , useDispatch } from 'react-redux'
 //import { addCustomer } from '../features/customer/customerSlice'
 import { addCustomer , addToken } from '../../redux/features/customer/customerSlice'
+import {resetloadCustomerState} from '../../redux/features/customer/loadCustomerSlice'
 import {customerLoginThunk} from '../../redux/thunks/customerThunk'
 import { toast } from 'react-toastify'
 
@@ -16,15 +17,22 @@ const CustomerLogin = () => {
   const dispatch = useDispatch();
 
   const {resturantName} = useParams()
-   console.log('res name ' , resturantName)
+   const loadCustomer = useSelector(state => state.loadcustomer)
+   console.log(loadCustomer)
 
   const customerDeteal = useSelector(state => state.customer)
-  console.log(customerDeteal.success);
+ 
 
   useEffect(()=>{
-    if(customerDeteal.success=== true) {
+    if(loadCustomer.success=== true) {
 navigate(`/customer/${resturantName}/customerHome`)
      toast.success("login success!")
+     dispatch(resetloadCustomerState())
+    }
+    if(loadCustomer.error) {
+      console.log(loadCustomer.error);
+      toast.error(loadCustomer.error.message)
+      dispatch(resetloadCustomerState())
     }
   },[customerDeteal.success])
 
@@ -99,7 +107,8 @@ localStorage.setItem("token" , token);
                     placeholder='Enter Your Mobile Number'
                     type='number' {...register("number", { required: true })} />
 
-                      <div  className='w-full h-10 mt-5'><Button ButtonName="Log in"/></div>
+                      <div  className='w-full h-10 mt-5'><Button 
+                      ButtonName={loadCustomer.loading === true ? 'loding...' : 'Log in'}/></div>
                 </form>
 
             </div>
