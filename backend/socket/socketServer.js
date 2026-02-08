@@ -17,7 +17,7 @@ const initSocket = (server) => {
         if (role == 'owner') {
             socket.join(restaurantId);
             console.log('owner createrd and jion room', restaurantId)
-        } else if (roll == 'customer') {
+        } else if (role == 'customer') {
             const room = io.socket.adapter.rooms.get(restaurantId)
             if (!room) {
                 socket.emit("service Unavailable");

@@ -6,6 +6,8 @@ const foodModel = require('../models/food-model')
 const categoryModel = require('../models/categories-model')
 const orderModel = require('../models/order-model')
 
+const {sendNewOrderNotification} = require('../socket/socketEvent')
+
 exports.customerLogin = async (req, res) => {
     try {
      
@@ -80,7 +82,8 @@ exports.customerPlaceOrder = async (req, res) => {
         const restaurant = await restaurantModel.findOne({ restaurantName })
         const { orders, customer } = req.body;
         let totalAmount = 0;
-
+        console.log(table)
+        console.log(token)
 
         orders.items.map(e => {
             totalAmount += e.subtotal
@@ -92,13 +95,14 @@ exports.customerPlaceOrder = async (req, res) => {
             items: orders.items,
             totalAmount
         })
-
+            sendNewOrderNotification(restaurant._id , createdOrder)
         res.status(200).json({
             message: 'order is plased',
             data: createdOrder
         })
 
     } catch (error) {
+        console.log(error)
         return res.status(401).json({ error: ' server error' });
 
     }
