@@ -9,6 +9,7 @@ import OwnerDashboard from "../pages/owner/OwnerDashboard";
 import OwnerMenu from "../pages/owner/OwnerMenu";
 import OwnerTables from "../pages/owner/OwnerTables"
 import OwnerOrder from "../pages/owner/OwnerOrders";
+import useSocket from '../hooks/useSocket'
 
 
 import { loadDashbordThunk } from '../redux/thunks/loardDashbordThunk'
@@ -20,11 +21,14 @@ import { useSelector, useDispatch } from "react-redux";
 // import RestaurantSettings from "../pages/owner/RestaurantSettings";
 
 const OwnerRoutes = () => {
-
+ 
   const dispatch = useDispatch()
   const { loading, success, error, } = useSelector(state => state.loardDashbordState)
   // console.log('owner route', { loading, success, error, })
   const [showSplash, setShowSplash] = useState(true);
+  
+    
+   
 
   const initDashboard = async () => {
     const splashTimer = setTimeout(() => {
@@ -41,6 +45,8 @@ const OwnerRoutes = () => {
       dispatch(loadDashbordThunk())
     }
   }, [showSplash]);
+
+   
 
   return (
     <OwnerLayout>

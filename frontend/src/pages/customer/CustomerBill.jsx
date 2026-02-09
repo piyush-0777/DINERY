@@ -10,6 +10,8 @@ import {CustomerPlaceOrder} from '../../redux/thunks/customerThunk'
 
 const CustomerBill = () => {
 
+ const loadCustomer = useSelector(state => state.loadcustomer)
+   console.log(loadCustomer)
 
   //use dispatch for store and chang the value of user order
   const dispatch = useDispatch()

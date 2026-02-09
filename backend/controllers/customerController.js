@@ -11,7 +11,7 @@ const {sendNewOrderNotification} = require('../socket/socketEvent')
 exports.customerLogin = async (req, res) => {
     try {
      
-    
+    console.log('hello')
         const { name, phone } = req.body
         const { restaurantName } = req.params;
 
@@ -95,7 +95,7 @@ exports.customerPlaceOrder = async (req, res) => {
             items: orders.items,
             totalAmount
         })
-            sendNewOrderNotification(restaurant._id , createdOrder)
+           const result = await sendNewOrderNotification(restaurant._id , createdOrder)
         res.status(200).json({
             message: 'order is plased',
             data: createdOrder
