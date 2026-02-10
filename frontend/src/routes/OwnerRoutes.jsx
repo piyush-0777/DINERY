@@ -23,6 +23,9 @@ import { useSelector, useDispatch } from "react-redux";
 const OwnerRoutes = () => {
  
   const dispatch = useDispatch()
+   useSocket()
+   const {socketId} = useSelector(state => state.socketId)
+   console.log('id' , socketId)
   const { loading, success, error, } = useSelector(state => state.loardDashbordState)
   // console.log('owner route', { loading, success, error, })
   const [showSplash, setShowSplash] = useState(true);
@@ -53,7 +56,7 @@ const OwnerRoutes = () => {
       <AnimatePresence mode="wait">
         {showSplash ? (
           <SplashScreen key="splash" />
-        ) : loading ? (
+        ) : loading || socketId === null ? (
           <DashboardSkeleton key="skeleton" />
         ) : (
           <Routes>

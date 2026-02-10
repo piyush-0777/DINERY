@@ -11,7 +11,7 @@ const initSocket = (server) => {
     cors: { origin: "*" },
   });
 
-  io.on("connection", (socket) => {
+  io.on("connect", (socket) => {
     console.log("client connected", socket.id);
 
     const { restaurantId, role } = socket.handshake.auth;

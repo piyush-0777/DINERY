@@ -3,7 +3,8 @@ import { StatCard } from "../../components/owner/StatCard";
 import { StatusCard } from "../../components/owner/StatusCard";
 import { OrdersTrend } from "../../components/owner/OrdersTrend";
 import Loader from '../../components/ui/Loader';
-import { getSocket } from '../../consfig/socket'
+import { getSocket  } from '../../consfig/socket'
+import {useSelector} from 'react-redux'
 
 const OwnerDashboard = () => {
 
@@ -13,23 +14,25 @@ const OwnerDashboard = () => {
   useEffect(() => {
     setTimeout(() => setLoading(false), 30000); // simulate loading
   }, []);
+  const {socketId} = useSelector(state => state.socketId)
+   console.log('id dashbord' , socketId)
   useEffect(() => {
-    
-        const socket = getSocket()
-        if (!socket){
-          console.log('socket is not find')
-          return;
-        } 
-        console.log('socket is  find' , socket)
-        socket.on("newOrder", (order) => {
-          console.log("📦 New Order Received:", order);
-          // show toast / play sound / update UI
-        });
-    
-        return () => {
-          socket.off("newOrder");
-        };
-      }, []);
+          const socket = getSocket()
+          if (!socket){
+            console.log('socket is not find')
+            return;
+          } 
+          console.log('socket is  find' , socket)
+          socket.on("newOrder", (order) => {
+            console.log("📦 New Order Received:", order);
+            // show toast / play sound / update UI
+          });
+      
+          return () => {
+            socket.off("newOrder");
+          };
+  
+        }, []);
 
   const recentOrders = [
     { id: '#1021', table: 'Table 4', amount: '₹420', status: 'Preparing' },

@@ -1,8 +1,11 @@
 import { io } from "socket.io-client";
+import {addSocketId} from '../redux/features/owner/socketSlice'
+import { useDispatch } from "react-redux";
 
 let socket = null;
 
 export const connectSocket = ({ role, restaurantId,  }) => {
+
   if (socket) return socket; // already connected
 
   socket = io("http://localhost:3000", {
@@ -20,6 +23,7 @@ export const connectSocket = ({ role, restaurantId,  }) => {
     console.log("Socket disconnected");
   });
 
+  
   return socket;
 };
 

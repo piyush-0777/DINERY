@@ -1,40 +1,36 @@
+// useSocket.js
 import { useEffect } from "react";
-import { useSelector } from "react-redux";
-import { connectSocket, getSocket } from "../socket/ownerSocket";
+import { useDispatch, useSelector } from "react-redux";
+import { initSocket } from "../redux/thunks/initThunk";
 
 const useSocket = () => {
-  const restaurant = useSelector(
-    (state) => state.restaurant.restaurant
+  const dispatch = useDispatch();
+
+  const restaurantId = useSelector(
+    (state) => state.restaurant.restaurant?._id
   );
 
-  const customer = useSelector(
-    (state) => state.customer.customer
+  const customerRestaurant = useSelector(
+    (state) => state.customer.customer?.restaurant
   );
 
   useEffect(() => {
-    // already connected → do nothing
-    if (getSocket()) return;
-
     let role = null;
-    let restaurantId = null;
+    let finalRestaurantId = null;
 
-    // OWNER
-    if (restaurant?._id) {
+    if (restaurantId) {
       role = "owner";
-      restaurantId = restaurant._id;
-    }
-
-    // CUSTOMER
-    else if (customer?.restaurant) {
+      finalRestaurantId = restaurantId;
+    } else if (customerRestaurant) {
       role = "customer";
-      restaurantId = customer.restaurant;
+      finalRestaurantId = customerRestaurant;
     }
 
-    if (!role || !restaurantId) return;
+    if (!role || !finalRestaurantId) return;
 
-    connectSocket({ role, restaurantId });
+    dispatch(initSocket({ role, restaurantId: finalRestaurantId }));
 
-  }, [restaurant?._id, customer?.restaurant]);
+  }, [restaurantId, customerRestaurant, dispatch]);
 };
 
 export default useSocket;
