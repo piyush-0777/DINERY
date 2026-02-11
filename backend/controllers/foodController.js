@@ -41,7 +41,7 @@ exports.deletFood = async (req , res) => {
  }
  const foodId = req.params.foodId;
 
- if(!resId) {
+ if(!foodId) {
   return res.status(401).json({error:'foodid is ont found'});
  }
 

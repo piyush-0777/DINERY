@@ -1,9 +1,13 @@
 import OrderStatusBadge from './OrderStatusBadge'
 import { Eye, Printer } from "lucide-react";
 import { motion } from "framer-motion";
+import { useSelector , useDispatch } from 'react-redux';
+import {updateOrderStatusThunk} from '../../../redux/thunks/ordersThunk'
+
 
 
 export default function OrderCard({ order, onClick , setSelectedOrder }) {
+    const dispatch = useDispatch()
 const statusBorder = {
 Pending: 'border-yellow-400/40',
 Preparing: 'border-blue-400/40',
@@ -16,6 +20,10 @@ Date.now() - order.createdAt > 90000 * 60000 &&
 order.status !== "Completed";
 
 
+const nextStatus = async (id) => {
+    const status =  'preparing'
+    await dispatch(updateOrderStatusThunk({id , status}))
+}
 
 
 
@@ -30,7 +38,7 @@ hover:shadow-[0_0_30px_-10px_rgba(234,179,8,0.4)] transition-all duration-300 `}
 <div>
 <p className="text-white font-semibold text-lg">#{order._id}</p>
 <p className="text-sm text-gray-400">
-table id: {order?.table !== null ?order.table.tableId : ''} • {order.createdAt}
+table id: {order?.table !== null ?order.table.tableId : '00'} • {order.createdAt}
 </p>
 </div>
 
