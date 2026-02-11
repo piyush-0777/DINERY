@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { fetchOrdersThunk } from '../../redux/thunks/ordersThunk'
 import OrderCard from '../../components/owner/order/OrderCard'
 import OrderFilters from '../../components/owner/order/OrderFilters'
+import OrderDetailModal from '../../components/owner/order/OrderDetailModal'
 
 
 export default function OwnerOrder() {
@@ -33,6 +34,13 @@ return (
 <OrderCard key={order._id} order={order} setSelectedOrder={setSelectedOrder} />
 ))}
 </div>
+{selectedOrder && 
+<OrderDetailModal  order={selectedOrder} 
+onClose={()=>{setSelectedOrder(null)}}
+onCashPayment={()=> {console.log('case payment')}} />}
+
+
+
 </div>
 )
 }
