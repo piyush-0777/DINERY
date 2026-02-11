@@ -28,9 +28,9 @@ hover:shadow-[0_0_30px_-10px_rgba(234,179,8,0.4)] transition-all duration-300 `}
 >
 <div className="flex justify-between items-center">
 <div>
-<p className="text-white font-semibold text-lg">{order._id}</p>
+<p className="text-white font-semibold text-lg">#{order._id}</p>
 <p className="text-sm text-gray-400">
-{order.table} • {order.createdAt}
+table id: {order?.table !== null ?order.table.tableId : ''} • {order.createdAt}
 </p>
 </div>
 

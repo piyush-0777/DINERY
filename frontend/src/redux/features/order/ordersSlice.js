@@ -1,5 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit'
 import { fetchOrdersThunk, updateOrderStatusThunk } from '../../thunks/ordersThunk'
+import {loadDashbordThunk} from '../../thunks/loardDashbordThunk'
 
 
 const ordersSlice = createSlice({
@@ -142,6 +143,10 @@ state.list = action.payload
 state.loading = false
 state.error = action.payload
 })
+.addCase(loadDashbordThunk.fulfilled, (state, action) => {
+       state.list = action.payload.order;
+       
+      })
 },
 })
 

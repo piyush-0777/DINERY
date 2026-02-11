@@ -5,6 +5,7 @@ const { hashPasswordGenerater, hashPasswordChecker } = require('../utils/hashPas
 const foodsModel = require('../models/food-model')
 const categoryModel = require('../models/categories-model')
 const tableModel = require('../models/table-model')
+const orderModel = require('../models/order-model')
 const generateQR = require('../utils/generateQR')
 
 
@@ -136,16 +137,25 @@ exports.getDashBord = async (req, res) => {
     if (!restaurant) {
       return res.status(404).json({ error: "restaurant is not found" })
     }
+
+    // find foods
     const foods = await foodsModel.find({ restaurant: restaurant._id })
+    // find foods category
     const category = await categoryModel.find({ restaurant: restaurant._id })
 
+    //find tables
     const tables = await tableModel.find({ restaurant: restaurant._id })
     let tablesWithQrimage = [];
     for (let table of tables) {
       const qrImage = await generateQR(table, restaurant.restaurantName)
       tablesWithQrimage.push({ ...table._doc, qrImage: qrImage })
     }
-    res.status(200).json({ restaurant, foods, category , tables:tablesWithQrimage });
+
+    // find order
+    const order = await orderModel.find({restaurant: restaurant._id})
+    .populate('table')
+
+    res.status(200).json({ restaurant, foods, category , tables:tablesWithQrimage ,order});
 
   } catch (error) {
     console.log(error);
