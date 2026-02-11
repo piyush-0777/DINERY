@@ -21,7 +21,10 @@ order.status !== "Completed";
 
 
 const nextStatus = async (id) => {
-    const status =  'preparing'
+    let status;
+    if (order.status) {
+       order.status 
+    }
     await dispatch(updateOrderStatusThunk({id , status}))
 }
 
