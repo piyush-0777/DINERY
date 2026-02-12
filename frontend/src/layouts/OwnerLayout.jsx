@@ -1,13 +1,13 @@
 import { Outlet } from "react-router-dom";
 import { getSocket } from "../consfig/socket";
-import useSocket from '../hooks/useSocket'
 import { useEffect } from "react";
 // import Sidebar from "../components/common/Sidebar";
 import Navbar from "../components/owner/Navbar"
-import {useSelector} from 'react-redux'
+import {useSelector , useDispatch} from 'react-redux'
+import {getOrderThunk} from '../redux/thunks/ordersThunk'
 
 const OwnerLayout = ({ children }) => {
- 
+ const dispatch = useDispatch()
   const { loading, success, error, } = useSelector(state => state.loardDashbordState)
 
   useEffect(() => {
@@ -16,12 +16,13 @@ const OwnerLayout = ({ children }) => {
             console.log('socket is not find')
             return;
           } 
-          socket.on("newOrder", (order) => {
-            console.log("📦 New Order Received:", order);
+          socket.on("newOrder", (orderId) => {
+            console.log("📦 New Order Received:", orderId);
+            dispatch(getOrderThunk(orderId))
             // show toast / play sound / update UI
           });
           socket.on("tableStatusUpdated" , (tableId)=>{
-            
+
           })
       
           return () => {

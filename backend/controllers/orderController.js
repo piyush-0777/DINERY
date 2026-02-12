@@ -28,3 +28,19 @@ exports.updateOrderStatus = async (req , res) => {
 
 }
 }
+
+exports.getOrderById = async (req , res) => {
+   try {
+   const orderId = req.params.orderId;
+   const order = await orderModel.findById(orderId)
+   res.status(200).json({
+      success: true ,
+    order,
+   })
+   } catch(error) {
+      console.log(error);
+  return res.status(500).json({error: 'server error 121' })
+
+   }
+
+}

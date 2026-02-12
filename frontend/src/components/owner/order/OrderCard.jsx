@@ -11,7 +11,6 @@ import { toast } from "react-toastify";
 export default function OrderCard({ order, onClick , setSelectedOrder , setUpdateStatus , updateStatus }) {
     const dispatch = useDispatch()
     const {loading , reqtype , error , success } = useSelector(state=>state.orders)
-    console.log({loading , reqtype , error , success })
 const statusBorder = { 
 pending: 'border-yellow-500/40 text-yellow-400 hover:bg-yellow-500/10',
 preparing: 'border-blue-500/40 text-blue-400 hover:bg-blue-500/10',
@@ -52,7 +51,7 @@ hover:shadow-[0_0_30px_-10px_rgba(234,179,8,0.4)] transition-all duration-300 `}
 <div>
 <p className="text-white font-semibold text-lg">#{order._id}</p>
 <p className="text-sm text-gray-400">
-table id: {order?.table !== null ?order.table.tableId : '00'} • {order.createdAt}
+table id: {order?.table !== null ?order.table.tableId : '00'} • {new Date(order.createdAt).toLocaleString()}
 </p>
 </div>
 

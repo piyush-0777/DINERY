@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit'
-import { fetchOrdersThunk, updateOrderStatusThunk } from '../../thunks/ordersThunk'
+import { fetchOrdersThunk, updateOrderStatusThunk, getOrderThunk } from '../../thunks/ordersThunk'
 import { loadDashbordThunk } from '../../thunks/loardDashbordThunk'
 
 
@@ -125,18 +125,18 @@ const ordersSlice = createSlice({
       },
     ],
     loading: false,
-    reqtype:null , 
+    reqtype: null,
     error: null,
     success: false,
   },
 
-   reducers: {
-    resetOrderLoadSlice: (state)=>{
+  reducers: {
+    resetOrderLoadSlice: (state) => {
       state.loading = false;
       state.error = null;
       state.success = false;
-    } ,
-  } ,
+    },
+  },
   extraReducers: (builder) => {
     builder
       // for fatch order
@@ -146,7 +146,9 @@ const ordersSlice = createSlice({
       })
       .addCase(fetchOrdersThunk.fulfilled, (state, action) => {
         state.loading = false
-        state.list = action.payload
+        state.list = action.payload.sort(
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+        );
       })
       .addCase(fetchOrdersThunk.rejected, (state, action) => {
         state.loading = false
@@ -154,24 +156,26 @@ const ordersSlice = createSlice({
       })
       // for load dashbord
       .addCase(loadDashbordThunk.fulfilled, (state, action) => {
-        state.list = action.payload.order;
+        state.list = action.payload.order.sort(
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+        );
 
       })
 
       // for update status
       .addCase(updateOrderStatusThunk.pending, (state) => {
-        state.reqtype='updateOrerStatus'
+        state.reqtype = 'updateOrerStatus'
         state.loading = true
         state.error = null
       })
       .addCase(updateOrderStatusThunk.fulfilled, (state, action) => {
-        
-        state.list = state.list.map((e)=>{
-            if(e._id === action.payload.order._id) {
-              return action.payload.order;
-            } else {
-              return e;
-            }
+
+        state.list = state.list.map((e) => {
+          if (e._id === action.payload.order._id) {
+            return action.payload.order;
+          } else {
+            return e;
+          }
         })
         state.loading = false
       })
@@ -179,8 +183,13 @@ const ordersSlice = createSlice({
         state.loading = false
         state.error = action.payload
       })
+      .addCase(getOrderThunk.fulfilled, (state, action) => {
+
+        state.list = [action.payload.order , ...state.list]
+
+      })
   },
 })
 
-export const {resetOrderLoadSlice} = ordersSlice.actions;
+export const { resetOrderLoadSlice } = ordersSlice.actions;
 export default ordersSlice.reducer

@@ -3,7 +3,7 @@ const {getIO} = require('./socketServer')
 // for order
 exports.sendNewOrderNotification = async (restaurantID , order)=>{
   try {
- getIO().to(restaurantID.toString()).emit('newOrder' , order)
+ getIO().to(restaurantID.toString()).emit('newOrder' , order._id)
  
  return true;
   } catch (error) {

@@ -30,7 +30,7 @@ export const updateOrderStatusThunk = createAsyncThunk(
 
 export const getOrderThunk = createAsyncThunk('getOrderThunk' , async (id ,thunkAPI )=>{
     try {
-            res = await orderService.getOrdersForOwner(id);
+           const res = await orderService.getOrdersForOwner(id);
             return res;
     } catch (error) {
          console.log(error)
