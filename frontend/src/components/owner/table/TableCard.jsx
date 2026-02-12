@@ -1,6 +1,20 @@
 import { TABLE_STATUS_UI, TABLE_STATUS } from "./TableStatus";
+import {
+  QrCode,
+  Trash2,
+  Receipt,
+  CreditCard,
+  Plus
+} from "lucide-react";
 
-const TableCard = ({ table, onOpen, onAddOrder, onShowQR, onBill , onDelete }) => {
+const TableCard = ({
+  table,
+  onOpen,
+  onAddOrder,
+  onShowQR,
+  onBill,
+  onDelete
+}) => {
   const ui = TABLE_STATUS_UI[table.status];
 
   return (
@@ -32,98 +46,110 @@ const TableCard = ({ table, onOpen, onAddOrder, onShowQR, onBill , onDelete }) =
         {ui.label}
       </p>
 
-      {/* If order exists */}
       {table.total && (
         <div className="mt-2 text-sm text-neutral-400">
-          🧾 ₹{table.total} • ⏱️ {table.time}
+          ₹{table.total} • ⏱ {table.time}
         </div>
       )}
 
-      {/* Customer info */}
       {table.customer && (
         <div className="mt-2 text-xs text-neutral-500">
           👤 {table.customer.name}
         </div>
       )}
 
-      {/* Hover overlay */}
+      {/* Hover Overlay */}
       <div
-        className="absolute inset-0 rounded-2xl
-        bg-black/60 opacity-0
-        group-hover:opacity-100
-        transition-all duration-300
-        flex flex-col items-center justify-center gap-3"
+        className="
+          absolute inset-0 rounded-2xl
+          bg-black/60 opacity-0
+          group-hover:opacity-100
+          transition-all duration-300
+        "
       >
-        {/* AVAILABLE → ADD ORDER */}
-        {table.status === TABLE_STATUS.AVAILABLE && (
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              onAddOrder(table);
-            }}
-            className="px-4 py-2 rounded-xl bg-green-500 text-black font-medium
-                       hover:bg-green-400 transition"
+        {/* Bottom Right Actions */}
+        <div className="absolute bottom-3 right-3 flex gap-2">
+          
+          {/* AVAILABLE → ADD ORDER */}
+          {table.status === TABLE_STATUS.AVAILABLE && (
+            <IconBtn
+              title="Add Order"
+              onClick={() => onAddOrder(table)}
+              color="bg-green-500"
+            >
+              <Plus size={16} />
+            </IconBtn>
+          )}
+
+          {/* OCCUPIED / BILL */}
+          {(table.status === TABLE_STATUS.OCCUPIED ||
+            table.status === TABLE_STATUS.BILL_PENDING) && (
+            <IconBtn
+              title="View Bill"
+              onClick={() => onOpen(table)}
+            >
+              <Receipt size={16} />
+            </IconBtn>
+          )}
+
+          {/* PAY BILL */}
+          {table.status === TABLE_STATUS.BILL_PENDING && (
+            <IconBtn
+              title="Pay Bill"
+              onClick={() => onBill(table)}
+              color="bg-yellow-500 text-black"
+            >
+              <CreditCard size={16} />
+            </IconBtn>
+          )}
+
+          {/* QR */}
+          <IconBtn
+            title="Show QR"
+            onClick={() => onShowQR(table.qr)}
           >
-            ➕ Add Order
-          </button>
-        )}
+            <QrCode size={16} />
+          </IconBtn>
 
-        {/* OCCUPIED / BILL PENDING */}
-        {(table.status === TABLE_STATUS.OCCUPIED ||
-          table.status === TABLE_STATUS.BILL_PENDING) && (
-          <>
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onOpen(table);
-              }}
-              className="px-4 py-2 rounded-xl bg-white text-black
-                         hover:bg-neutral-200 transition"
+          {/* DELETE (only empty table) */}
+          {!table.total && (
+            <IconBtn
+              title="Delete Table"
+              onClick={() => onDelete(table._id)}
+              color="bg-red-600"
             >
-              🧾 View Bill
-            </button>
-
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                onBill(table);
-              }}
-              className="px-4 py-2 rounded-xl bg-yellow-500 text-black
-                         hover:bg-yellow-400 transition"
-            >
-              💳 Pay Bill
-            </button>
-          </>
-        )}
-
-        {/* QR */}
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onShowQR(table.qr);
-          }}
-          className="absolute bottom-3 right-3 text-xs px-3 py-1 rounded-full
-                     bg-neutral-800 text-white hover:bg-neutral-700 transition"
-        >
-          QR
-        </button>
-        {!table.total && (
-  <button
-    onClick={(e) => {
-      e.stopPropagation();
-      onDelete(table._id);
-    }}
-    className="px-4 py-2 rounded-xl
-               bg-red-600 text-white
-               hover:bg-red-500 transition"
-  >
-    🗑 Delete
-  </button>
-)}
-
+              <Trash2 size={16} />
+            </IconBtn>
+          )}
+        </div>
       </div>
     </div>
   );
 };
+
+/* Icon Button */
+const IconBtn = ({
+  children,
+  onClick,
+  color = "bg-neutral-800",
+  title
+}) => (
+  <button
+    title={title}
+    onClick={(e) => {
+      e.stopPropagation();
+      onClick();
+    }}
+    className={`
+      w-9 h-9 flex items-center justify-center
+      rounded-xl ${color}
+      text-white
+      hover:scale-110
+      transition
+    `}
+  >
+    {children}
+  </button>
+);
 
 export default TableCard;

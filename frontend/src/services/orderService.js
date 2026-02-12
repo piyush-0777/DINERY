@@ -7,8 +7,8 @@ export const orderService = {
   getCustomerOrders: (restaurantId, tableId) =>
     request(`/order/${restaurantId}/${tableId}`, "GET"),
 
-  getLiveOrdersForOwner: () =>
-    request("/order/live", "GET"),
+  getOrdersForOwner: (id) =>
+    request(`/order/${id}`, "GET"),
 
   updateOrderStatus: (orderId, status) =>
     request(`/order/${orderId}/status`, "PUT", { status }),

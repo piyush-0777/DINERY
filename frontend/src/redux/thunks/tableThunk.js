@@ -31,3 +31,13 @@ export const updateTableThunk = createAsyncThunk('updateTableThunk' , async ({id
         return thunkAPI.rejectWithValue({status:error.status || 500 , message: error.data?.error || error.message})
     }
 })
+
+export const updateStatusThunk = createAsyncThunk('updateStatusThunk' , async (id, thunkAPI)=>{
+    try {
+        res  = await tableService.getTable(id) 
+        return res;
+    } catch (error) {
+        console.log(error) 
+        return thunkAPI.rejectWithValue({status:error.status || 500 , message: error.data?.error || error.message})
+    }
+})

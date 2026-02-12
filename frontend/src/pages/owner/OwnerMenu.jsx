@@ -16,7 +16,6 @@ const OwnerMenu = () => {
 
     const categories = useSelector(state => state.foodObject.category);
     const items = useSelector(state => state.foodObject.foods);
-
     const foodStatus = useSelector(state => state.loadfoodstatus);
     const categoryStatus = useSelector(state => state.addcategory);
 

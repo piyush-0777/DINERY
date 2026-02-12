@@ -7,5 +7,7 @@ export const tableService = {
         request(`/tables/deletetable/${id}` , "DELETE"),
     updateTable: (id , data)=>
          request(`/tables/deletetable/${id}` , "PUT", data),
+    getTable: (id) =>
+        request(`tables/getTable/${id}` , "GET" ) ,
     
 }

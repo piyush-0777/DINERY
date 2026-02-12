@@ -15,6 +15,7 @@ export default function OrderCard({ order, onClick , setSelectedOrder , setUpdat
 const statusBorder = { 
 pending: 'border-yellow-500/40 text-yellow-400 hover:bg-yellow-500/10',
 preparing: 'border-blue-500/40 text-blue-400 hover:bg-blue-500/10',
+served: 'border-orange-500/40 text-orange-400 hover:bg-orange-500/10' ,
 completed: 'border-green-500/40 text-green-400 hover:bg-green-500/10',
 delayed: 'border-red-500/40 text-red-400 hover:bg-red-500/10',
 }
@@ -84,7 +85,7 @@ className="p-2 rounded-lg bg-gray-800 hover:bg-yellow-400 hover:text-black trans
 </button>
 
 
-{order.status !== "Completed" && (
+{order.status !== "completed" && (
 <button
 onClick={() => nextStatus(order._id)}
 className="px-3 py-1 text-xs rounded-lg bg-yellow-400 text-black hover:opacity-80 transition"

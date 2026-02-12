@@ -1,12 +1,10 @@
 const {getIO} = require('./socketServer')
 
-
+// for order
 exports.sendNewOrderNotification = async (restaurantID , order)=>{
   try {
-    console.log(restaurantID.toString())
-    console.log(order)
  getIO().to(restaurantID.toString()).emit('newOrder' , order)
- console.log('notification is send')
+ 
  return true;
   } catch (error) {
     console.log('socket error' , error)
@@ -21,3 +19,15 @@ exports.sendOrderStatusUpdateNotification = (restaurantId, orderId, status) => {
     status
   });
 };
+
+// for tables
+
+exports.sendTableUpdateNotification = (restaurantID , tableId ) =>{
+  try {
+getIO().to(restaurantID.toString()).emit('tableStatusUpdated', tableId)
+return true;
+  } catch (error) {
+    console.log(error);
+    return false;
+  }
+}

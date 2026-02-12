@@ -52,13 +52,14 @@ const OwnerRoutes = () => {
    
 
   return (
-    <OwnerLayout>
+    
       <AnimatePresence mode="wait">
         {showSplash ? (
           <SplashScreen key="splash" />
         ) : loading || socketId === null ? (
           <DashboardSkeleton key="skeleton" />
         ) : (
+          <OwnerLayout>
           <Routes>
             <Route path="dashboard" element={<OwnerDashboard />} />
             <Route path="menu" element={<OwnerMenu />} />
@@ -70,10 +71,11 @@ const OwnerRoutes = () => {
         <Route path="analytics" element={<SalesAnalytics />} />
         <Route path="settings" element={<RestaurantSettings />} /> */}
           </Routes>
+          </OwnerLayout>
         )}
       </AnimatePresence>
 
-    </OwnerLayout>
+   
   );
 };
 

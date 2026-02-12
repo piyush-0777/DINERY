@@ -6,7 +6,7 @@ const foodModel = require('../models/food-model')
 const categoryModel = require('../models/categories-model')
 const orderModel = require('../models/order-model')
 
-const {sendNewOrderNotification} = require('../socket/socketEvent')
+const {sendNewOrderNotification , sendTableUpdateNotification} = require('../socket/socketEvent')
 
 exports.customerLogin = async (req, res) => {
     try {
@@ -14,7 +14,16 @@ exports.customerLogin = async (req, res) => {
     console.log('hello')
         const { name, phone } = req.body
         const { restaurantName } = req.params;
+         const token = req.cookies?.token || req.headers.authorization?.split(" ")[1];
 
+        if (!token) {
+            return res.status(401).json({ error: 'token is not provide' });
+        }
+
+        const table = await tableModel.findOneAndUpdate({ qrCode: token } , 
+            {status:'occupied'} ,
+             {new: true} , )
+            
         const restaurant = await restaurantModel.findOne({ restaurantName })
 
         const loginCustomer = await customer.create({
@@ -23,14 +32,13 @@ exports.customerLogin = async (req, res) => {
             phone,
         })
 
-    
+         const result = sendTableUpdateNotification(restaurant._id , table._id)
 
-        if (loginCustomer) {
+        
          
             res.status(200).json({ message: 'loged in.', data: loginCustomer })
-        } else {
-            res.status(400).json({ error: 'error in login' })
-        }
+      
+          
     } catch (error) {
         console.log(error)
         return res.status(401).json({ error: ' server error' });
@@ -49,6 +57,8 @@ exports.loadCustomerDashbord = async (req, res) => {
         if (!restaurantName) {
             return res.status(401).json({ error: 'restaurantName is not provide' });
         }
+
+        
 
 
         const restaurant = await restaurantModel.findOne({ restaurantName })
