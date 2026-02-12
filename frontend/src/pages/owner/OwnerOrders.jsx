@@ -8,10 +8,11 @@ import OrderDetailModal from '../../components/owner/order/OrderDetailModal'
 
 export default function OwnerOrder() {
 const dispatch = useDispatch()
-const { list, loading, error } = useSelector(s => s.orders)
-console.log({ list, loading, error })
+const { list, loading, error , reqtype  , success } = useSelector(s => s.orders)
+
 const [filter, setFilter] = useState('Today')
 const [selectedOrder , setSelectedOrder] = useState();
+const [updateStatus , setUpdateStatus] = useState();
 
 
 // useEffect(() => {
@@ -19,8 +20,8 @@ const [selectedOrder , setSelectedOrder] = useState();
 // }, [])
 
 
-if (loading) return <p className="text-yellow-400">Loading orders...</p>
-if (error) return <p className="text-red-400">{error}</p>
+// if (loading) return <p className="text-yellow-400">Loading orders...</p>
+// if (error) return <p className="text-red-400">{error}</p>
 
 
 return (
@@ -31,7 +32,12 @@ return (
 
 <div className="grid gap-4">
 {list.map(order => (
-<OrderCard key={order._id} order={order} setSelectedOrder={setSelectedOrder} />
+<OrderCard 
+key={order._id} 
+order={order} 
+setSelectedOrder={setSelectedOrder}
+setUpdateStatus={setUpdateStatus}
+updateStatus={updateStatus} />
 ))}
 </div>
 {selectedOrder && 

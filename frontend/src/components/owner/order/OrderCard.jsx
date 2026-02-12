@@ -1,31 +1,41 @@
+import {useEffect} from 'react'
 import OrderStatusBadge from './OrderStatusBadge'
 import { Eye, Printer } from "lucide-react";
 import { motion } from "framer-motion";
 import { useSelector , useDispatch } from 'react-redux';
 import {updateOrderStatusThunk} from '../../../redux/thunks/ordersThunk'
+import { toast } from "react-toastify";
 
 
 
-export default function OrderCard({ order, onClick , setSelectedOrder }) {
+export default function OrderCard({ order, onClick , setSelectedOrder , setUpdateStatus , updateStatus }) {
     const dispatch = useDispatch()
-const statusBorder = {
-Pending: 'border-yellow-400/40',
-Preparing: 'border-blue-400/40',
-Served: 'border-green-400/40',
-Delayed: 'border-red-500/40 ',
+    const {loading , reqtype , error , success } = useSelector(state=>state.orders)
+    console.log({loading , reqtype , error , success })
+const statusBorder = { 
+pending: 'border-yellow-500/40 text-yellow-400 hover:bg-yellow-500/10',
+preparing: 'border-blue-500/40 text-blue-400 hover:bg-blue-500/10',
+completed: 'border-green-500/40 text-green-400 hover:bg-green-500/10',
+delayed: 'border-red-500/40 text-red-400 hover:bg-red-500/10',
 }
 
-const isDelayed =
-Date.now() - order.createdAt > 90000 * 60000 &&
-order.status !== "Completed";
-
+useEffect(()=>{
+    if(reqtype === 'updateOrerStatus' && error){
+        toast.error(error.message)
+    }
+} , [])
 
 const nextStatus = async (id) => {
     let status;
-    if (order.status) {
-       order.status 
-    }
-    await dispatch(updateOrderStatusThunk({id , status}))
+    if (order.status === "pending") {
+       status = 'preparing' 
+    } else if (order.status === "preparing") {
+        status = 'served'
+    } else if (order.status === "served") {
+        status = 'completed'
+    } 
+    setUpdateStatus(id);
+     dispatch(updateOrderStatusThunk({id , status}))
 }
 
 
@@ -48,14 +58,10 @@ table id: {order?.table !== null ?order.table.tableId : '00'} • {order.created
 
 <span
 className={`px-3 py-1 text-xs rounded-full border cursor-pointer ${
-order.status === "Completed"
-? "border-green-500/40 text-green-400 hover:bg-green-500/10"
-: order.status === "Preparing"
-? "border-yellow-500/40  text-yellow-300 hover:bg-green-500/10"
-: "border-red-500/40  text-red-300 hover:bg-red-500/10"
+statusBorder[order.status]
 }`}
 >
-{order.status}
+{loading === true && order._id === updateStatus ? 'processing...' :  order.status}
 </span>
 </div>
 

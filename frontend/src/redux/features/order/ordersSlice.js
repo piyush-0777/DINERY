@@ -165,7 +165,7 @@ const ordersSlice = createSlice({
         state.error = null
       })
       .addCase(updateOrderStatusThunk.fulfilled, (state, action) => {
-        state.loading = false
+        
         state.list = state.list.map((e)=>{
             if(e._id === action.payload.order._id) {
               return action.payload.order;
@@ -173,6 +173,7 @@ const ordersSlice = createSlice({
               return e;
             }
         })
+        state.loading = false
       })
       .addCase(updateOrderStatusThunk.rejected, (state, action) => {
         state.loading = false
