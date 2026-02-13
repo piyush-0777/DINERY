@@ -1,9 +1,9 @@
 const {getIO} = require('./socketServer')
 
 // for order
-exports.sendNewOrderNotification = async (restaurantID , order)=>{
+exports.sendNewOrderNotification = async (restaurantID , order , bill)=>{
   try {
- getIO().to(restaurantID.toString()).emit('newOrder' , order._id)
+ getIO().to(restaurantID.toString()).emit('newOrder' , {orderId:order._id , billId:bill._id})
  
  return true;
   } catch (error) {

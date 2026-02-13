@@ -2,7 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 import {addFoodThunk ,   
   deletFoodThunk , 
   updateFoodThunk ,
-changeAvailablity} from '../../thunks/manuThunk'
+changeAvailablity } from '../../thunks/manuThunk'
 
 
 const initialState = {

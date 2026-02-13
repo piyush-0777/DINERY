@@ -5,6 +5,7 @@ const tableModel = require('../models/table-model')
 const foodModel = require('../models/food-model')
 const categoryModel = require('../models/categories-model')
 const orderModel = require('../models/order-model')
+const billModel = require('../models/bill-model')
 
 const {sendNewOrderNotification , sendTableUpdateNotification} = require('../socket/socketEvent')
 
@@ -105,10 +106,19 @@ exports.customerPlaceOrder = async (req, res) => {
             items: orders.items,
             totalAmount
         })
-           const result = await sendNewOrderNotification(restaurant._id , createdOrder)
+        const bill = await billModel.create({
+            restaurant:restaurant._id,
+              order: createdOrder._id,
+              billAmount: totalAmount,
+              tax: 5,
+              finalAmount: totalAmount + (totalAmount*0.05),
+              paymentStatus: "unpaid"
+        })
+
+        const result = await sendNewOrderNotification(restaurant._id , createdOrder , bill)
         res.status(200).json({
             message: 'order is plased',
-            data: createdOrder
+            data: {createdOrder , bill} ,
         })
 
     } catch (error) {

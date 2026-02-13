@@ -11,6 +11,8 @@ import loardtablereducer from '../features/table/loardTablesSlice'
 import ordersreducer from '../features/order/ordersSlice'
 import loadcustomerreducer from '../features/customer/loadCustomerSlice'
 import socketIdreducer  from '../features/owner/socketSlice'
+import billreducer from '../features/bill/billSlice'
+import loadBillreducer from '../features/bill/loadBillSlice'
 
 export const store = configureStore({
     reducer: {
@@ -26,5 +28,7 @@ export const store = configureStore({
         orders:ordersreducer ,
         loadcustomer:loadcustomerreducer ,
         socketId: socketIdreducer ,
+        bills:billreducer , 
+        loadBill:loadBillreducer ,
     }
 });

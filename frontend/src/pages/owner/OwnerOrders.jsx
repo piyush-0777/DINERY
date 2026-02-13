@@ -4,11 +4,14 @@ import { fetchOrdersThunk } from '../../redux/thunks/ordersThunk'
 import OrderCard from '../../components/owner/order/OrderCard'
 import OrderFilters from '../../components/owner/order/OrderFilters'
 import OrderDetailModal from '../../components/owner/order/OrderDetailModal'
+import {cashPaymentThunk} from '../../redux/thunks/billThunk'
 
 
 export default function OwnerOrder() {
 const dispatch = useDispatch()
 const { list, loading, error , reqtype  , success } = useSelector(s => s.orders)
+const bills = useSelector(s=> s.bills.bill)
+console.log(bills)
 
 const [filter, setFilter] = useState('Today')
 const [selectedOrder , setSelectedOrder] = useState();
@@ -23,6 +26,10 @@ const [updateStatus , setUpdateStatus] = useState();
 // if (loading) return <p className="text-yellow-400">Loading orders...</p>
 // if (error) return <p className="text-red-400">{error}</p>
 
+const cashPayment = (id) => {
+    dispatch(cashPaymentThunk(id))
+
+}
 
 return (
 <div className="p-4 bg-black min-h-screen">
@@ -41,11 +48,13 @@ updateStatus={updateStatus} />
 ))}
 </div>
 {selectedOrder && 
-<OrderDetailModal  order={selectedOrder} 
+<OrderDetailModal  
+order={selectedOrder} 
+bill = {
+     bills.filter((e)=> e.order === selectedOrder._id)[0]
+}
 onClose={()=>{setSelectedOrder(null)}}
-onCashPayment={()=> {console.log('case payment')}} />}
-
-
+onCashPayment={cashPayment} />}
 
 </div>
 )

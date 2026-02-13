@@ -10,7 +10,7 @@ const BillSchema = new mongoose.Schema({
 
   paymentStatus: { type: String, enum: ["paid","unpaid"], default: "unpaid" },
   paymentMode: { type: String, enum: ["cash","upi","card"] },
-
+  paymentAt: {type: Date , default: null} ,
   createdAt: { type: Date, default: Date.now }
 });
 

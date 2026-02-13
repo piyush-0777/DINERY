@@ -5,6 +5,7 @@ import { useEffect } from "react";
 import Navbar from "../components/owner/Navbar"
 import {useSelector , useDispatch} from 'react-redux'
 import {getOrderThunk} from '../redux/thunks/ordersThunk'
+import {getBillThunk} from '../redux/thunks/billThunk'
 
 const OwnerLayout = ({ children }) => {
  const dispatch = useDispatch()
@@ -16,9 +17,10 @@ const OwnerLayout = ({ children }) => {
             console.log('socket is not find')
             return;
           } 
-          socket.on("newOrder", (orderId) => {
+          socket.on("newOrder", ({orderId , billId}) => {
             console.log("📦 New Order Received:", orderId);
             dispatch(getOrderThunk(orderId))
+            dispatch(getBillThunk(billId))
             // show toast / play sound / update UI
           });
           socket.on("tableStatusUpdated" , (tableId)=>{

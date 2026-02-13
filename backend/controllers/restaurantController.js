@@ -7,6 +7,7 @@ const categoryModel = require('../models/categories-model')
 const tableModel = require('../models/table-model')
 const orderModel = require('../models/order-model')
 const generateQR = require('../utils/generateQR')
+const billModel = require('../models/bill-model')
 
 
 
@@ -154,8 +155,13 @@ exports.getDashBord = async (req, res) => {
     // find order
     const order = await orderModel.find({restaurant: restaurant._id})
     .populate('table')
+    .populate('customer')
 
-    res.status(200).json({ restaurant, foods, category , tables:tablesWithQrimage ,order});
+    const bill = await billModel.find({restaurant: restaurant._id})
+    
+
+    res.status(200).json({ restaurant, foods, category , tables:tablesWithQrimage ,order , bill});
+
 
   } catch (error) {
     console.log(error);

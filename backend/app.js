@@ -36,7 +36,7 @@ app.use("/api/tables" , require('./routes/tableRoutes'))
 app.use("/api/customer" , require('./routes/customerRoutes'))
  app.use("/api/food" , require('./routes/foodRoutes'))
  app.use("/api/order" , require('./routes/orderRoutes'))
-// app.use("/api/bill" , require('./routes/billRoutes'))
+app.use("/api/bill" , require('./routes/billRoutes'))
 // app.use("/api/analytics" , require('./routes/analyticsRoutes'))
 
 

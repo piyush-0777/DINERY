@@ -32,9 +32,9 @@ export const updateTableThunk = createAsyncThunk('updateTableThunk' , async ({id
     }
 })
 
-export const updateStatusThunk = createAsyncThunk('updateStatusThunk' , async (id, thunkAPI)=>{
+export const updateStatusThunk = createAsyncThunk('updateStatusThunk' , async ({id , status}, thunkAPI)=>{
     try {
-        res  = await tableService.getTable(id) 
+        res  = await tableService.getTable(id , status) 
         return res;
     } catch (error) {
         console.log(error) 
