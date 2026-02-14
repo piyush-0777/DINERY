@@ -26,8 +26,8 @@ const [updateStatus , setUpdateStatus] = useState();
 // if (loading) return <p className="text-yellow-400">Loading orders...</p>
 // if (error) return <p className="text-red-400">{error}</p>
 
-const cashPayment = (id) => {
-    dispatch(cashPaymentThunk(id))
+const cashPayment = (billId , tableId) => {
+    dispatch(cashPaymentThunk({billId , tableId}))
 
 }
 

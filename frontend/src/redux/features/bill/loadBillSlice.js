@@ -1,4 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
+import {cashPaymentThunk} from '../../thunks/billThunk'
 
 const initialState = {
     reqtype:null,
@@ -20,6 +21,7 @@ const loadBillSlice = createSlice({
   },
   extraReducers: (builder) => {
       builder
+      .addCase(cashPaymentThunk.f)
         
     },
 

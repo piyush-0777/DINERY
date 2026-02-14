@@ -113,7 +113,7 @@ const OrderDetailModal = ({ order, bill, onClose, onCashPayment }) => {
           {order.status === "completed" && (
             <div className="mt-6 flex justify-center">
               <button
-                onClick={()=>onCashPayment(bill._id)}
+                onClick={()=>onCashPayment(bill._id , order.table._id)}
                 className="bg-green-600 hover:bg-green-700
                            hover:scale-105 px-6 py-3 rounded-xl font-semibold
                            shadow-lg transition-all duration-200"
