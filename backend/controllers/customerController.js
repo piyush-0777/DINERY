@@ -12,7 +12,7 @@ const {sendNewOrderNotification , sendTableUpdateNotification} = require('../soc
 exports.customerLogin = async (req, res) => {
     try {
      
-    console.log('hello')
+
         const { name, phone } = req.body
         const { restaurantName } = req.params;
          const token = req.cookies?.token || req.headers.authorization?.split(" ")[1];

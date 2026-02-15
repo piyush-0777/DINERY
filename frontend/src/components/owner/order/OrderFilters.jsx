@@ -1,5 +1,10 @@
 export default function OrderFilters({ active, setActive }) {
-const filters = ['Today', 'Pending', 'Completed']
+const filters = ["Today",  //all order
+    "pending", // order is pending
+      "preparing", // order is in kitchen 
+      "served" , // order is plased
+      "completed", // order is completed
+      "cancelled"]
 
 
 return (

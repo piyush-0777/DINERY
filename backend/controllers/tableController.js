@@ -1,6 +1,7 @@
 const tableModel = require('../models/table-model')
 const generateQR = require('../utils/generateQR')
 const crypto = require('crypto')
+const tableService = require('../services/tableService')
 
 exports.getAllTable = async (req, res) => {
     try {
@@ -123,6 +124,23 @@ exports.updateStatus = async (req, res) => {
             message: 'table status is updated.',
             table
         })
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({
+            error: 'internal server error'
+        })
+    }
+}
+
+exports.getTableById = async (req , res) => {
+    try {
+         const tableId = req.params.tableId;
+         const table = await tableService.getTableById(tableId)
+
+         return res.status(200).json({
+            secess: true,
+            table
+         })
     } catch (error) {
         console.log(error)
         res.status(500).json({

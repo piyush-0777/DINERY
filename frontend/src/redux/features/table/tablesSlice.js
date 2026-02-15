@@ -1,12 +1,13 @@
 // tablesSlice.js
 import { createSlice } from "@reduxjs/toolkit";
 import { TABLE_STATUS } from "../../../components/owner/table/TableStatus";
-import { addTableThunk , deleteTableThunk , updateTableThunk } from "../../thunks/tableThunk";
+import { addTableThunk, deleteTableThunk, updateTableThunk, getTableThunk } from "../../thunks/tableThunk";
 import { loadDashbordThunk } from '../../thunks/loardDashbordThunk'
+import { cashPaymentThunk } from '../../thunks/billThunk'
 
 
 const initialState = {
-    tables:[],
+    tables: [],
 };
 
 const tablesSlice = createSlice({
@@ -33,28 +34,43 @@ const tablesSlice = createSlice({
         }
     },
     extraReducers: (builter) => {
-    builter
-    .addCase(loadDashbordThunk.fulfilled, (state, action) => {
-            state.tables = action.payload.tables;
-            
-          })
-    .addCase(addTableThunk.fulfilled , (state, action)=>{
-       state.tables.push(action.payload.table)
-    })
-    .addCase(deleteTableThunk.fulfilled , (state, action)=>{
-       state.tables =state.tables.filter((table)=> table._id !== action.payload.table._id)
-    })
-     .addCase(updateTableThunk.fulfilled , (state, action)=>{
-       state.tables =state.tables.map((table)=>{ 
-        if(table._id === action.payload.table._id){
-                return action.payload.table;
-        } else {
-            return table;
-        }
-    })
-    })
+        builter
+            .addCase(loadDashbordThunk.fulfilled, (state, action) => {
+                state.tables = action.payload.tables;
+
+            })
+            .addCase(addTableThunk.fulfilled, (state, action) => {
+                state.tables.push(action.payload.table)
+            })
+            .addCase(deleteTableThunk.fulfilled, (state, action) => {
+                state.tables = state.tables.filter((table) => table._id !== action.payload.table._id)
+            })
+            .addCase(updateTableThunk.fulfilled, (state, action) => {
+                state.tables = state.tables.map((table) => {
+                    if (table._id === action.payload.table._id) {
+                        return action.payload.table;
+                    } else {
+                        return table;
+                    }
+                })
+            })
+            .addCase(cashPaymentThunk.fulfilled, (state, action) => {
+                state.tables = state.tables.map((e) => {
+                    if (e._id === action.payload.data.table._id) return action.payload.data.table;
+                    else return e;
+                })
+            })
+            .addCase(getTableThunk.fulfilled, (state, action) => {
+                state.tables = state.tables.map((table) => {
+                    if (table._id === action.payload.table._id) {
+                        return action.payload.table;
+                    } else {
+                        return table;
+                    }
+                })
+            })
     }
 });
 
-export const { updateTableStatus , mergeTables } = tablesSlice.actions;
+export const { updateTableStatus, mergeTables } = tablesSlice.actions;
 export default tablesSlice.reducer;

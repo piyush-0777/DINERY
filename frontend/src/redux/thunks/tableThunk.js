@@ -34,7 +34,17 @@ export const updateTableThunk = createAsyncThunk('updateTableThunk' , async ({id
 
 export const updateStatusThunk = createAsyncThunk('updateStatusThunk' , async ({id , status}, thunkAPI)=>{
     try {
-        res  = await tableService.getTable(id , status) 
+        res  = await tableService.updateStatus(id , status) 
+        return res;
+    } catch (error) {
+        console.log(error) 
+        return thunkAPI.rejectWithValue({status:error.status || 500 , message: error.data?.error || error.message})
+    }
+})
+
+export const getTableThunk = createAsyncThunk('getTableThunk' , async (tableId , thunkAPI) =>{
+    try {
+        res  = await tableService.getTable(tableId) 
         return res;
     } catch (error) {
         console.log(error) 

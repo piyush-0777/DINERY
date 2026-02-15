@@ -21,7 +21,18 @@ const loadBillSlice = createSlice({
   },
   extraReducers: (builder) => {
       builder
-      .addCase(cashPaymentThunk.f)
+      .addCase(cashPaymentThunk.pending , (state) => {
+        state.reqtype = 'cashPayment'
+        state.loading = true;
+      })
+      .addCase(cashPaymentThunk.fulfilled , (state)=>{
+        state.loading = false;
+        state.success = true;
+      })
+      .addCase(cashPaymentThunk.rejected , (state , action) =>{
+        state.loading = false;
+        state.error = action.payload;
+      })
         
     },
 

@@ -4,7 +4,7 @@ const {getBillById , BillCashPayment} = require('../controllers/billController')
 
 const router = express.Router()
 
-router.get('/:tableId/:billId'  ,authenticateResturant ,getBillById)
-router.put('/cashPayment/:billId' ,authenticateResturant ,BillCashPayment )
+router.get('/:billId'  ,authenticateResturant ,getBillById)
+router.put('/cashPayment/:tableId/:billId' ,authenticateResturant ,BillCashPayment )
 
 module.exports = router;

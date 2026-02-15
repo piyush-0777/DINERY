@@ -20,7 +20,7 @@ exports.BillCashPayment = async (req , res) => {
     const billId = req.params.billId;
     const tableId = req.params.tableId;
 
-    const {bill , table} = await billService(billId , tableId)
+    const {bill , table} = await billService.cashBillPayment(billId , tableId)
 
     res.status(200).json({
       message:'payment is seccessfuly payed',

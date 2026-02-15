@@ -1,6 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit'
 import { loadDashbordThunk } from '../../thunks/loardDashbordThunk'
 import {getBillThunk} from '../../thunks/billThunk'
+import {cashPaymentThunk} from '../../thunks/billThunk'
 
 
 const billSlice = createSlice({
@@ -18,6 +19,13 @@ const billSlice = createSlice({
             })
             .addCase(getBillThunk.fulfilled, (state , action) => {
                 state.bill =[action.payload.bill , ...state.bill ]
+            })
+            .addCase(cashPaymentThunk.fulfilled , (state , action) =>{
+                state.bill = state.bill.map((e)=>{
+                    if(e._id === action.payload.data.bill._id){
+                        return action.payload.data.bill
+                    } else return e;
+                })
             })
     }
 })

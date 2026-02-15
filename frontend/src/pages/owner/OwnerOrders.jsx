@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState , useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { fetchOrdersThunk } from '../../redux/thunks/ordersThunk'
 import OrderCard from '../../components/owner/order/OrderCard'
@@ -10,14 +10,22 @@ import {cashPaymentThunk} from '../../redux/thunks/billThunk'
 export default function OwnerOrder() {
 const dispatch = useDispatch()
 const { list, loading, error , reqtype  , success } = useSelector(s => s.orders)
+const loadBill = useSelector(s => s.loadBill)
+
 const bills = useSelector(s=> s.bills.bill)
-console.log(bills)
+
 
 const [filter, setFilter] = useState('Today')
 const [selectedOrder , setSelectedOrder] = useState();
 const [updateStatus , setUpdateStatus] = useState();
 
-
+const filerOrder = useMemo(()=>{
+ if(filter === "Today") {
+    return list;
+ } else {
+    return list.filter((e)=>e.status === filter);
+ }
+} , [filter])
 // useEffect(() => {
 // dispatch(fetchOrdersThunk())
 // }, [])
@@ -27,6 +35,7 @@ const [updateStatus , setUpdateStatus] = useState();
 // if (error) return <p className="text-red-400">{error}</p>
 
 const cashPayment = (billId , tableId) => {
+    console.log('bill' , billId , 'table' , tableId)
     dispatch(cashPaymentThunk({billId , tableId}))
 
 }
@@ -38,7 +47,7 @@ return (
 
 
 <div className="grid gap-4">
-{list.map(order => (
+{filerOrder.map(order => (
 <OrderCard 
 key={order._id} 
 order={order} 

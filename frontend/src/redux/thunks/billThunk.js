@@ -11,9 +11,9 @@ export const getBillThunk = createAsyncThunk('getBillThunk' , async (id ,thunkAP
     }
 })
 
-export const cashPaymentThunk = createAsyncThunk('cashPaymentThunk' , async ({billId , orderId} ,thunkAPI ) =>{
+export const cashPaymentThunk = createAsyncThunk('cashPaymentThunk' , async ({billId , tableId} ,thunkAPI ) =>{
  try {
-           const res = await billSecrvice.cashPaymentBill(billId , orderId);
+           const res = await billService.cashPaymentBill(billId , tableId);
             return res;
     } catch (error) {
          console.log(error)

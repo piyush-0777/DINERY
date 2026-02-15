@@ -24,7 +24,7 @@ const OwnerLayout = ({ children }) => {
             // show toast / play sound / update UI
           });
           socket.on("tableStatusUpdated" , (tableId)=>{
-
+              dispatch(getTableThunk(tableId))
           })
       
           return () => {
