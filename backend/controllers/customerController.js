@@ -18,7 +18,7 @@ exports.customerLogin = async (req, res) => {
          const token = req.cookies?.token || req.headers.authorization?.split(" ")[1];
 
         if (!token) {
-            return res.status(401).json({ error: 'token is not provide' });
+            return res.status(404).json({ error: 'token is not provide' });
         }
 
         const table = await tableModel.findOneAndUpdate({ qrCode: token } , 
