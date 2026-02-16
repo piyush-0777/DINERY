@@ -6,6 +6,7 @@ const foodModel = require('../models/food-model')
 const categoryModel = require('../models/categories-model')
 const orderModel = require('../models/order-model')
 const billModel = require('../models/bill-model')
+const customerService = require('../services/customerService')
 
 const {sendNewOrderNotification , sendTableUpdateNotification} = require('../socket/socketEvent')
 
@@ -21,23 +22,13 @@ exports.customerLogin = async (req, res) => {
             return res.status(404).json({ error: 'token is not provide' });
         }
 
-        const table = await tableModel.findOneAndUpdate({ qrCode: token } , 
-            {status:'occupied'} ,
-             {new: true} , )
-            
-        const restaurant = await restaurantModel.findOne({ restaurantName })
-
-        const loginCustomer = await customer.create({
-            restaurant: restaurant._id,
-            name,
-            phone,
-        })
+        const loginCustomer = await customerService.loginCustomer(restaurantName, token , name , phone)
 
          const result = sendTableUpdateNotification(restaurant._id , table._id)
 
         
          
-            res.status(200).json({ message: 'loged in.', data: loginCustomer })
+        res.status(200).json({ message: 'loged in.', data: loginCustomer })
       
           
     } catch (error) {
