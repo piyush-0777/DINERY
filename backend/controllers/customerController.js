@@ -9,7 +9,7 @@ const billModel = require('../models/bill-model')
 const customerService = require('../services/customerService')
 
 const {sendNewOrderNotification , sendTableUpdateNotification} = require('../socket/socketEvent')
-//no
+
 
 exports.customerLogin = async (req, res) => {
     try {
