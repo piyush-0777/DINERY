@@ -18,6 +18,7 @@ exports.customerLogin = async (req, res) => {
         const { name, phone } = req.body
         const { restaurantName } = req.params;
          const token = req.cookies?.token || req.headers.authorization?.split(" ")[1];
+         console.log('token' , token , restaurantName);
 
         if (!token) {
             return res.status(404).json({ error: 'token is not provide' });
