@@ -46,11 +46,19 @@ const TableCard = ({
         {ui.label}
       </p>
 
-      {table.total && (
-        <div className="mt-2 text-sm text-neutral-400">
-          ₹{table.total} • ⏱ {table.time}
-        </div>
-      )}
+      {table.status === TABLE_STATUS.OCCUPIED ? (
+  <div className="mt-2 text-sm text-neutral-400">
+    🆔 {"#2385"} <br />
+    ₹{8907} <br />
+    💳 {'panding'}
+  </div>
+) : (
+  table.total && (
+    <div className="mt-2 text-sm text-neutral-400">
+      ₹{table.total} • ⏱ {table.time}
+    </div>
+  )
+)}
 
       {table.customer && (
         <div className="mt-2 text-xs text-neutral-500">
