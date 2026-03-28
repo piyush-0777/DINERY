@@ -2,16 +2,22 @@ const BASE_URL = "http://localhost:3000/api";
 
 const getToken = () => localStorage.getItem("token");
 
-const request = async (endpoint, method = "GET", body = null, isFormData = false) => {
+const request = async (endpoint, method = "GET", body = null, isFormData = false , query = null) => {
   const headers = {
     Authorization: getToken() ? `Bearer ${getToken()}` : "",
   };
   if (!isFormData) {
     headers["Content-Type"] = "application/json";
   }
+  let params;
+  if(query) {
+    params = new URLSearchParams(query).toString();
+
+  }
+  
   console.log(`${BASE_URL}${endpoint}`);
 
-  const response = await fetch(`${BASE_URL}${endpoint}`, {
+  const response = await fetch(`${BASE_URL}${endpoint}${query?`?${params}`:''}`, {
     method,
     headers,
     body: body ? (isFormData ? body : JSON.stringify(body)) : null,

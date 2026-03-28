@@ -12,7 +12,7 @@ const initSocket = (server) => {
   });
 
   io.on("connect", (socket) => {
-    console.log("client connected", socket.id);
+    // console.log("client connected", socket.id);
 
     const { restaurantId, role } = socket.handshake.auth;
 
@@ -30,7 +30,7 @@ const initSocket = (server) => {
       }
       onlineOwners.get(restaurantId).add(socket.id);
 
-      console.log("Owner ONLINE for restaurant:", restaurantId);
+      // console.log("Owner ONLINE for restaurant:", restaurantId);
     }
 
     // CUSTOMER LOGIC
@@ -44,7 +44,7 @@ const initSocket = (server) => {
       }
 
       socket.join(restaurantId);
-      console.log("Customer joined restaurant:", restaurantId);
+      // console.log("Customer joined restaurant:", restaurantId);
     }
 
     socket.on("disconnect", () => {
@@ -54,11 +54,11 @@ const initSocket = (server) => {
           owners.delete(socket.id);
           if (owners.size === 0) {
             onlineOwners.delete(restaurantId);
-            console.log("Restaurant OFFLINE:", restaurantId);
+            // console.log("Restaurant OFFLINE:", restaurantId);
           }
         }
       }
-      console.log("client disconnected", socket.id);
+      // console.log("client disconnected", socket.id);
     });
   });
 

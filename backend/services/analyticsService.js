@@ -1,204 +1,189 @@
 const mongoose = require("mongoose");
-const orderModel = require('../models/order-model')
-const billModel = require('../models/bill-model')
+const Order = require('../models/order-model')
+const Bill = require('../models/bill-model')
 
-/* =========================================
-   HELPER: Date Filter Builder
-========================================= */
-const buildDateFilter = (startDate, endDate) => {
-  const filter = {};
-  if (startDate && endDate) {
-    filter.createdAt = {
-      $gte: new Date(startDate),
-      $lte: new Date(endDate)
-    };
+
+function getDateRange({ type, year, month, week }) {
+
+  const now = new Date();
+
+  year = parseInt(year) || now.getFullYear();
+  month = parseInt(month);
+  week = parseInt(week);
+
+  let start, end;
+
+  if (type === "year") {
+
+    start = new Date(year, 0, 1);
+    end = year === now.getFullYear() ? now : new Date(year, 11, 31);
+
   }
-  return filter;
-};
 
-/* =========================================
-   1️⃣ DAILY SALES REPORT
-========================================= */
-exports.getDailySalesReport = async (restaurantId, startDate, endDate) => {
-  const dateFilter = buildDateFilter(startDate, endDate);
+  if (type === "month") {
 
-  return await billModel.aggregate([
+    start = new Date(year, month - 1, 1);
+    end =
+      year === now.getFullYear() && month === now.getMonth() + 1
+        ? now
+        : new Date(year, month, 0);
+
+  }
+
+  if (type === "week") {
+
+    const firstDay = new Date(year, month - 1, 1);
+
+    const startDay = (week - 1) * 7 + 1;
+    const endDay = startDay + 6;
+
+    start = new Date(year, month - 1, startDay);
+    end = new Date(year, month - 1, endDay);
+
+    if (end > now) end = now;
+  }
+
+  return { start, end };
+}
+
+exports.ordersAnalytics = async ({
+  restaurantId,
+  type,
+  year,
+  month,
+  week,
+}) => {
+
+  const { start, end } = getDateRange({
+    type,
+    year,
+    month,
+    week,
+  });
+
+  let group;
+
+  if (type === "week") group = { $dayOfWeek: "$createdAt" };
+
+  if (type === "month") group = {
+    $ceil: { $divide: [{ $dayOfMonth: "$createdAt" }, 7] },
+  };
+
+  if (type === "year") group = { $month: "$createdAt" };
+
+  const data = await Order.aggregate([
     {
       $match: {
-        restaurant: new mongoose.Types.ObjectId(restaurantId),
+        restaurant: restaurantId,
+        createdAt: { $gte: start, $lte: end },
+      },
+    },
+    {
+      $group: {
+        _id: group,
+        totalOrder: { $sum: 1 },
+      },
+    },
+    { $sort: { _id: 1 } },
+  ]);
+
+  return data.map((d) => ({
+    date: d._id,
+    totalOrder: d.totalOrder,
+  }));
+};
+
+
+exports.revenueAnalytics = async ({
+  restaurantId,
+  type,
+  year,
+  month,
+  week,
+}) => {
+
+  const { start, end } = getDateRange({
+    type,
+    year,
+    month,
+    week,
+  });
+
+  let group;
+
+  if (type === "week") group = { $dayOfWeek: "$createdAt" };
+
+  if (type === "month")
+    group = {
+      $ceil: { $divide: [{ $dayOfMonth: "$createdAt" }, 7] },
+    };
+
+  if (type === "year") group = { $month: "$createdAt" };
+
+  const data = await Bill.aggregate([
+    {
+      $match: {
+        restaurant: restaurantId,
+        createdAt: { $gte: start, $lte: end },
         paymentStatus: "paid",
-        ...dateFilter
-      }
+      },
     },
     {
       $group: {
-        _id: {
-          $dateToString: { format: "%Y-%m-%d", date: "$createdAt" }
-        },
-        totalSales: { $sum: "$finalAmount" },
-        totalTax: { $sum: "$tax" },
-        totalBills: { $sum: 1 }
-      }
+        _id: group,
+        totalRevenue: { $sum: "$finalAmount" },
+      },
     },
-    { $sort: { _id: 1 } }
+    { $sort: { _id: 1 } },
   ]);
+
+  return data.map((d) => ({
+    date: d._id,
+    totalRevenue: d.totalRevenue,
+  }));
 };
 
-/* =========================================
-   2️⃣ MONTHLY REVENUE REPORT
-========================================= */
-exports.getMonthlyRevenueReport = async (restaurantId) => {
-  return await billModel.aggregate([
+
+exports.topItemsAnalytics = async ({
+  restaurantId,
+  type,
+  year,
+  month,
+  week,
+}) => {
+
+  const { start, end } = getDateRange({
+    type,
+    year,
+    month,
+    week,
+  });
+  console.log(start , end , 'date');
+
+  const data = await Order.aggregate([
     {
       $match: {
-        restaurant: new mongoose.Types.ObjectId(restaurantId),
-        paymentStatus: "paid"
-      }
+        restaurant: restaurantId,
+        createdAt: { $gte: start, $lte: end },
+      },
     },
-    {
-      $group: {
-        _id: {
-          year: { $year: "$createdAt" },
-          month: { $month: "$createdAt" }
-        },
-        revenue: { $sum: "$finalAmount" }
-      }
-    },
-    { $sort: { "_id.year": 1, "_id.month": 1 } }
-  ]);
-};
 
-/* =========================================
-   3️⃣ GST / TAX REPORT
-========================================= */
-exports.getTaxReport = async (restaurantId, startDate, endDate) => {
-  const dateFilter = buildDateFilter(startDate, endDate);
-
-  return await billModel.aggregate([
-    {
-      $match: {
-        restaurant: new mongoose.Types.ObjectId(restaurantId),
-        paymentStatus: "paid",
-        ...dateFilter
-      }
-    },
-    {
-      $group: {
-        _id: null,
-        totalTaxCollected: { $sum: "$tax" },
-        totalRevenue: { $sum: "$finalAmount" }
-      }
-    }
-  ]);
-};
-
-/* =========================================
-   4️⃣ STAFF PERFORMANCE REPORT
-   (Based on order count)
-========================================= */
-exports.getStaffPerformanceReport = async (restaurantId, startDate, endDate) => {
-  const dateFilter = buildDateFilter(startDate, endDate);
-
-  return await orderModel.aggregate([
-    {
-      $match: {
-        restaurant: new mongoose.Types.ObjectId(restaurantId),
-        status: "completed",
-        ...dateFilter
-      }
-    },
-    {
-      $lookup: {
-        from: "tables",
-        localField: "table",
-        foreignField: "_id",
-        as: "tableInfo"
-      }
-    },
-    {
-      $group: {
-        _id: "$table",
-        totalOrders: { $sum: 1 },
-        totalRevenue: { $sum: "$totalAmount" }
-      }
-    }
-  ]);
-};
-
-/* =========================================
-   5️⃣ CANCELLED ORDERS REPORT
-========================================= */
-exports.getCancelledOrdersReport = async (restaurantId, startDate, endDate) => {
-  const dateFilter = buildDateFilter(startDate, endDate);
-
-  return await orderModel.aggregate([
-    {
-      $match: {
-        restaurant: new mongoose.Types.ObjectId(restaurantId),
-        status: "cancelled",
-        ...dateFilter
-      }
-    },
-    {
-      $group: {
-        _id: {
-          $dateToString: { format: "%Y-%m-%d", date: "$createdAt" }
-        },
-        cancelledOrders: { $sum: 1 },
-        lostRevenue: { $sum: "$totalAmount" }
-      }
-    },
-    { $sort: { _id: 1 } }
-  ]);
-};
-
-/* =========================================
-   6️⃣ ANALYTICS: TOP SELLING ITEMS
-========================================= */
-exports.getTopSellingItems = async (restaurantId, startDate, endDate) => {
-  const dateFilter = buildDateFilter(startDate, endDate);
-
-  return await orderModel.aggregate([
-    {
-      $match: {
-        restaurant: new mongoose.Types.ObjectId(restaurantId),
-        status: "completed",
-        ...dateFilter
-      }
-    },
     { $unwind: "$items" },
+
     {
       $group: {
         _id: "$items.name",
-        totalSold: { $sum: "$items.quantity" },
-        revenue: { $sum: "$items.subtotal" }
-      }
+        sales: { $sum: "$items.quantity" },
+      },
     },
-    { $sort: { totalSold: -1 } },
-    { $limit: 5 }
-  ]);
-};
 
-/* =========================================
-   7️⃣ ANALYTICS: PEAK HOURS
-========================================= */
-exports.getPeakHours = async (restaurantId, startDate, endDate) => {
-  const dateFilter = buildDateFilter(startDate, endDate);
+    { $sort: { sales: -1 } },
 
-  return await orderModel.aggregate([
-    {
-      $match: {
-        restaurant: new mongoose.Types.ObjectId(restaurantId),
-        status: "completed",
-        ...dateFilter
-      }
-    },
-    {
-      $group: {
-        _id: { $hour: "$createdAt" },
-        totalOrders: { $sum: 1 }
-      }
-    },
-    { $sort: { totalOrders: -1 } }
+    { $limit: 10 },
   ]);
+
+  return data.map((d) => ({
+    name: d._id,
+    sales: d.sales,
+  }));
 };

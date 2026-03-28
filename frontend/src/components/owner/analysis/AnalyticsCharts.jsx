@@ -3,6 +3,8 @@ import {
   BarChart, Bar, PieChart, Pie, Cell
 } from "recharts";
 
+import {useSelector} from 'react-redux'
+
 const ordersData = [
   { name: "Mon", orders: 40 },
   { name: "Tue", orders: 55 },
@@ -33,6 +35,8 @@ const orderType = [
 const COLORS = ["#EAB308", "#444"];
 
 const AnalyticsCharts = () => {
+  const data = useSelector((s) => s.analysis)
+  console.log('analisis data',data)
   return (
     <div className="grid md:grid-cols-2 gap-8 mt-8">
 
@@ -40,11 +44,11 @@ const AnalyticsCharts = () => {
       <div className="bg-[#111] p-6 rounded-xl border border-gray-800 hover:border-yellow-500 transition">
         <h3 className="text-yellow-400 mb-4">Orders Trend</h3>
         <ResponsiveContainer width="100%" height={250}>
-          <LineChart data={ordersData}>
-            <XAxis dataKey="name" stroke="#aaa" />
+          <LineChart data={data.orders}>
+            <XAxis dataKey="date" stroke="#aaa" />
             <YAxis stroke="#aaa" />
             <Tooltip />
-            <Line type="monotone" dataKey="orders" stroke="#EAB308" strokeWidth={3} />
+            <Line type="monotone" dataKey="totalOrder" stroke="#EAB308" strokeWidth={3} />
           </LineChart>
         </ResponsiveContainer>
       </div>
@@ -53,11 +57,11 @@ const AnalyticsCharts = () => {
       <div className="bg-[#111] p-6 rounded-xl border border-gray-800 hover:border-yellow-500 transition">
         <h3 className="text-yellow-400 mb-4">Revenue Trend</h3>
         <ResponsiveContainer width="100%" height={250}>
-          <BarChart data={revenueData}>
-            <XAxis dataKey="name" stroke="#aaa" />
+          <BarChart data={data?.revenue}>
+            <XAxis dataKey="date" stroke="#aaa" />
             <YAxis stroke="#aaa" />
             <Tooltip />
-            <Bar dataKey="revenue" fill="#EAB308" radius={[6,6,0,0]} />
+            <Bar dataKey="totalRevenue" fill="#EAB308" radius={[6,6,0,0]} />
           </BarChart>
         </ResponsiveContainer>
       </div>
@@ -66,7 +70,7 @@ const AnalyticsCharts = () => {
       <div className="bg-[#111] p-6 rounded-xl border border-gray-800 hover:border-yellow-500 transition">
         <h3 className="text-yellow-400 mb-4">Top Selling Items</h3>
         <ResponsiveContainer width="100%" height={250}>
-          <BarChart data={topItems}>
+          <BarChart data={data?.top}>
             <XAxis dataKey="name" stroke="#aaa" />
             <YAxis stroke="#aaa" />
             <Tooltip />
