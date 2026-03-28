@@ -18,10 +18,9 @@ const OwnerAnalytics = () => {
 
   const dispatch = useDispatch();
   const [opction , setOpction] = useState('week')
-  console.log(opction)
+  
 
   const analysis = useSelector((s) => s.analysis);
-  console.log(analysis)
   const load = useSelector((s) => s.loadAnalysis);
 
   const totalOrder = useMemo(()=>{

@@ -14,7 +14,7 @@ exports.getCustomerReport = async (req, res) => {
       restaurantId
     );
 
-    res.json(data);
+     res.json({ success: true, data });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -33,8 +33,9 @@ exports.getDailySaleReport = async (req, res) => {
     const data = await reportService.getDailySaleReportService(
       restaurantId
     );
+    console.log(data);
 
-    res.json(data);
+     res.json({ success: true, data });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -54,7 +55,7 @@ exports.getGSTReport = async (req, res) => {
       restaurantId
     );
 
-    res.json(data);
+     res.json({ success: true, data });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -75,7 +76,7 @@ exports.getMonthlyRevenueReport = async (req, res) => {
         restaurantId
       );
 
-    res.json(data);
+     res.json({ success: true, data });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }

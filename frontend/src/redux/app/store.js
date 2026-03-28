@@ -15,6 +15,8 @@ import billreducer from '../features/bill/billSlice'
 import loadBillreducer from '../features/bill/loadBillSlice'
 import analysisreducer from '../features/analysis/analysisSlice'
 import loadanalysisreducer from '../features/analysis/loadAnalysisSlice'
+import reportreducer from '../features/report/reportSlice'
+import loadreportreducer from '../features/report/loadReportSlice'
 
 export const store = configureStore({
     reducer: {
@@ -34,5 +36,7 @@ export const store = configureStore({
         loadBill:loadBillreducer ,
         analysis: analysisreducer ,
         loadAnalysis: loadanalysisreducer ,
+        report: reportreducer ,
+        loadReport : loadreportreducer,
     }
 });

@@ -3,15 +3,15 @@ import request from "./api";
 export const reportService = {
 
   getCustomerReport: () =>
-    request("/customer-report", "GET"),
+    request("/report/customer-report", "GET"),
 
   getDailySaleReport: () =>
-    request("/dailySale-report", "GET"),
+    request("/report/dailySale-report", "GET"),
 
   getGSTReport: () =>
-    request("/GST-report", "GET"),
+    request("/report/GST-report", "GET"),
 
   getMonthlyRevenueReport: () =>
-    request("/monthlyRevenue-report", "GET"),
+    request("/report/monthlyRevenue-report", "GET"),
 
 };
