@@ -21,8 +21,7 @@ const loginCustomer = async (restaurantName, token, name, phone) => {
 
       const cleanToken = token.trim();
 
-const table = await tableModel.findOne({ qrCode: cleanToken });
-console.log("DB Result:", table);
+        const table = await tableModel.findOne({ qrCode: cleanToken });
 
         if (!table) {
             throw new Error("Table not found");

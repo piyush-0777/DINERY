@@ -27,7 +27,6 @@ exports.customerLogin = async (req, res) => {
 
         const loginCustomer = await customerService.loginCustomer(restaurantName, token , name , phone)
         if(loginCustomer === false) {
-            console.log("i am run");
             return res.status(402).json({ error : 'table is occupied' });
 
         }
