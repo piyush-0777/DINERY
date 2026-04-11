@@ -19,14 +19,20 @@ exports.customerLogin = async (req, res) => {
         const { restaurantName } = req.params;
          const token = req.cookies?.token || req.headers.authorization?.split(" ")[1];
          console.log('token' , token , restaurantName);
+         
 
         if (!token) {
             return res.status(404).json({ error: 'token is not provide' });
         }
 
         const loginCustomer = await customerService.loginCustomer(restaurantName, token , name , phone)
+        if(loginCustomer === false) {
+            console.log("i am run");
+            return res.status(402).json({ error : 'table is occupied' });
 
-         const result = sendTableUpdateNotification(restaurant._id , table._id)
+        }
+
+         const result = sendTableUpdateNotification(loginCustomer.restaurant , loginCustomer.table);
 
         
          
@@ -34,8 +40,8 @@ exports.customerLogin = async (req, res) => {
       
           
     } catch (error) {
-        console.log(error)
-        return res.status(401).json({ error: ' server error' });
+        console.log('from',error)
+        return res.status(401).json({ error: error});
     }
 
 }

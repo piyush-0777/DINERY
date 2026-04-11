@@ -19,34 +19,43 @@ const loginCustomer = async (restaurantName, token, name, phone) => {
             throw new Error("Restaurant not found");
         }
 
-        const table = await tableModel.findOneAndUpdate(
-            { qrCode: token },
-            { status: "occupied" },
-            { new: true, session }
-        );
+      const cleanToken = token.trim();
+
+const table = await tableModel.findOne({ qrCode: cleanToken });
+console.log("DB Result:", table);
 
         if (!table) {
             throw new Error("Table not found");
         }
 
-        const newCustomer = await customerModel.create(
+        if (table.status === 'occupied') {
+        await session.abortTransaction();
+            return false
+        }
+
+        // 🔥 Update table status
+        table.status = 'occupied';
+        await table.save({ session });
+
+        const [newCustomer] = await customerModel.create(
             [{
                 restaurant: restaurant._id,
                 name,
                 phone,
+                table: table._id,
             }],
             { session }
         );
 
         await session.commitTransaction();
-        session.endSession();
 
-        return newCustomer[0];
+        return newCustomer;
 
     } catch (error) {
         await session.abortTransaction();
+        console.log(error)
+    } finally {
         session.endSession();
-        throw error;
     }
 };
 
