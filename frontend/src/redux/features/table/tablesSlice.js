@@ -1,7 +1,7 @@
 // tablesSlice.js
 import { createSlice } from "@reduxjs/toolkit";
 import { TABLE_STATUS } from "../../../components/owner/table/TableStatus";
-import { addTableThunk, deleteTableThunk, updateTableThunk, getTableThunk } from "../../thunks/tableThunk";
+import { addTableThunk, deleteTableThunk, updateTableThunk, getTableThunk , updateStatusThunk } from "../../thunks/tableThunk";
 import { loadDashbordThunk } from '../../thunks/loardDashbordThunk'
 import { cashPaymentThunk } from '../../thunks/billThunk'
 
@@ -35,16 +35,21 @@ const tablesSlice = createSlice({
     },
     extraReducers: (builter) => {
         builter
+        // load dashbord
             .addCase(loadDashbordThunk.fulfilled, (state, action) => {
                 state.tables = action.payload.tables;
 
             })
+            // add new table
             .addCase(addTableThunk.fulfilled, (state, action) => {
                 state.tables.push(action.payload.table)
             })
+
+            //delete table
             .addCase(deleteTableThunk.fulfilled, (state, action) => {
                 state.tables = state.tables.filter((table) => table._id !== action.payload.table._id)
             })
+           // update table
             .addCase(updateTableThunk.fulfilled, (state, action) => {
                 state.tables = state.tables.map((table) => {
                     if (table._id === action.payload.table._id) {
@@ -54,13 +59,29 @@ const tablesSlice = createSlice({
                     }
                 })
             })
+
+            //cash paymant
             .addCase(cashPaymentThunk.fulfilled, (state, action) => {
                 state.tables = state.tables.map((e) => {
                     if (e._id === action.payload.data.table._id) return action.payload.data.table;
                     else return e;
                 })
             })
+
+            //get table
             .addCase(getTableThunk.fulfilled, (state, action) => {
+                state.tables = state.tables.map((table) => {
+                    if (table._id === action.payload.table._id) {
+                        return action.payload.table;
+                    } else {
+                        return table;
+                    }
+                })
+            })
+
+            //update table status
+
+            .addCase(updateStatusThunk.fulfilled, (state, action) =>{
                 state.tables = state.tables.map((table) => {
                     if (table._id === action.payload.table._id) {
                         return action.payload.table;

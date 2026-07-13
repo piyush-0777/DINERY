@@ -17,6 +17,7 @@ const CustomerLogin = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+
   const { resturantName } = useParams()
   const loadCustomer = useSelector(state => state.loadcustomer)
   console.log(loadCustomer)
@@ -44,6 +45,7 @@ const CustomerLogin = () => {
     const token = searchParams.get('token')
     dispatch(addToken(token))
     localStorage.setItem("token", token);
+    console.log(token);
   }, [])
 
   // use to navigate user to other paje
@@ -63,7 +65,7 @@ const CustomerLogin = () => {
   // submit customer data
   const onSubmit = async (data) => {
    
-      dispatch(customerLoginThunk({ resturantName: resturantName, customerName: data.name, CustomerMobile: data.number }))
+      dispatch(customerLoginThunk({ resturantName: resturantName, customerName: data.name, CustomerMobile: data.number , token: customerDeteal.token }))
 
   }
 

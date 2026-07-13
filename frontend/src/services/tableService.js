@@ -8,8 +8,8 @@ export const tableService = {
     updateTable: (id , data)=>
          request(`/tables/updatetable/${id}` , "PUT", data),
     getTable: (id) =>
-        request(`tables/getTable/${id}` , "GET" ) ,
-    updateStatus: (id , status) =>
-         request(`tables/updatetablestatus/${id}` , "PUT" , status ) ,
+        request(`/tables/getTable/${id}` , "GET" ) ,
+    updateStatus: (id , data) =>
+         request(`/tables/updatetablestatus/${id}` , "PUT" , data ) ,
     
 }

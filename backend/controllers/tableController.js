@@ -4,31 +4,20 @@ const crypto = require('crypto')
 const tableService = require('../services/tableService')
 
 exports.getAllTable = async (req, res) => {
-    try {
-        const restaurant = req.restaurant
-        if (!restaurant) {
-            res.status(404).json({
-                error: 'restaurant is not found'
-            })
-        }
+   try {
+        const tables = await tableService.getAllTable(req.restaurant);
 
-        const tables = await tableModel.find({ restaurant: restaurant._id })
-        let tablesWithQrimage = [];
-        for (let table of tables) {
-            const qrImage = await generateQR(table, restaurant.name)
-            tablesWithQrimage.push({ ...tables._doc, qrImage: qrImage })
-        }
         return res.status(200).json({
-            tables: tablesWithQrimage
-        })
-
+            tables,
+        });
     } catch (error) {
-        console.log(error)
-        res.status(500).json({
-            error: 'internal server error'
-        })
+        console.error(error);
+
+        return res.status(500).json({
+            error: error.message,
+        });
     }
-}
+};
 
 exports.createTable = async (req, res) => {
     try {
@@ -99,38 +88,36 @@ exports.deleteTable = async (req, res) => {
 
 exports.updateStatus = async (req, res) => {
     try {
-        const restaurant = req.restaurant
-        const { status } = req.body
+        const restaurant = req.restaurant;
+        const { status , customer } = req.body;
+        const { tableId } = req.params;
+        
+
         if (!restaurant) {
             return res.status(404).json({
-                error: 'restaurant is not found'
-            })
+                error: "Restaurant not found",
+            });
         }
-        const tableId = req.params.tableId;
-        if (!table) {
-            return res.status(404).json({
-                error: 'table is not found'
-            })
-        }
-        const table = tableModel.findOne(tableId)
-        if (!table) {
-            return res.status(404).json({
-                error: 'table is not found'
-            })
-        }
-        table.status = status;
-        await table.save()
+
+        const table = await tableService.updateTableStatus(
+            tableId,
+            status ,
+            customer
+        );
+        const tableData = await tableService.getTableById(tableId)
+
         return res.status(200).json({
-            message: 'table status is updated.',
-            table
-        })
+            message: "Table status updated successfully.",
+            table,
+        });
     } catch (error) {
-        console.log(error)
-        res.status(500).json({
-            error: 'internal server error'
-        })
+        console.error(error);
+
+        return res.status(500).json({
+            error: error.message,
+        });
     }
-}
+};
 
 exports.getTableById = async (req , res) => {
     try {

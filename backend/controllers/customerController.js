@@ -7,43 +7,79 @@ const categoryModel = require('../models/categories-model')
 const orderModel = require('../models/order-model')
 const billModel = require('../models/bill-model')
 const customerService = require('../services/customerService')
-
+const tableService = require("../services/tableService");
+const orderService = require("../services/orderService");
 const {sendNewOrderNotification , sendTableUpdateNotification} = require('../socket/socketEvent')
 
 
 exports.customerLogin = async (req, res) => {
     try {
-     
-
-        const { name, phone } = req.body
+        const { name, phone , token } = req.body;
         const { restaurantName } = req.params;
-         const token = req.cookies?.token || req.headers.authorization?.split(" ")[1];
-         console.log('token' , token , restaurantName);
-         
+        console.log(token);
+
+        // const token =
+        //     req.cookies?.token ||
+        //     req.headers.authorization?.split(" ")[1];
 
         if (!token) {
-            return res.status(404).json({ error: 'token is not provide' });
+            return res.status(401).json({
+                success: false,
+                message: "Token is not provided."
+            });
         }
 
-        const loginCustomer = await customerService.loginCustomer(restaurantName, token , name , phone)
-        if(loginCustomer === false) {
-            return res.status(402).json({ error : 'table is occupied' });
+        const loginCustomer = await customerService.loginCustomer(
+            restaurantName,
+            token,
+            name,
+            phone
+        );
 
+        if (!loginCustomer.success) {
+
+            if (loginCustomer.tableStatus === "active") {
+                return res.status(409).json({
+                    success: false,
+                    tableStatus: "active",
+                    message: "A customer is already using this table."
+                });
+            }
+
+            if (loginCustomer.tableStatus === "occupied") {
+                return res.status(409).json({
+                    success: false,
+                    tableStatus: "occupied",
+                    message: "An order has already been placed for this table."
+                });
+            }
         }
 
-         const result = sendTableUpdateNotification(loginCustomer.restaurant , loginCustomer.table);
+          await tableService.updateTableStatus(
+            loginCustomer.table,
+            "active" , loginCustomer.customer._id
+        );
 
-        
-         
-        res.status(200).json({ message: 'loged in.', data: loginCustomer })
-      
-          
+        sendTableUpdateNotification(
+            loginCustomer.restaurant,
+            loginCustomer.table
+        );
+
+        return res.status(200).json({
+            success: true,
+            tableStatus: "active",
+            message: "Customer logged in successfully.",
+            data: loginCustomer.customer
+        });
+
     } catch (error) {
-        console.log('from',error)
-        return res.status(401).json({ error: error});
-    }
 
-}
+        return res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+};
 
 exports.loadCustomerDashbord = async (req, res) => {
     try {
@@ -78,50 +114,38 @@ exports.loadCustomerDashbord = async (req, res) => {
 exports.customerPlaceOrder = async (req, res) => {
     try {
         const { restaurantName } = req.params;
-        const token = req.cookies?.token || req.headers.authorization?.split(" ")[1];
-
-
+        console.log('res' , restaurantName )
+        const token = req.body.token
+        
         if (!token) {
-            return res.status(401).json({ error: 'token is not provide' });
+            return res.status(401).json({
+                error: "Token is not provided",
+            });
         }
+        console.log('token' , token )
+        console.log('body' , req.body )
+
         if (!restaurantName) {
-            return res.status(401).json({ error: 'restaurantName is not provide' });
+            return res.status(400).json({
+                error: "Restaurant name is required",
+            });
         }
-        const table = await tableModel.findOne({ qrCode: token })
-        const restaurant = await restaurantModel.findOne({ restaurantName })
-        const { orders, customer } = req.body;
-        let totalAmount = 0;
-        console.log(table)
-        console.log(token)
 
-        orders.items.map(e => {
-            totalAmount += e.subtotal
-        })
-        const createdOrder = await orderModel.create({
-            restaurant: restaurant._id,
-            customer: customer._id,
-            table: table._id,
-            items: orders.items,
-            totalAmount
-        })
-        const bill = await billModel.create({
-            restaurant:restaurant._id,
-              order: createdOrder._id,
-              billAmount: totalAmount,
-              tax: 5,
-              finalAmount: totalAmount + (totalAmount*0.05),
-              paymentStatus: "unpaid"
-        })
+        const result = await orderService.customerPlaceOrder({
+            restaurantName,
+            token,
+            body: req.body,
+        });
 
-        const result = await sendNewOrderNotification(restaurant._id , createdOrder , bill)
-        res.status(200).json({
-            message: 'order is plased',
-            data: {createdOrder , bill} ,
-        })
-
+        return res.status(201).json({
+            message: "Order placed successfully",
+            data: result,
+        });
     } catch (error) {
-        console.log(error)
-        return res.status(401).json({ error: ' server error' });
+        console.error(error);
 
+        return res.status(400).json({
+            error: error.message,
+        });
     }
-}
+};

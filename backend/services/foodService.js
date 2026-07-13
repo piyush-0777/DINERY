@@ -42,4 +42,9 @@ const deletFood = async (food_id, res_id, session = null) => {
   }
 };
 
-module.exports = { deletFood };
+const getAllFood = async (restaurantID) =>{
+   const foods = await foodModel.find({ restaurant: restaurantID })
+   return foods;
+}
+
+module.exports = { deletFood , getAllFood };

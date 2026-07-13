@@ -42,7 +42,6 @@ const OwnerRoutes = () => {
 
   }
   useEffect(() => {
-
     initDashboard()
   }, []);
   useEffect(() => {

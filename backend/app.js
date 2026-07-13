@@ -20,9 +20,7 @@ const io = initSocket(server)
 
 app.use(cors({
     credentials:true,
-    origin: ["http://localhost:5173",
-        "http://10.208.30.29:5173" , 
-    "http://10.102.40.29:5173" , "http://192.168.1.16:5173" ],
+    origin: true,
 }))
 app.use(cookieParser())
 app.use(express.json())

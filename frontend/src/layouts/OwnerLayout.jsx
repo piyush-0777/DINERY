@@ -6,6 +6,8 @@ import Navbar from "../components/owner/Navbar"
 import {useSelector , useDispatch} from 'react-redux'
 import {getOrderThunk} from '../redux/thunks/ordersThunk'
 import {getBillThunk} from '../redux/thunks/billThunk'
+import { getTableThunk } from "../redux/thunks/tableThunk";
+import { toast } from "react-toastify";
 
 const OwnerLayout = ({ children }) => {
  const dispatch = useDispatch()
@@ -21,9 +23,11 @@ const OwnerLayout = ({ children }) => {
             console.log("📦 New Order Received:", orderId);
             dispatch(getOrderThunk(orderId))
             dispatch(getBillThunk(billId))
+            toast.success("new order is add.");
             // show toast / play sound / update UI
           });
           socket.on("tableStatusUpdated" , (tableId)=>{
+              toast.success("table state is update");
               dispatch(getTableThunk(tableId))
           })
       

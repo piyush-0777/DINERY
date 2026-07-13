@@ -44,5 +44,10 @@ const deletCategory = async (category_id, res_id) => {
   }
 };
 
+const getAllcategory = async (restaurantID) => {
+const category = await categoryModel.find({ restaurant: restaurantID });
+return category;
+}
 
-module.exports = { deletCategory }
+
+module.exports = { deletCategory , getAllcategory }

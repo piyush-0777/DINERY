@@ -1,5 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-import { addTableThunk , deleteTableThunk , updateTableThunk } from "../../thunks/tableThunk";
+import { addTableThunk , deleteTableThunk , updateTableThunk , updateStatusThunk } from "../../thunks/tableThunk";
 
 const initialState = {
     reqtype:null,
@@ -77,6 +77,26 @@ const loardTablesSlice = createSlice({
       state.loading = false;
       state.error = action.payload ;
   })
+
+  //update table status
+
+   .addCase(updateStatusThunk.pending , (state)=>{
+      state.reqtype='updateStatus'
+      state.loading = true;
+      state.error = null;
+      state.success = false;
+    })
+    .addCase(updateStatusThunk.fulfilled , (state)=>{
+       state.reqtype='updateStatus'
+      state.loading = false;
+      state.error = null;
+      state.success = true;
+    })
+    .addCase(updateStatusThunk.rejected , (state , action)=>{
+       state.reqtype='updateStatus'
+      state.loading = false;
+      state.error = action.payload ;
+    })
 
   }
 

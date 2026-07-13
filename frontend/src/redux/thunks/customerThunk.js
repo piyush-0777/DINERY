@@ -3,14 +3,15 @@ import {customerService} from '../../services/customerService'
 
 
 
-export const customerLoginThunk = createAsyncThunk('customerLoginThunk' , async ({resturantName ,customerName ,CustomerMobile} , thunkAPI)=>{
+export const customerLoginThunk = createAsyncThunk('customerLoginThunk' , async ({resturantName ,customerName ,CustomerMobile , token} , thunkAPI)=>{
 try {
-const data = {name:customerName ,phone:CustomerMobile}
+    console.log(token)
+const data = {name:customerName ,phone:CustomerMobile , token:token}
     const res = await customerService.customerLogin(resturantName , data)
     return res;
 } catch (error){
-     console.log(error)
-    return thunkAPI.rejectWithValue({status:error.status || 500 , message:error.data?.error || error.message});
+    console.log(error.data);
+    return thunkAPI.rejectWithValue({status:error.status || 500 , message:error.data?.message || error.message});
 }
 })
 
@@ -20,8 +21,8 @@ export const LoadCustomerDashbord = createAsyncThunk('LoadCustomerDashbord' , as
         console.log(res);
         return res;
     } catch (error) {
-        console.log(error);
-        return thunkAPI.rejectWithValue({status:error.status || 500 , message:error.data?.error || error.message})
+        console.log(error.data);
+        return thunkAPI.rejectWithValue({status:error.status || 500 , message:error.data?.message || error.message})
     }
 })
 

@@ -32,12 +32,13 @@ export const updateTableThunk = createAsyncThunk('updateTableThunk' , async ({id
     }
 })
 
-export const updateStatusThunk = createAsyncThunk('updateStatusThunk' , async ({id , status}, thunkAPI)=>{
+export const updateStatusThunk = createAsyncThunk('updateStatusThunk' , async ({id , status , customer = null }, thunkAPI)=>{
     try {
-        res  = await tableService.updateStatus(id , status) 
+        const res  = await tableService.updateStatus(id , { status , customer}) 
+        console.log(res)
         return res;
     } catch (error) {
-        console.log(error) 
+        console.log('error' , error) 
         return thunkAPI.rejectWithValue({status:error.status || 500 , message: error.data?.error || error.message})
     }
 })

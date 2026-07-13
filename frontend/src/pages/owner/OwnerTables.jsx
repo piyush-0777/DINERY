@@ -29,9 +29,6 @@ export default function TablesPage() {
   const handleAddTable = (data) => {
     dispatch(addTableThunk(data))
   }
-  const onDeleteTable = (id) =>{
-    dispatch(deleteTableThunk(id))
-  }
 
 
   return (
@@ -72,7 +69,6 @@ export default function TablesPage() {
             table={table}
             onOpen={() => setSelectedTable(table)}
             onShowQR={() => setQrImage(table.qrImage)}
-            onDelete={onDeleteTable}
           />
         ))}
       </div>

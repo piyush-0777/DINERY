@@ -1,4 +1,9 @@
 import { TABLE_STATUS_UI, TABLE_STATUS } from "./TableStatus";
+import { toast } from "react-toastify";
+import { useState, useEffect } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { updateStatusThunk, deleteTableThunk } from "../../../redux/thunks/tableThunk";
+import { updateOrderStatusThunk } from "../../../redux/thunks/ordersThunk"
 import {
   QrCode,
   Trash2,
@@ -14,33 +19,120 @@ const TableCard = ({
   onAddOrder,
   onShowQR,
   onBill,
-  onDelete,
-  onChangeTableStatus,
-  onChangeOrderStatus
+
 }) => {
   const ui = TABLE_STATUS_UI[table.status];
+  const dispatch = useDispatch()
+
+  // reqtype: updateOrerStatus when call change status
+  const { loading, reqtype, error, success } = useSelector(state => state.orders) // this is for order loading
+  const tableLoadState = useSelector(state => state.loardtables);// this is for table loading
+  // have tableLoadState.loading , tableLoadState.reqtype , tableLoadState.error , tableLoadState.success
+  // for delet tableLoadState.reqtype == 'deleteTable'
+  // for updatetableStatue tableLoadState.reqtype == 'updateStatus'
+
+  const updatingTable =
+    tableLoadState.loading && tableLoadState.reqtype === "updateStatus";
+
+  const deletingTable =
+    tableLoadState.loading && tableLoadState.reqtype === "deleteTable";
+
+  const updatingOrder =
+    loading && reqtype === "updateOrderStatus";
+
+  const [elapsed, setElapsed] = useState("00:00");
+
+  useEffect(() => {
+    if (table.status !== TABLE_STATUS.ACTIVE || !table.activeSince) {
+      setElapsed("00:00");
+      return;
+    }
+
+    const updateTimer = () => {
+      const diff = Math.floor(
+        (Date.now() - new Date(table.activeSince).getTime()) / 1000
+      );
+
+      const hours = Math.floor(diff / 3600);
+      const minutes = Math.floor((diff % 3600) / 60);
+      const seconds = diff % 60;
+
+      setElapsed(
+        `${hours.toString().padStart(2, "0")}:${minutes
+          .toString()
+          .padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`
+      );
+    };
+
+    updateTimer();
+
+    const interval = setInterval(updateTimer, 1000);
+
+    return () => clearInterval(interval);
+  }, [table.status, table.activeSince]);
 
   /* 🔄 NEXT TABLE STATE */
-  const getNextTableState = () => {
-    switch (table.status) {
-      case TABLE_STATUS.AVAILABLE:
-        return TABLE_STATUS.OCCUPIED;
-      case TABLE_STATUS.OCCUPIED:
-        return TABLE_STATUS.BILL_PENDING;
-      case TABLE_STATUS.BILL_PENDING:
-        return TABLE_STATUS.AVAILABLE;
+  const getNextOrderState = () => {
+    switch (table?.order?.status) {
+      case "pending":
+        return "preparing";
+
+      case "preparing":
+        return "served";
+
       default:
-        return TABLE_STATUS.AVAILABLE;
+        return null;
     }
   };
 
-  /* 🔄 NEXT ORDER STATE */
-  const getNextOrderState = () => {
-    const current = table.orderStatus || "pending";
+  // change table state active to availabel
+  const onChangeTableStatus = async (table, status) => {
+    try {
+      
+      const result = await dispatch(updateStatusThunk({id:table?._id, status}));
 
-    if (current === "pending") return "preparing";
-    if (current === "preparing") return "served";
-    return "pending";
+      if (updateStatusThunk.fulfilled.match(result)) {
+        toast.success("Table status updated.");
+      } else {
+        toast.error(result.payload || "Failed to update table.");
+      }
+    } catch (err) {
+      toast.error(err.message || "Something went wrong.");
+    }
+  };
+
+  // order status change
+  const onChangeOrderStatus = async (id, status) => {
+    try {
+      const result = await dispatch(
+        updateOrderStatusThunk({ id, status })
+      );
+
+      if (updateOrderStatusThunk.fulfilled.match(result)) {
+        toast.success("Order status updated.");
+      } else {
+        toast.error(result.payload || "Failed to update order.");
+      }
+    } catch (err) {
+      toast.error(err.message || "Something went wrong.");
+    }
+  };
+
+  // delet table 
+  const onDelete = async (id) => {
+    if (!window.confirm("Delete this table?")) return;
+
+    try {
+      const result = await dispatch(deleteTableThunk(id));
+
+      if (deleteTableThunk.fulfilled.match(result)) {
+        toast.success("Table deleted.");
+      } else {
+        toast.error(result.payload || "Failed to delete table.");
+      }
+    } catch (err) {
+      toast.error(err.message || "Something went wrong.");
+    }
   };
 
   return (
@@ -64,135 +156,203 @@ const TableCard = ({
       <span className={`absolute top-3 right-3 w-3 h-3 rounded-full ${ui.dot}`} />
 
       {/* Info */}
-     {/* 🔷 TABLE SECTION */}
-<div className="space-y-2">
-  <div className="flex justify-between items-center">
-    <h3 className="text-xl font-bold text-white tracking-wide">
-      Table {table.number}
-    </h3>
+      {/* 🔷 TABLE SECTION */}
+      <div className="space-y-2">
+        <div className="flex justify-between items-center">
+          <h3 className="text-xl font-bold text-white tracking-wide">
+            Table {table.number}
+          </h3>
 
-    <span
-      className={`
+          <span
+            className={`
         text-xs px-2 py-1 rounded-full
         ${ui.color} bg-opacity-20
       `}
-    >
-      {ui.label}
-    </span>
-  </div>
+          >
+            {ui.label}
+          </span>
+        </div>
 
-  <div className="flex justify-between text-sm text-neutral-400">
-    <span>Capacity</span>
-    <span className="text-white font-medium">{table.capacity}</span>
-  </div>
+        <div className="flex justify-between text-sm text-neutral-400">
+          <span>Capacity</span>
+          <span className="text-white font-medium">{table.capacity}</span>
+        </div>
 
-  {table.customer && (
-    <div className="flex justify-between text-sm text-neutral-400">
-      <span>Customer</span>
-      <span className="text-white">{table.customer.name}</span>
-    </div>
-  )}
-</div>
+        {table.customer && (
+          <div className="flex justify-between text-sm text-neutral-400">
+            <span>Customer</span>
+            <span className="text-white">{table.customer.name}</span>
+          </div>
+        )}
+      </div>
 
-{/* 🔻 DIVIDER (ONLY if OCCUPIED) */}
-{table.status === TABLE_STATUS.OCCUPIED && (
-  <div className="my-3 border-t border-neutral-800" />
-)}
+      {table.status === TABLE_STATUS.ACTIVE && (
+        <div className="flex justify-between text-sm text-neutral-400">
+          <span>Active For</span>
+          <span className="text-yellow-400 font-semibold">
+            {elapsed}
+          </span>
+        </div>
+      )}
 
-{/* 🍽 ORDER SECTION */}
-{table.status === TABLE_STATUS.OCCUPIED && (
-  <div className="space-y-2">
+      {/* 🔻 DIVIDER (ONLY if OCCUPIED) */}
+      {(table.status === TABLE_STATUS.ACTIVE ||
+        table.status === TABLE_STATUS.OCCUPIED) && (
+          <div className="my-3 border-t border-neutral-800" />
+        )}
 
-    <div className="flex justify-between items-center">
-      <p className="text-sm font-semibold text-neutral-300">
-        Order Details
-      </p>
+      {/* 🍽 ORDER SECTION */}
+      {table.status === TABLE_STATUS.OCCUPIED && (
+        <div className="space-y-2">
 
-      <span className="text-xs bg-yellow-500/20 text-yellow-400 px-2 py-1 rounded-full">
-        {table.orderStatus || "pending"}
-      </span>
-    </div>
+          <div className="flex justify-between items-center">
+            <p className="text-sm font-semibold text-neutral-300">
+              Order Details
+            </p>
 
-    <div className="flex justify-between text-sm text-neutral-400">
-      <span>Order ID</span>
-      <span className="text-white">#2385</span>
-    </div>
+            <span
+              className={`text-xs px-2 py-1 rounded-full
+    ${table?.order?.status === "pending"
+                  ? "bg-yellow-500/20 text-yellow-400"
+                  : table?.order?.status === "preparing"
+                    ? "bg-blue-500/20 text-blue-400"
+                    : table?.order?.status === "served"
+                      ? "bg-green-500/20 text-green-400"
+                      : table?.order?.status === "completed"
+                        ? "bg-emerald-500/20 text-emerald-400"
+                        : "bg-red-500/20 text-red-400"
+                }
+  `}
+            >
+              {table?.order?.status}
+            </span>
+          </div>
 
-    <div className="flex justify-between text-sm text-neutral-400">
-      <span>Total</span>
-      <span className="text-green-400 font-semibold">
-        ₹{8907}
-      </span>
-    </div>
+          <div className="flex justify-between text-sm text-neutral-400">
+            <span>Order ID</span>
+            <span className="text-white">#2385</span>
+          </div>
 
-    <div className="flex justify-between text-sm text-neutral-400">
-      <span>Payment</span>
-      <span className="text-white">Pending</span>
-    </div>
-  </div>
-)}
+          <div className="flex justify-between text-sm text-neutral-400">
+            <span>Total</span>
+            <span className="text-green-400 font-semibold">
+              ₹{table?.order?.totalAmount}
+            </span>
+          </div>
+
+          <div className="flex justify-between text-sm text-neutral-400">
+            <span>Payment</span>
+            <span className="text-white">Pending</span>
+          </div>
+        </div>
+      )}
 
       {/* Hover Overlay */}
-      <div className="
-        absolute inset-0 rounded-2xl
-        bg-black/70 backdrop-blur-sm
-        opacity-0 group-hover:opacity-100
-        transition-all duration-300
-        flex flex-col justify-between p-4
-      ">
-
-        {/* 🔄 SWITCH BUTTONS */}
+      {/* Hover Overlay */}
+      <div
+        className="
+    absolute inset-0 rounded-2xl
+    bg-black/70 backdrop-blur-sm
+    opacity-0 group-hover:opacity-100
+    transition-all duration-300
+    flex flex-col justify-between p-4
+  "
+      >
         <div className="flex flex-col gap-3">
 
-          {/* TABLE SWITCH */}
-          <SwitchBtn
-            label="Switch Table State"
-            onClick={() =>
-              onChangeTableStatus?.(table, getNextTableState())
-            }
-          />
-
-          {/* ORDER SWITCH */}
-          {table.status === TABLE_STATUS.OCCUPIED && (
+          {/* ACTIVE */}
+          {table.status === TABLE_STATUS.ACTIVE && (
             <SwitchBtn
-              label="Switch Order State"
+              loading={updatingTable}
+              label="Mark Available"
               onClick={() =>
-                onChangeOrderStatus?.(table, getNextOrderState())
+                onChangeTableStatus(table, TABLE_STATUS.AVAILABLE)
               }
             />
           )}
+
+          {/* OCCUPIED */}
+          {table.status === TABLE_STATUS.OCCUPIED &&
+            table?.order?.status !== "served" &&
+            table?.order?.status !== "completed" &&
+            table?.order?.status !== "cancelled" && (
+              <SwitchBtn
+                loading={updatingOrder}
+                label={`Mark ${getNextOrderState()}`}
+                onClick={() =>
+                  onChangeOrderStatus(
+                    table.order._id,
+                    getNextOrderState()
+                  )
+                }
+              />
+            )}
+
         </div>
 
-        {/* ACTION BUTTONS */}
         <div className="flex justify-end gap-2">
+
+          {/* AVAILABLE */}
           {table.status === TABLE_STATUS.AVAILABLE && (
-            <IconBtn onClick={() => onAddOrder(table)} color="bg-green-500">
-              <Plus size={16} />
-            </IconBtn>
+            <>
+              <IconBtn
+                loading={updatingOrder}
+                onClick={() => onAddOrder(table)}
+                color="bg-green-600"
+              >
+                <Plus size={16} />
+              </IconBtn>
+
+              <IconBtn
+                loading={updatingOrder}
+                onClick={() => onShowQR(table.qr)}>
+                <QrCode size={16} />
+              </IconBtn>
+
+              <IconBtn
+                loading={deletingTable}
+                onClick={() => onDelete(table._id)}
+                color="bg-red-600"
+              >
+                <Trash2 size={16} />
+              </IconBtn>
+            </>
           )}
 
-          {(table.status === TABLE_STATUS.OCCUPIED ||
-            table.status === TABLE_STATUS.BILL_PENDING) && (
-            <IconBtn onClick={() => onOpen(table)}>
-              <Receipt size={16} />
-            </IconBtn>
+          {/* ACTIVE */}
+          {table.status === TABLE_STATUS.ACTIVE && (
+            <>
+              <IconBtn
+                onClick={() => onAddOrder(table)}
+                color="bg-green-600"
+              >
+                <Plus size={16} />
+              </IconBtn>
+
+              <IconBtn onClick={() => onShowQR(table.qr)}>
+                <QrCode size={16} />
+              </IconBtn>
+            </>
           )}
 
-          {table.status === TABLE_STATUS.BILL_PENDING && (
-            <IconBtn onClick={() => onBill(table)} color="bg-yellow-400 text-black">
-              <CreditCard size={16} />
-            </IconBtn>
+          {/* OCCUPIED */}
+          {table.status === TABLE_STATUS.OCCUPIED && (
+            <>
+              <IconBtn onClick={() => onOpen(table)}>
+                <Receipt size={16} />
+              </IconBtn>
+
+              {table?.order?.status === "served" && (
+                <IconBtn
+                  onClick={() => onBill(table)}
+                  color="bg-emerald-600"
+                >
+                  <CreditCard size={16} />
+                </IconBtn>
+              )}
+            </>
           )}
 
-          <IconBtn onClick={() => onShowQR(table.qr)}>
-            <QrCode size={16} />
-          </IconBtn>
-
-          {!table.total && (
-            <IconBtn onClick={() => onDelete(table._id)} color="bg-red-600">
-              <Trash2 size={16} />
-            </IconBtn>
-          )}
         </div>
       </div>
     </div>
@@ -200,22 +360,31 @@ const TableCard = ({
 };
 
 /* 🔘 SWITCH BUTTON (PREMIUM UI) */
-const SwitchBtn = ({ label, onClick }) => (
+const SwitchBtn = ({
+  label,
+  onClick,
+  loading = false
+}) => (
   <button
+    disabled={loading}
     onClick={(e) => {
       e.stopPropagation();
       onClick();
     }}
-    className="
+    className={`
       w-full flex items-center justify-between
       px-3 py-2 rounded-xl
-      bg-neutral-800 text-white text-sm
-      hover:bg-neutral-700
+      text-white text-sm
       transition-all duration-200
-    "
+      ${loading
+        ? "bg-neutral-700 opacity-60 cursor-not-allowed"
+        : "bg-neutral-800 hover:bg-neutral-700"
+      }
+    `}
   >
-    {label}
-    <RefreshCw size={16} className="opacity-70" />
+    {loading ? "Please wait..." : label}
+
+    {!loading && <RefreshCw size={16} className="opacity-70" />}
   </button>
 );
 
@@ -223,22 +392,29 @@ const SwitchBtn = ({ label, onClick }) => (
 const IconBtn = ({
   children,
   onClick,
-  color = "bg-neutral-800"
+  color = "bg-neutral-800",
+  loading = false
 }) => (
   <button
+    disabled={loading}
     onClick={(e) => {
       e.stopPropagation();
       onClick();
     }}
     className={`
       w-9 h-9 flex items-center justify-center
-      rounded-xl ${color}
-      text-white
-      hover:scale-110 hover:shadow-lg
-      transition
+      rounded-xl text-white transition
+      ${loading
+        ? "bg-neutral-700 opacity-60 cursor-not-allowed"
+        : `${color} hover:scale-110 hover:shadow-lg`
+      }
     `}
   >
-    {children}
+    {loading ? (
+      <RefreshCw size={16} className="animate-spin" />
+    ) : (
+      children
+    )}
   </button>
 );
 

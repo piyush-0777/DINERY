@@ -27,6 +27,7 @@ const CustomerBill = () => {
   // get customer orders 
 const orders = useSelector(state => state.customer.order);
 const customer = useSelector(state => state.customer.customer);
+const {token} = useSelector(state => state.customer)
 
 
     
@@ -35,7 +36,7 @@ const customer = useSelector(state => state.customer.customer);
   // function for goto customerHome paje
 
   const goToCustomerHomepaje = () => {
-      navigate(`/customer/customerHome/${id}`)
+      navigate(`/customer/customerHome/${resturantName}`)
   }
 
   //increas the contity of any order
@@ -69,7 +70,7 @@ const customer = useSelector(state => state.customer.customer);
   }
 
   const placeOrder = () =>{
-    dispatch(CustomerPlaceOrder({resturantName ,data: {orders ,customer } }))
+    dispatch(CustomerPlaceOrder({resturantName ,data: {orders ,customer , token } }))
   }
 
   return (

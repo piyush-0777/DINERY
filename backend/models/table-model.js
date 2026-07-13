@@ -6,7 +6,9 @@ const TableSchema = mongoose.Schema({
     tableId: {type:Number , require:true},
     qrCode: String,
     capacity:{type:Number , require:true , default: 2},
-    status: { type: String, enum: ["available","occupied"], default: "available" }
+    status: { type: String, enum: ["available","active","occupied"], default: "available" },
+    currentCustomer: {type: mongoose.Schema.Types.ObjectId , ref: "Customer", default: null } ,
+    activeSince: { type: Date, default: null, },
 })
 
 module.exports = mongoose.model('Table' , TableSchema)

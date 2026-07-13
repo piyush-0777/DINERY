@@ -2,12 +2,12 @@ const jwt = require('jsonwebtoken')
 const Restaurant = require('../models/restaurant-model')
 const bcrypt = require('bcrypt')
 const { hashPasswordGenerater, hashPasswordChecker } = require('../utils/hashPassword')
-const foodsModel = require('../models/food-model')
-const categoryModel = require('../models/categories-model')
-const tableModel = require('../models/table-model')
 const orderModel = require('../models/order-model')
 const generateQR = require('../utils/generateQR')
 const billModel = require('../models/bill-model')
+const tableService = require('../services/tableService')
+const foodService = require('../services/foodService')
+const categoryService = require('../services/categoryService')
 
 
 
@@ -18,9 +18,8 @@ exports.login = async (req, res) => {
 
     // find user deteal using  resturnt model
     const restaurant = await Restaurant.findOne({ ownerEmail });
-
     if (!restaurant) {
-      res.status(401).json({ error: 'invalid email or password' })
+      res.status(401).json({ error: 'restaurant is not found. register fist' })
       return;
     }
 
@@ -140,17 +139,13 @@ exports.getDashBord = async (req, res) => {
     }
 
     // find foods
-    const foods = await foodsModel.find({ restaurant: restaurant._id })
+    const foods = await foodService.getAllFood( restaurant._id)
     // find foods category
-    const category = await categoryModel.find({ restaurant: restaurant._id })
+    const category = await categoryService.getAllcategory(restaurant._id)
 
     //find tables
-    const tables = await tableModel.find({ restaurant: restaurant._id })
-    let tablesWithQrimage = [];
-    for (let table of tables) {
-      const qrImage = await generateQR(table, restaurant.restaurantName)
-      tablesWithQrimage.push({ ...table._doc, qrImage: qrImage })
-    }
+    const tables = await tableService.getAllTable(restaurant);
+ 
 
     // find order
     const order = await orderModel.find({restaurant: restaurant._id})
@@ -160,7 +155,7 @@ exports.getDashBord = async (req, res) => {
     const bill = await billModel.find({restaurant: restaurant._id})
     
 
-    res.status(200).json({ restaurant, foods, category , tables:tablesWithQrimage ,order , bill});
+    res.status(200).json({ restaurant, foods, category , tables:tables ,order , bill});
 
 
   } catch (error) {

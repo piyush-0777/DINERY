@@ -7,7 +7,7 @@ router.get('/getalltable' ,authenticateResturant, )
 router.post('/createtable',authenticateResturant , createTable)
 router.delete('/deletetable/:tableId' ,authenticateResturant, deleteTable )
 router.put('/updatetablestatus/:tableId',authenticateResturant ,updateStatus)
-router.get('/updatetablestatus/:tableId' , authenticateResturant , getTableById) 
+router.get('/gettablestatus/:tableId' , authenticateResturant , getTableById) 
 
 
 module.exports = router
