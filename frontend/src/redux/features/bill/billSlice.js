@@ -18,6 +18,7 @@ const billSlice = createSlice({
         );
             })
             .addCase(getBillThunk.fulfilled, (state , action) => {
+                console.log(action.payload);
                 state.bill =[action.payload.bill , ...state.bill ]
             })
             .addCase(cashPaymentThunk.fulfilled , (state , action) =>{

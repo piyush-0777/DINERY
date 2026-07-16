@@ -4,6 +4,7 @@ import { TABLE_STATUS } from "../../../components/owner/table/TableStatus";
 import { addTableThunk, deleteTableThunk, updateTableThunk, getTableThunk , updateStatusThunk } from "../../thunks/tableThunk";
 import { loadDashbordThunk } from '../../thunks/loardDashbordThunk'
 import { cashPaymentThunk } from '../../thunks/billThunk'
+import { updateOrderStatusThunk } from "../../thunks/ordersThunk";
 
 
 const initialState = {
@@ -44,6 +45,20 @@ const tablesSlice = createSlice({
             .addCase(addTableThunk.fulfilled, (state, action) => {
                 state.tables.push(action.payload.table)
             })
+                // updata order thank chang table ouder staus
+                .addCase(updateOrderStatusThunk.fulfilled, (state, action) => {
+                
+                        state.tables = state.tables.map((e) => {
+                          if (e?.order?._id == action.payload.order._id) {
+                            e.order = action.payload.order
+                            return e;
+                          } else {
+                            return e;
+                          }
+                        })
+                        state.loading = false
+                      })
+
 
             //delete table
             .addCase(deleteTableThunk.fulfilled, (state, action) => {

@@ -1,8 +1,9 @@
 const mongoose = require('../config/mongoDB-connection')
 const billModel = require('../models/bill-model')
 const tableModel = require('../models/table-model')
+const tableService = require('../services/tableService')
 
-const cashBillPayment = async (billId , tableId) => {
+const cashBillPayment = async (billId , tableId , restaurant) => {
      const session = await mongoose.startSession();
     try {
         session.startTransaction()
@@ -10,13 +11,13 @@ const cashBillPayment = async (billId , tableId) => {
          bill.paymentStatus = 'paid';
     bill.paymentMode = 'cash';
     await bill.save({session})
-    const table = await tableModel.findById(tableId , null , {session});
-        table.status = 'available'
-        await table.save({session});
+    const table = await tableService.updateTableStatus(tableId ,"available")
+    const tableData = await tableService.getTableById(tableId , restaurant)
+        
 
         await session.commitTransaction();
         session.endSession()
-        return {bill , table}
+        return {bill , table:tableData}
     } catch (error) {
         await session.abortTransaction()
         session.endSession()

@@ -5,7 +5,7 @@ import {customerService} from '../../services/customerService'
 
 export const customerLoginThunk = createAsyncThunk('customerLoginThunk' , async ({resturantName ,customerName ,CustomerMobile , token} , thunkAPI)=>{
 try {
-    console.log(token)
+    
 const data = {name:customerName ,phone:CustomerMobile , token:token}
     const res = await customerService.customerLogin(resturantName , data)
     return res;
@@ -15,21 +15,21 @@ const data = {name:customerName ,phone:CustomerMobile , token:token}
 }
 })
 
-export const LoadCustomerDashbord = createAsyncThunk('LoadCustomerDashbord' , async (restaurantName , thunkAPI) =>{
+export const LoadCustomerDashbord = createAsyncThunk('LoadCustomerDashbord' , async ({restaurantName , token} , thunkAPI) =>{
     try {
-        const res = await customerService.getCustomerDashbord(restaurantName);
+        const res = await customerService.getCustomerDashbord(restaurantName , token);
         console.log(res);
         return res;
     } catch (error) {
-        console.log(error.data);
+        console.log(error);
         return thunkAPI.rejectWithValue({status:error.status || 500 , message:error.data?.message || error.message})
     }
 })
 
 
-export const CustomerPlaceOrder = createAsyncThunk('CustomerPlaceOrder' , async ({resturantName , data} , thunkAPI)=>{
+export const CustomerPlaceOrder = createAsyncThunk('CustomerPlaceOrder' , async ({restaurantName , data} , thunkAPI)=>{
     try {
-        const res = await customerService.placeCustomerOrder(resturantName , data)
+        const res = await customerService.placeCustomerOrder(restaurantName , data)
         return res;
     } catch (error) {
         console.log(error);

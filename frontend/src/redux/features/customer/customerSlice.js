@@ -1,5 +1,5 @@
 import { createSlice, nanoid } from "@reduxjs/toolkit";
-import { customerLoginThunk, LoadCustomerDashbord } from "../../thunks/customerThunk"
+import { customerLoginThunk, LoadCustomerDashbord , CustomerPlaceOrder } from "../../thunks/customerThunk"
 
 const initialState = {
     token: null ,
@@ -7,6 +7,10 @@ const initialState = {
     order: {
         items: [],
     },
+    placedOrder:{
+        order:null,
+        bill:null
+    }
 };
 
 
@@ -71,15 +75,23 @@ export const customerSlice = createSlice({
         deleteAllOrder: (state) => {
             state.order.items = [];
         },
+        updateOrderStatus: (state , action) =>{
+           // status , orderId
+           if(state.placedOrder?.order?._id ==action.payload.orderId){
+            state.placedOrder.order.status = action.payload.status;
+           }
+        } ,
+        updateBillStatus: (state , action) =>{
+           // status , billId
+           if(state.placedOrder?.bill?._id ==action.payload.billId){
+            state.placedOrder.bill.paymentStatus = action.payload.status;
+           }
+        }
     },
 
     extraReducers: (builder) => {
         builder
-            .addCase(customerLoginThunk.pending, (state) => {
-                state.reqtype = 'login'
-                state.loading = true;
-                state.error = null;
-            })
+            
             .addCase(customerLoginThunk.fulfilled, (state, action) => {
                 state.loading = false;
                 // state.message = action.payload.message;
@@ -91,29 +103,23 @@ export const customerSlice = createSlice({
                 state.customer = action.payload.data
                 state.success = true;
             })
-            .addCase(customerLoginThunk.rejected, (state, action) => {
-                state.loading = false;
-                state.error = action.payload ?? {
-                    status: 500,
-                    message: action.error.message,
-                };
-            })
-            .addCase(LoadCustomerDashbord.pending, (state) => {
-                state.reqtype = 'dashbord'
-                state.loading = true;
-                state.error = null;
-            })
-            .addCase(LoadCustomerDashbord.fulfilled, (state, action) => {
-                state.loading = false;
-                state.success = true;
-            })
-            .addCase(LoadCustomerDashbord.rejected, (state, action) => {
-                state.loading = false;
-                state.error = action.payload ?? {
-                    status: 500,
-                    message: action.error.message,
-                };
-            })
+           .addCase(CustomerPlaceOrder.fulfilled, (state , action)=>{
+            state.placedOrder = action.payload.data;
+           })
+           .addCase(LoadCustomerDashbord.fulfilled, (state , action)=>{
+            console.log(action.payload.customer)
+            
+            if(action.payload.tableStatus == 'active'){
+                state.customer = action.payload.customer;
+            }
+            if(action.payload.tableStatus == 'occupied') {
+                 state.customer = action.payload.customer;
+                 state.placedOrder.order = action.payload.order;
+                 state.placedOrder.bill = action.payload.bill;
+            }
+           })
+
+           
     }
 })
 export const { addToken,
@@ -122,6 +128,9 @@ export const { addToken,
     incresContityOfOrder,
     dicresContityOfOrder,
     deleteAllOrder, 
-    deletOrder , } = customerSlice.actions
+    deletOrder ,
+updateOrderStatus ,
+updateBillStatus ,
+ } = customerSlice.actions
 
 export default customerSlice.reducer;

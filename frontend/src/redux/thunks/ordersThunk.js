@@ -20,6 +20,7 @@ export const updateOrderStatusThunk = createAsyncThunk(
     async ({ id, status }, thunkAPI) => {
         try {
             const res = await orderService.updateOrderStatus(id, status);
+            console.log(res)
             return res;
         } catch (error) {
             console.log(error)

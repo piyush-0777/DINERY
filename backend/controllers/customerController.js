@@ -9,7 +9,7 @@ const billModel = require('../models/bill-model')
 const customerService = require('../services/customerService')
 const tableService = require("../services/tableService");
 const orderService = require("../services/orderService");
-const {sendNewOrderNotification , sendTableUpdateNotification} = require('../socket/socketEvent')
+const {sendNewOrderNotification , sendTableUpdateNotification , } = require('../socket/socketEvent')
 
 
 exports.customerLogin = async (req, res) => {
@@ -17,7 +17,6 @@ exports.customerLogin = async (req, res) => {
         const { name, phone , token } = req.body;
         const { restaurantName } = req.params;
         console.log(token);
-
         // const token =
         //     req.cookies?.token ||
         //     req.headers.authorization?.split(" ")[1];
@@ -84,46 +83,66 @@ exports.customerLogin = async (req, res) => {
 exports.loadCustomerDashbord = async (req, res) => {
     try {
         const { restaurantName } = req.params;
-        const token = req.cookies?.token || req.headers.authorization?.split(" ")[1];
-
+        const token =
+            req.headers.authorization?.split(" ")[1] ||
+            req.cookies?.token;
+       
         if (!token) {
-            return res.status(401).json({ error: 'token is not provide' });
+            return res.status(401).json({
+                success: false,
+                error: "Token is not provided",
+            });
         }
+
         if (!restaurantName) {
-            return res.status(401).json({ error: 'restaurantName is not provide' });
+            return res.status(400).json({
+                success: false,
+                error: "Restaurant name is not provided",
+            });
         }
 
-        
+        const customerDashbordData = await customerService.LoadDashbord(
+            token,
+            restaurantName
+        );
 
-
-        const restaurant = await restaurantModel.findOne({ restaurantName })
-
-        const food = await foodModel.find({ restaurant: restaurant._id })
-        const category = await categoryModel.find({ restaurant: restaurant._id })
-
+        if (!customerDashbordData.success) {
+            return res.status(409).json({
+                 success: false,
+                tableStatus: "available",
+                message: "Table is currently available. Please activate the table first.",
+                
+            });
+        }
+      
         return res.status(200).json({
-            message: 'dashbord is load',
-            food, category
+            message: "Dashboard loaded successfully",
+            ...customerDashbordData,
         });
-    } catch (error) {
 
-        return res.status(401).json({ error: ' server error' });
+    } catch (error) {
+        console.error(error);
+
+        return res.status(500).json({
+            success: false,
+            error: error.message || "Server error",
+        });
     }
-}
+};
 
 exports.customerPlaceOrder = async (req, res) => {
     try {
         const { restaurantName } = req.params;
         console.log('res' , restaurantName )
-        const token = req.body.token
+        const token = req.headers.authorization?.split(" ")[1] ||
+            req.cookies?.token;
         
         if (!token) {
             return res.status(401).json({
                 error: "Token is not provided",
             });
         }
-        console.log('token' , token )
-        console.log('body' , req.body )
+        
 
         if (!restaurantName) {
             return res.status(400).json({

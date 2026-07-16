@@ -3,7 +3,7 @@ const customerModel = require("../models/customer-model");
 const orderModel = require("../models/order-model");
 const generateQR = require("../utils/generateQR");
 
-const getTableById = async(tableId) =>{
+const getTableById = async(tableId , restaurant) =>{
     try {
         const table = await tableModel.findById(tableId)
          const qrImage = await generateQR(table, restaurant.restaurantName);

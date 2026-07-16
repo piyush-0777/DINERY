@@ -1,17 +1,19 @@
 import React from 'react'
 import { useState } from 'react';
-import { useSelector , useDispatch } from 'react-redux';
-import { incresContityOfOrder , dicresContityOfOrder , deletOrder } from '../../redux/features/customer/customerSlice';
+import { useSelector, useDispatch } from 'react-redux';
+import { incresContityOfOrder, dicresContityOfOrder, deletOrder } from '../../redux/features/customer/customerSlice';
 import { HiChevronLeft } from "react-icons/hi";
-import {useNavigate , useParams } from 'react-router-dom'
-import {CustomerPlaceOrder} from '../../redux/thunks/customerThunk'
-
+import { useNavigate, useParams } from 'react-router-dom'
+import { CustomerPlaceOrder } from '../../redux/thunks/customerThunk'
+import  { useEffect } from "react";
+import { toast } from "react-toastify";
+import { resetloadCustomerState } from "../../redux/features/customer/loadCustomerSlice";
 
 
 const CustomerBill = () => {
 
- const loadCustomer = useSelector(state => state.loadcustomer)
-   console.log(loadCustomer)
+  const loadCustomer = useSelector(state => state.loadcustomer)
+  console.log(loadCustomer)
 
   //use dispatch for store and chang the value of user order
   const dispatch = useDispatch()
@@ -20,23 +22,25 @@ const CustomerBill = () => {
   const navigate = useNavigate()
 
   //  use params to gat usesr table id
-  const {resturantName} = useParams()
- 
+  const {  restaurantName } = useParams();
+
 
 
   // get customer orders 
-const orders = useSelector(state => state.customer.order);
-const customer = useSelector(state => state.customer.customer);
-const {token} = useSelector(state => state.customer)
+  const orders = useSelector(state => state.customer.order);
+  const customer = useSelector(state => state.customer.customer);
+  const { token } = useSelector(state => state.customer)
+  const { reqtype, loading, success, error } = useSelector(state => state.loadcustomer)
+  //reqType = "placeOrder"
+  const isPlacingOrder = reqtype === "placeOrder" && loading;
 
 
-    
 
 
   // function for goto customerHome paje
 
   const goToCustomerHomepaje = () => {
-      navigate(`/customer/customerHome/${resturantName}`)
+    navigate(`/customer/${restaurantName}/customerHome`)
   }
 
   //increas the contity of any order
@@ -61,31 +65,68 @@ const {token} = useSelector(state => state.customer)
 
   // return total amount of all aorder bill
 
-  const totalAmount = ()=>{
+  const totalAmount = () => {
     let total = 0;
-    orders.items.map(order=>{
+    orders.items.map(order => {
       total = total + order.subtotal;
     })
     return total;
   }
 
-  const placeOrder = () =>{
-    dispatch(CustomerPlaceOrder({resturantName ,data: {orders ,customer , token } }))
-  }
+
+  useEffect(() => {
+    if (reqtype !== "placeOrder") return;
+
+    if (success) {
+      toast.success("Order placed successfully.");
+
+      dispatch(resetloadCustomerState());
+
+      navigate(
+        `/customer/${restaurantName}/CustomerOrderDeteal`
+      );
+    }
+
+    if (error) {
+      toast.error(
+        error?.message || error || "Failed to place order."
+      );
+
+      dispatch(resetloadCustomerState());
+    }
+  }, [
+    reqtype,
+    success,
+    error,
+    dispatch,
+    navigate,
+    restaurantName,
+  ]);
+
+  const placeOrder = () => {
+    if (isPlacingOrder) return;
+
+    dispatch(
+      CustomerPlaceOrder({
+        restaurantName,
+        data: { orders, customer, token },
+      })
+    );
+  };
 
   return (
-    
-       <div className="min-h-screen bg-gray-100 p-3 max-w-md mx-auto flex flex-col justify-between    ">
+
+    <div className="min-h-screen bg-gray-100 p-3 max-w-md mx-auto flex flex-col justify-between    ">
       {/* Header */}
       <div className='mb-8 sticky top-0 bg-gray-100 p-1 pb-3 pt-2'>
-      <div className="flex  gap-3 items-center   ">
-        
+        <div className="flex  gap-3 items-center   ">
+
           <HiChevronLeft onClick={goToCustomerHomepaje} className="text-green-600 text-4xl border-1 border-green-600 rounded-full" />
-        <span className="text-xl font-semibold">Your Order</span>
-       
+          <span className="text-xl font-semibold">Your Order</span>
+
+        </div>
       </div>
-      </div>
-      
+
 
       {/* Items List */}
       <div className="space-y-4">
@@ -119,10 +160,10 @@ const {token} = useSelector(state => state.customer)
             </div>
           </div>
         ))}
-      
+
       </div>
       <div>
-       
+
 
       </div>
 
@@ -133,12 +174,20 @@ const {token} = useSelector(state => state.customer)
           <span>₹{totalAmount()}</span>
         </div>
 
-        <button onClick={()=>placeOrder()}  className="w-full bg-green-600 text-white py-3 rounded-xl text-base font-semibold">
-          Place Order
+        <button
+          onClick={placeOrder}
+          disabled={isPlacingOrder}
+          className={`w-full py-3 rounded-xl text-base font-semibold text-white
+    ${isPlacingOrder
+              ? "bg-gray-500 cursor-not-allowed"
+              : "bg-green-600 hover:bg-green-700"
+            }`}
+        >
+          {isPlacingOrder ? "Placing Order..." : "Place Order"}
         </button>
       </div>
     </div>
-   
+
   )
 }
 

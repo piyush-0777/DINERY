@@ -45,7 +45,8 @@ const CustomerLogin = () => {
     const token = searchParams.get('token')
     dispatch(addToken(token))
     localStorage.setItem("token", token);
-    console.log(token);
+    console.log(localStorage.getItem("token"));
+  
   }, [])
 
   // use to navigate user to other paje

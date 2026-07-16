@@ -11,13 +11,13 @@ import { LoadCustomerDashbord } from '../../redux/thunks/customerThunk'
 import useSocket from '../../hooks/useSocket'
 const CustomerHome = () => {
  
-  const {  resturantName } = useParams();
+  const {  restaurantName } = useParams();
   
   const navigate = useNavigate();
   const dispatch = useDispatch();
-//  useSocket(); 
 
-const token = useSelector(state => state.customer.token);
+
+const token = localStorage.getItem("token");
   const foods = useSelector(state => state.foodObject.foods);
   const category = useSelector(state => state.foodObject.category);
   const customer = useSelector(state => state.customer.customer);
@@ -26,20 +26,16 @@ const token = useSelector(state => state.customer.token);
   const [filterfoods, setFilterFoods] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('All');
 
-  useEffect(() => {
-    if (!customer) {
-      navigate(`/customer/${resturantName}/login/?token=${token}`);
-    }
-  }, [customer]);
+  
 
-  useEffect(() => {
-    dispatch(LoadCustomerDashbord(resturantName));
-  }, []);
+  
 
   useEffect(() => {
     setFilterFoods(foods);
   }, [foods]);
 
+
+  // change category functon
   const changCategory = (e) => {
     const categoryId = e.currentTarget.id;
     setSelectedCategory(categoryId);

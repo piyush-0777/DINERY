@@ -12,7 +12,7 @@ const loardTablesSlice = createSlice({
   name: "loadTable",
   initialState,
   reducers: {
-    resetLoadTablesState: (state) => {
+    resetLoardTablesState: (state) => {
       state.reqtype = null;
       state.loading = false;
       state.success = false;

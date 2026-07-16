@@ -2,9 +2,8 @@ const { Server } = require("socket.io");
 
 let io;
 
-// Track online owners per restaurant
-const onlineOwners = new Map(); 
 // restaurantId -> Set(socketId)
+const onlineOwners = new Map();
 
 const initSocket = (server) => {
   io = new Server(server, {
@@ -12,9 +11,7 @@ const initSocket = (server) => {
   });
 
   io.on("connect", (socket) => {
-    // console.log("client connected", socket.id);
-
-    const { restaurantId, role } = socket.handshake.auth;
+    const { restaurantId, role, customerId } = socket.handshake.auth;
 
     if (!restaurantId || !role) {
       socket.disconnect();
@@ -28,13 +25,20 @@ const initSocket = (server) => {
       if (!onlineOwners.has(restaurantId)) {
         onlineOwners.set(restaurantId, new Set());
       }
+
       onlineOwners.get(restaurantId).add(socket.id);
 
-      // console.log("Owner ONLINE for restaurant:", restaurantId);
+      //  console.log("Owner ONLINE:", restaurantId);
     }
 
     // CUSTOMER LOGIC
     else if (role === "customer") {
+     
+      if (!customerId) {
+        socket.disconnect();
+        return;
+      }
+       console.log(role, customerId)
       const owners = onlineOwners.get(restaurantId);
 
       if (!owners || owners.size === 0) {
@@ -43,22 +47,30 @@ const initSocket = (server) => {
         return;
       }
 
+      // Restaurant room
       socket.join(restaurantId);
-      // console.log("Customer joined restaurant:", restaurantId);
+
+      // Private customer room
+      socket.join(`customer:${customerId}`);
+
+        console.log(`Customer ${customerId} joined`);
     }
 
     socket.on("disconnect", () => {
       if (role === "owner") {
         const owners = onlineOwners.get(restaurantId);
+
         if (owners) {
           owners.delete(socket.id);
+
           if (owners.size === 0) {
             onlineOwners.delete(restaurantId);
             // console.log("Restaurant OFFLINE:", restaurantId);
           }
         }
       }
-      // console.log("client disconnected", socket.id);
+
+      // console.log("Client disconnected:", socket.id);
     });
   });
 
@@ -66,7 +78,10 @@ const initSocket = (server) => {
 };
 
 const getIO = () => {
-  if (!io) throw new Error("Socket not initialized");
+  if (!io) {
+    throw new Error("Socket not initialized");
+  }
+
   return io;
 };
 

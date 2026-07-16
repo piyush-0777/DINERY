@@ -1,17 +1,18 @@
 import { io } from "socket.io-client";
 import {addSocketId} from '../redux/features/owner/socketSlice'
 import { useDispatch } from "react-redux";
-
+const socketUrl = import.meta.env.VITE_SOCKET_URL;
 let socket = null;
 
-export const connectSocket = ({ role, restaurantId,  }) => {
+export const connectSocket = ({ role, restaurantId, customerId  }) => {
 
   if (socket) return socket; // already connected
 
-  socket = io("http://localhost:3000", {
+  socket = io(socketUrl , {
     auth: {
       role,
       restaurantId,
+      customerId
     },
   });
 

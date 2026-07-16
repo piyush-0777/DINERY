@@ -1,9 +1,49 @@
-import React from "react";
+import React, { useEffect } from "react";
+import { useSelector , useDispatch } from "react-redux";
+import { toast } from "react-toastify";
+import {resetloadBillState} from "../../../redux/features/bill/loadBillSlice"
 
 const OrderDetailModal = ({ order, bill, onClose, onCashPayment }) => {
   if (!order) return null;
+   const dispatch = useDispatch()
+  const billLoadingDeteal = useSelector(s => s.loadBill)
+  // billLoading have this type of value
+  //billLoadingDeteal={
+  //  reqtype: null || 'cashPayment',
+  //   loading: false || true,
+  //   success: false || true,
+  //   error: null || error,
+  //}
 
+
+  const isCashPaymentLoading =
+    billLoadingDeteal.loading &&
+    billLoadingDeteal.reqtype === "cashPayment";
   const customer = order.customer;
+
+  useEffect(() => {
+    if (billLoadingDeteal.reqtype !== "cashPayment") return;
+
+    if (billLoadingDeteal.success) {
+      toast.success("Payment completed successfully.");
+      dispatch(resetloadBillState())
+      onClose(); // Automatically close modal
+    }
+
+    if (billLoadingDeteal.error) {
+      toast.error(
+        billLoadingDeteal.error?.message ||
+        billLoadingDeteal.error ||
+        "Payment failed."
+      );
+      dispatch(resetloadBillState())
+    }
+  }, [
+    billLoadingDeteal.success,
+    billLoadingDeteal.error,
+    billLoadingDeteal.reqtype,
+    onClose,
+  ]);
 
   return (
     <>
@@ -129,15 +169,18 @@ const OrderDetailModal = ({ order, bill, onClose, onCashPayment }) => {
             )}
 
             {/* Action */}
-            {order.status === "completed" &&bill.paymentStatus === "unpaid" && (
+            {order.status === "completed" && bill.paymentStatus === "unpaid" && (
               <div className="mt-6 flex justify-center">
                 <button
-                  onClick={() => onCashPayment(bill._id, order.table._id)}
-                  className="bg-green-600 hover:bg-green-700
-                           hover:scale-105 px-6 py-3 rounded-xl font-semibold
-                           shadow-lg transition-all duration-200"
+                  onClick={() => onCashPayment(bill._id, order.table?._id || order.table , order.customer?._id || order.customer)}
+                  disabled={isCashPaymentLoading}
+                  className={`px-6 py-3 rounded-xl font-semibold shadow-lg transition-all duration-200
+                    ${isCashPaymentLoading
+                      ? "bg-gray-600 cursor-not-allowed"
+                      : "bg-green-600 hover:bg-green-700 hover:scale-105"
+                    }`}
                 >
-                  Cash Payment Bill
+                  {isCashPaymentLoading ? "Processing..." : "Cash Payment Bill"}
                 </button>
               </div>
             )}

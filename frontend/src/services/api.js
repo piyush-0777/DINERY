@@ -1,8 +1,9 @@
-const BASE_URL = "http://localhost:3000/api";
+const BASE_URL = import.meta.env.VITE_BASE_URL;
 
 const getToken = () => localStorage.getItem("token");
 
 const request = async (endpoint, method = "GET", body = null, isFormData = false , query = null) => {
+  console.log(getToken())
   const headers = {
     Authorization: getToken() ? `Bearer ${getToken()}` : "",
   };

@@ -36,7 +36,7 @@ exports.createTable = async (req, res) => {
             qrCode: crypto.randomUUID()
         })
 
-        const qrImage = await generateQR(table, restaurant.name)
+        const qrImage = await generateQR(table, restaurant.restaurantName)
        const data = {...table._doc, qrImage:qrImage}
         return res.status(200).json({
             message:'table is added',
@@ -104,11 +104,11 @@ exports.updateStatus = async (req, res) => {
             status ,
             customer
         );
-        const tableData = await tableService.getTableById(tableId)
+        const tableData = await tableService.getTableById(tableId , restaurant)
 
         return res.status(200).json({
             message: "Table status updated successfully.",
-            table,
+            table:tableData,
         });
     } catch (error) {
         console.error(error);
@@ -121,8 +121,9 @@ exports.updateStatus = async (req, res) => {
 
 exports.getTableById = async (req , res) => {
     try {
+        const restaurant = req.restaurant;
          const tableId = req.params.tableId;
-         const table = await tableService.getTableById(tableId)
+         const table = await tableService.getTableById(tableId , restaurant)
 
          return res.status(200).json({
             secess: true,

@@ -11,6 +11,7 @@ import OwnerTables from "../pages/owner/OwnerTables"
 import OwnerOrder from "../pages/owner/OwnerOrders";
 import OwnerAnalytics from "../pages/owner/OwnerAnalytics";
 import OwnerReports from "../pages/owner/OwnerReports"
+import RestaurantSettings from "../pages/owner/RestaurantSettings"
 import useSocket from '../hooks/useSocket'
 
 
@@ -68,6 +69,7 @@ const OwnerRoutes = () => {
             <Route path="orders" element={<OwnerOrder />} />
             <Route path="analytics" element={<OwnerAnalytics />} />
             <Route path="reports" element={<OwnerReports />} />
+            <Route path="setting" element={<RestaurantSettings />}/>
             {/* <Route path="dashboard" element={<OwnerDashboard />} />
         <Route path="products" element={<ManageProducts />} />
         <Route path="orders" element={<ManageOrders />} />

@@ -7,8 +7,8 @@ export const customerService = {
   customerLogin:(restaurantName , data)=>
     request(`/customer/${restaurantName}/login` , "POST" , data),
 
-  getCustomerDashbord: (restaurantName)=>
-    request(`/customer/${restaurantName}/loadCustomerDashbord` , 'GET') ,
+  getCustomerDashbord: (restaurantName , token)=>
+    request(`/customer/${restaurantName}/loadCustomerDashbord` , 'GET', ) ,
 
   placeCustomerOrder:(restaurantName , data) =>
     request(`/customer/${restaurantName}/placeOrder` , 'POST' , data)

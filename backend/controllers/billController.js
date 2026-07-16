@@ -1,5 +1,6 @@
 const billModel = require('../models/bill-model')
 const billService = require('../services/billService')
+const {sendBillStatusUpdateNotificationToCustomer} =require('../socket/socketEvent')
 
 exports.getBillById = async(req , res) => {
     try {
@@ -17,11 +18,12 @@ exports.getBillById = async(req , res) => {
 
 exports.BillCashPayment = async (req , res) => {
     try {
+      const restaurant = req.restaurant
     const billId = req.params.billId;
     const tableId = req.params.tableId;
-
-    const {bill , table} = await billService.cashBillPayment(billId , tableId)
-
+      const {customerId} = req.body;
+    const {bill , table} = await billService.cashBillPayment(billId , tableId , restaurant)
+      sendBillStatusUpdateNotificationToCustomer(customerId ,billId , bill.paymentStatus)
     res.status(200).json({
       message:'payment is seccessfuly payed',
       secces: true,

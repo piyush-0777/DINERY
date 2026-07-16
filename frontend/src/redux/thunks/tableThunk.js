@@ -45,7 +45,7 @@ export const updateStatusThunk = createAsyncThunk('updateStatusThunk' , async ({
 
 export const getTableThunk = createAsyncThunk('getTableThunk' , async (tableId , thunkAPI) =>{
     try {
-        res  = await tableService.getTable(tableId) 
+       const res  = await tableService.getTable(tableId) 
         return res;
     } catch (error) {
         console.log(error) 

@@ -1,9 +1,9 @@
 const {getIO} = require('./socketServer')
 
 // for order
-exports.sendNewOrderNotification = async (restaurantID , order , bill)=>{
+exports.sendNewOrderNotification = async (restaurantID , order , bill , tableId)=>{
   try {
- getIO().to(restaurantID.toString()).emit('newOrder' , {orderId:order._id , billId:bill._id})
+ getIO().to(restaurantID.toString()).emit('newOrder' , {orderId:order._id , billId:bill._id , tableId:tableId})
  
  return true;
   } catch (error) {
@@ -19,6 +19,22 @@ exports.sendOrderStatusUpdateNotification = (restaurantId, orderId, status) => {
     status
   });
 };
+
+exports.sendOrderStatusUpdateNotificationToCustomer = (customerId ,orderId , status) => {
+  getIO().to(`customer:${customerId}`).emit("orderStatusUpdated" , {
+    orderId,
+    status
+
+  })
+}
+
+exports.sendBillStatusUpdateNotificationToCustomer = (customerId ,billId , status) => {
+  getIO().to(`customer:${customerId}`).emit("BillStatusUpdated" , {
+    billId,
+    status
+
+  })
+}
 
 // for tables
 

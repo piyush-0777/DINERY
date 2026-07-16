@@ -1,9 +1,9 @@
 import { connectSocket } from "../../consfig/socket";
 import { addSocketId } from "../features/owner/socketSlice";
 
-export const initSocket = ({ role, restaurantId }) => {
+export const initSocket = ({ role, restaurantId , customerId }) => {
   return (dispatch) => {
-    const socket = connectSocket({ role, restaurantId });
+    const socket = connectSocket({ role, restaurantId , customerId });
 
     socket.on("connect", () => {
       dispatch(addSocketId(socket.id));

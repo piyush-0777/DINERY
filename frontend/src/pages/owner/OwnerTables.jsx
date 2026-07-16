@@ -6,8 +6,9 @@ import TableDetailsModal from "../../components/owner/table/TableDetailsModal";
 import QRPopup from "../../components/owner/table/QRPopup";
 import MergeSplitModal from "../../components/owner/table/MergeSplitModal";
 import AddTableModal from "../../components/owner/table/AddTableModal"
+import OrderDetailModal from "../../components/owner/order/OrderDetailModal";
 
-
+import {cashPaymentThunk} from '../../redux/thunks/billThunk'
 import {addTableThunk , deleteTableThunk} from '../../redux/thunks/tableThunk'
 
 
@@ -16,18 +17,35 @@ export default function TablesPage() {
   const dispatch = useDispatch() 
 
   const tables = useSelector(state => state.tables.tables);
-  console.log(tables)
   const loardTable = useSelector(state => state.loardtables)
-  console.log('table',loardTable)
+  const bills = useSelector(s=> s.bills.bill)
+  const { list } = useSelector(s => s.orders)
+  
 
   const [selectedTable, setSelectedTable] = useState(null);
   const [qrImage, setQrImage] = useState(null);
   const [showMergeModal, setShowMergeModal] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [selectedOrder , setSelectedOrder] = useState();
 
 
   const handleAddTable = (data) => {
     dispatch(addTableThunk(data))
+  }
+
+
+  const cashPayment = (billId , tableId , customerId) => {
+      console.log('bill' , billId , 'table' , tableId)
+      dispatch(cashPaymentThunk({billId , tableId , customerId}))
+  
+  }
+
+  const setOrderBillDeteal = (id) =>{
+    list.map((e)=> {
+      if(e._id == id){
+        setSelectedOrder(e);
+      }
+    })
   }
 
 
@@ -69,6 +87,7 @@ export default function TablesPage() {
             table={table}
             onOpen={() => setSelectedTable(table)}
             onShowQR={() => setQrImage(table.qrImage)}
+            onBill={setOrderBillDeteal}
           />
         ))}
       </div>
@@ -96,6 +115,15 @@ export default function TablesPage() {
     onClose={() => setShowAddModal(false)}
   />
 )}
+
+{selectedOrder && 
+<OrderDetailModal  
+order={selectedOrder} 
+bill = {
+     bills.filter((e)=> e.order === selectedOrder._id)[0]
+}
+onClose={()=>{setSelectedOrder(null)}}
+onCashPayment={cashPayment} />}
     </div>
   );
 }

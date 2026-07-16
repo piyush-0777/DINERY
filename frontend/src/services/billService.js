@@ -5,8 +5,8 @@ export const billService = {
 
   getBillsForOwner: (id) =>
     request(`/bill/${id}`, "GET"),
-  cashPaymentBill: (billId , tableId) => 
-     request(`/bill/cashPayment/${tableId}/${billId}`, "PUT"),
+  cashPaymentBill: (billId , tableId , customerId) => 
+     request(`/bill/cashPayment/${tableId}/${billId}`, "PUT" , {customerId}),
 
  
 };

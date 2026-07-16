@@ -19,10 +19,11 @@ const OwnerLayout = ({ children }) => {
             console.log('socket is not find')
             return;
           } 
-          socket.on("newOrder", ({orderId , billId}) => {
+          socket.on("newOrder", ({orderId , billId , tableId}) => {
             console.log("📦 New Order Received:", orderId);
             dispatch(getOrderThunk(orderId))
             dispatch(getBillThunk(billId))
+            dispatch(getTableThunk(tableId))
             toast.success("new order is add.");
             // show toast / play sound / update UI
           });

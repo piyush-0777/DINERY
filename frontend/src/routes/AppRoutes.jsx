@@ -12,7 +12,7 @@ import Home from "../pages/public/Home";
 import About from "../pages/public/About";
 import Login from "../pages/auth/Login";
 import Register from "../pages/auth/Register";
-
+import InvalidSession from "../pages/customer/InvalidSession";
 
 
 // Auth Pages
@@ -49,7 +49,9 @@ const AppRoutes = () => {
 
         {/* Protected Routes */}
         <Route path="/owner/*" element={<OwnerRoutes />} />
-        <Route path="/customer/:resturantName/*" element={<CustomerRoutes />} />
+        <Route path="/customer/:restaurantName/*" element={<CustomerRoutes />} />
+        <Route path="/customer/invalid-session" element={<InvalidSession />}
+          />
       </Routes>
     </Router>
   );

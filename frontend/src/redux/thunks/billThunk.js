@@ -4,6 +4,7 @@ import { createAsyncThunk } from '@reduxjs/toolkit'
 export const getBillThunk = createAsyncThunk('getBillThunk' , async (id ,thunkAPI )=>{
     try {
            const res = await billService.getBillsForOwner(id);
+           console.log(res);
             return res;
     } catch (error) {
          console.log(error)
@@ -11,9 +12,9 @@ export const getBillThunk = createAsyncThunk('getBillThunk' , async (id ,thunkAP
     }
 })
 
-export const cashPaymentThunk = createAsyncThunk('cashPaymentThunk' , async ({billId , tableId} ,thunkAPI ) =>{
+export const cashPaymentThunk = createAsyncThunk('cashPaymentThunk' , async ({billId , tableId , customerId} ,thunkAPI ) =>{
  try {
-           const res = await billService.cashPaymentBill(billId , tableId);
+           const res = await billService.cashPaymentBill(billId , tableId , customerId);
             return res;
     } catch (error) {
          console.log(error)

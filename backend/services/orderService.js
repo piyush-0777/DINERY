@@ -80,7 +80,8 @@ exports.customerPlaceOrder = async ({
         await sendNewOrderNotification(
             restaurant._id,
             createdOrder[0],
-            bill[0]
+            bill[0] , 
+            table._id
         );
 
         return {
@@ -93,4 +94,42 @@ exports.customerPlaceOrder = async ({
 
         throw error;
     }
+};
+
+
+const VALID_ORDER_STATUS = [
+  "pending",
+  "preparing",
+  "served",
+  "completed",
+  "cancelled",
+];
+
+exports.updateOrderStatus = async (restaurantId, orderId, status) => {
+  if (!restaurantId) {
+    throw new Error("Restaurant not found.");
+  }
+
+  if (!status) {
+    throw new Error("Status is required.");
+  }
+
+  if (!VALID_ORDER_STATUS.includes(status)) {
+    throw new Error("Invalid order status.");
+  }
+
+  const order = await orderModel.findById(orderId);
+
+  if (!order) {
+    throw new Error("Order not found.");
+  }
+
+  if (order.restaurant.toString() !== restaurantId.toString()) {
+    throw new Error("Unauthorized to update this order.");
+  }
+
+  order.status = status;
+  await order.save();
+
+  return order;
 };

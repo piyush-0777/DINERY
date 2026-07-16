@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { updateStatusThunk, deleteTableThunk } from "../../../redux/thunks/tableThunk";
 import { updateOrderStatusThunk } from "../../../redux/thunks/ordersThunk"
+import {resetOrderLoadSlice} from "../../../redux/features/order/ordersSlice"
+import { resetLoardTablesState} from "../../../redux/features/table/loardTablesSlice"
 import {
   QrCode,
   Trash2,
@@ -31,6 +33,9 @@ const TableCard = ({
   // for delet tableLoadState.reqtype == 'deleteTable'
   // for updatetableStatue tableLoadState.reqtype == 'updateStatus'
 
+
+  
+// console.log( { loading, reqtype, error, success })
   const updatingTable =
     tableLoadState.loading && tableLoadState.reqtype === "updateStatus";
 
@@ -80,6 +85,9 @@ const TableCard = ({
       case "preparing":
         return "served";
 
+      case "served":
+      return "completed";
+
       default:
         return null;
     }
@@ -93,8 +101,10 @@ const TableCard = ({
 
       if (updateStatusThunk.fulfilled.match(result)) {
         toast.success("Table status updated.");
+        dispatch(resetLoardTablesState())
       } else {
         toast.error(result.payload || "Failed to update table.");
+         dispatch(resetLoardTablesState())
       }
     } catch (err) {
       toast.error(err.message || "Something went wrong.");
@@ -110,8 +120,10 @@ const TableCard = ({
 
       if (updateOrderStatusThunk.fulfilled.match(result)) {
         toast.success("Order status updated.");
+        dispatch(resetOrderLoadSlice())
       } else {
         toast.error(result.payload || "Failed to update order.");
+        dispatch(resetOrderLoadSlice())
       }
     } catch (err) {
       toast.error(err.message || "Something went wrong.");
@@ -127,8 +139,10 @@ const TableCard = ({
 
       if (deleteTableThunk.fulfilled.match(result)) {
         toast.success("Table deleted.");
+        dispatch(resetLoardTablesState())
       } else {
         toast.error(result.payload || "Failed to delete table.");
+        dispatch(resetLoardTablesState())
       }
     } catch (err) {
       toast.error(err.message || "Something went wrong.");
@@ -273,7 +287,6 @@ const TableCard = ({
 
           {/* OCCUPIED */}
           {table.status === TABLE_STATUS.OCCUPIED &&
-            table?.order?.status !== "served" &&
             table?.order?.status !== "completed" &&
             table?.order?.status !== "cancelled" && (
               <SwitchBtn
@@ -281,7 +294,7 @@ const TableCard = ({
                 label={`Mark ${getNextOrderState()}`}
                 onClick={() =>
                   onChangeOrderStatus(
-                    table.order._id,
+                    table?.order?._id,
                     getNextOrderState()
                   )
                 }
@@ -342,9 +355,9 @@ const TableCard = ({
                 <Receipt size={16} />
               </IconBtn>
 
-              {table?.order?.status === "served" && (
+              {table?.order?.status === "completed" && (
                 <IconBtn
-                  onClick={() => onBill(table)}
+                  onClick={() => onBill(table?.order._id)}
                   color="bg-emerald-600"
                 >
                   <CreditCard size={16} />

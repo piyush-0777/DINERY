@@ -1,6 +1,11 @@
 import { Settings, LogOut } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const ProfileCard = () => {
+  const navigate = useNavigate();
+  const goTosetting = () =>{
+    navigate(`/owner/setting`);
+  }
   return (
     <div className="absolute right-0 mt-4 w-72 rounded-2xl 
       bg-gradient-to-br from-[#0f0f0f] to-[#141414]
@@ -46,6 +51,7 @@ const ProfileCard = () => {
       {/* Actions */}
       <div className="mt-4 space-y-1">
         <button
+        onClick={goTosetting}
           className="flex items-center gap-3 w-full px-3 py-2 rounded-lg
           text-gray-300 hover:text-white
           hover:bg-gray-800 transition-all"
