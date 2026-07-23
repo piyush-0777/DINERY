@@ -8,6 +8,7 @@ const billModel = require('../models/bill-model')
 const tableService = require('../services/tableService')
 const foodService = require('../services/foodService')
 const categoryService = require('../services/categoryService')
+const orderService = require('../services/orderService')
 
 
 
@@ -148,14 +149,13 @@ exports.getDashBord = async (req, res) => {
  
 
     // find order
-    const order = await orderModel.find({restaurant: restaurant._id})
-    .populate('table')
-    .populate('customer')
+    const order = await orderService.getTodayOrder(restaurant._id);
+    const Last7DaysOrders = await orderService.getLast7DaysOrders(restaurant._id)
 
     const bill = await billModel.find({restaurant: restaurant._id})
     
 
-    res.status(200).json({ restaurant, foods, category , tables:tables ,order , bill});
+    res.status(200).json({ restaurant, foods, category , tables:tables ,order , bill, Last7DaysOrders });
 
 
   } catch (error) {

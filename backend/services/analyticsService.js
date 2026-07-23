@@ -3,44 +3,44 @@ const Order = require('../models/order-model')
 const Bill = require('../models/bill-model')
 
 
-function getDateRange({ type, year, month, week }) {
-
+function getDateRange({ type, year, month }) {
   const now = new Date();
-
-  year = parseInt(year) || now.getFullYear();
-  month = parseInt(month);
-  week = parseInt(week);
 
   let start, end;
 
-  if (type === "year") {
+  if (type === "week") {
+    end = new Date(now);
 
-    start = new Date(year, 0, 1);
-    end = year === now.getFullYear() ? now : new Date(year, 11, 31);
+    start = new Date(now);
+    start.setDate(now.getDate() - 6); // Last 7 days (including today)
+    start.setHours(0, 0, 0, 0);
 
+    end.setHours(23, 59, 59, 999);
   }
 
   if (type === "month") {
+    year = parseInt(year) || now.getFullYear();
+    month = parseInt(month) || now.getMonth() + 1;
 
     start = new Date(year, month - 1, 1);
-    end =
-      year === now.getFullYear() && month === now.getMonth() + 1
-        ? now
-        : new Date(year, month, 0);
 
+    if (year === now.getFullYear() && month === now.getMonth() + 1) {
+      end = new Date(now);
+    } else {
+      end = new Date(year, month, 0, 23, 59, 59, 999);
+    }
   }
 
-  if (type === "week") {
+  if (type === "year") {
+    year = parseInt(year) || now.getFullYear();
 
-    const firstDay = new Date(year, month - 1, 1);
+    start = new Date(year, 0, 1);
 
-    const startDay = (week - 1) * 7 + 1;
-    const endDay = startDay + 6;
-
-    start = new Date(year, month - 1, startDay);
-    end = new Date(year, month - 1, endDay);
-
-    if (end > now) end = now;
+    if (year === now.getFullYear()) {
+      end = new Date(now);
+    } else {
+      end = new Date(year, 11, 31, 23, 59, 59, 999);
+    }
   }
 
   return { start, end };
@@ -58,8 +58,12 @@ exports.ordersAnalytics = async ({
     type,
     year,
     month,
-    week,
   });
+  console.log( restaurantId,
+  type,
+  year,
+  month,
+  week)
 
   let group;
 
@@ -106,7 +110,6 @@ exports.revenueAnalytics = async ({
     type,
     year,
     month,
-    week,
   });
 
   let group;
@@ -156,7 +159,6 @@ exports.topItemsAnalytics = async ({
     type,
     year,
     month,
-    week,
   });
   console.log(start , end , 'date');
 

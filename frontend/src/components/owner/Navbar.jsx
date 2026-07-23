@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import ProfileCard from "./ProfileCard";
+import { useSelector } from "react-redux";
 
 import {
     LayoutDashboard,
@@ -15,7 +16,6 @@ const navItems = [
     "Orders",
     "Menu",
     "Tables",
-    "Staff",
     "Analytics",
     "Reports",
 ];
@@ -32,6 +32,9 @@ const Navbar = () => {
     const [showProfile, setShowProfile] = useState(false);
     const [active, setActive] = useState("Dashboard");
     const [mobileMenu, setMobileMenu] = useState(false);
+    const restaurantImg = useSelector(
+    (state) => state.restaurant.restaurant?.profileImg
+  );
 
     useEffect(()=>{
         navigate(`/owner/${active.toLowerCase()}`);
@@ -126,7 +129,7 @@ const Navbar = () => {
                         }}
                     >
                         <img
-                            src="https://i.pravatar.cc/100"
+                            src={restaurantImg}
                             alt="profile"
                             className="w-9 h-9 rounded-full cursor-pointer
                 ring-2 ring-gray-700 hover:ring-[#D4AF37]

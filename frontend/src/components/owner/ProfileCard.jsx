@@ -1,8 +1,12 @@
 import { Settings, LogOut } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 const ProfileCard = () => {
   const navigate = useNavigate();
+  const restaurant = useSelector(
+    (state) => state.restaurant.restaurant
+  );
   const goTosetting = () =>{
     navigate(`/owner/setting`);
   }
@@ -16,7 +20,7 @@ const ProfileCard = () => {
       <div className="flex items-center gap-4 mb-4">
         <div className="relative">
           <img
-            src="https://i.pravatar.cc/100"
+            src={restaurant?.profileImg}
             alt="owner"
             className="w-14 h-14 rounded-full border border-gray-700"
           />
@@ -25,10 +29,10 @@ const ProfileCard = () => {
 
         <div>
           <p className="text-white font-semibold leading-tight">
-            Piyush
+            {restaurant?.restaurantName}
           </p>
           <p className="text-gray-400 text-xs">
-            Restaurant Owner
+           {restaurant?.ownerName}
           </p>
         </div>
       </div>
@@ -40,11 +44,11 @@ const ProfileCard = () => {
       <div className="space-y-2 text-sm">
         <div className="flex justify-between text-gray-400">
           <span>Restaurant</span>
-          <span className="text-white font-medium">Dinery</span>
+          <span className="text-white font-medium">{restaurant?.restaurantName}</span>
         </div>
         <div className="flex justify-between text-gray-400">
           <span>Email</span>
-          <span className="text-white">owner@dinery.com</span>
+          <span className="text-white">{restaurant?.ownerEmail}</span>
         </div>
       </div>
 

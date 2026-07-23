@@ -1,7 +1,51 @@
-import { Calendar, FileText, Building2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import {
+  Calendar,
+  FileText,
+  Building2,
+  Pencil,
+  Save,
+  X,
+  LoaderCircle,
+} from "lucide-react";
+import { useDispatch, useSelector } from "react-redux";
+import { toast } from "react-toastify";
+
 import SettingsCard from "./SettingsCard";
+import { updateGSTNumber } from "../../../redux/thunks/settingThunk.js";
+import { resetSettingLoadState } from "../../../redux/features/owner/settingLoadSlice.js";
 
 export default function BusinessSection({ restaurant }) {
+  const dispatch = useDispatch();
+
+  const { loading, success, error, reqtype } = useSelector(
+    (state) => state.loadsetting
+  );
+
+  const [isEditing, setIsEditing] = useState(false);
+  const [gstNumber, setGstNumber] = useState("");
+
+  useEffect(() => {
+    if (restaurant) {
+      setGstNumber(restaurant.gstNumber || "");
+    }
+  }, [restaurant]);
+
+  useEffect(() => {
+    if (reqtype !== "updateGSTNumber") return;
+
+    if (success) {
+      toast.success("GST Number updated successfully.");
+      setIsEditing(false);
+      dispatch(resetSettingLoadState());
+    }
+
+    if (error) {
+      toast.error(error);
+      dispatch(resetSettingLoadState());
+    }
+  }, [success, error, reqtype, dispatch]);
+
   const formatDate = (date) => {
     if (!date) return "N/A";
 
@@ -10,6 +54,23 @@ export default function BusinessSection({ restaurant }) {
       month: "long",
       year: "numeric",
     });
+  };
+
+  const handleCancel = () => {
+    setGstNumber(restaurant?.gstNumber || "");
+    setIsEditing(false);
+  };
+
+  const handleSave = () => {
+    if (!gstNumber.trim()) {
+      return toast.error("GST Number is required.");
+    }
+
+    dispatch(
+      updateGSTNumber({
+        gstNumber: gstNumber.trim(),
+      })
+    );
   };
 
   return (
@@ -31,9 +92,15 @@ export default function BusinessSection({ restaurant }) {
             />
 
             <input
-              defaultValue={restaurant?.gstNumber || ""}
+              value={gstNumber}
+              onChange={(e) => setGstNumber(e.target.value)}
+              disabled={!isEditing}
               placeholder="GST Number"
-              className="w-full pl-11 bg-zinc-950 border border-zinc-700 rounded-xl px-4 py-3 text-white outline-none focus:border-orange-500 transition"
+              className={`w-full pl-11 rounded-xl px-4 py-3 border transition ${
+                isEditing
+                  ? "bg-zinc-950 border-zinc-700 focus:border-orange-500 text-white"
+                  : "bg-zinc-900 border-zinc-800 text-zinc-400 cursor-not-allowed"
+              }`}
             />
           </div>
         </div>
@@ -70,6 +137,47 @@ export default function BusinessSection({ restaurant }) {
             className="w-full bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-zinc-400 cursor-not-allowed"
           />
         </div>
+      </div>
+
+      <div className="flex justify-end gap-3 mt-8">
+        {!isEditing ? (
+          <button
+            onClick={() => setIsEditing(true)}
+            className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white px-5 py-3 rounded-xl transition"
+          >
+            <Pencil size={18} />
+            Edit
+          </button>
+        ) : (
+          <>
+            <button
+              onClick={handleCancel}
+              disabled={loading && reqtype === "updateGSTNumber"}
+              className="flex items-center gap-2 border border-zinc-700 hover:bg-zinc-800 text-white px-5 py-3 rounded-xl transition"
+            >
+              <X size={18} />
+              Cancel
+            </button>
+
+            <button
+              onClick={handleSave}
+              disabled={loading && reqtype === "updateGSTNumber"}
+              className="flex items-center justify-center gap-2 bg-orange-500 hover:bg-orange-600 disabled:opacity-60 disabled:cursor-not-allowed text-white px-5 py-3 rounded-xl transition min-w-[170px]"
+            >
+              {loading && reqtype === "updateGSTNumber" ? (
+                <>
+                  <LoaderCircle size={18} className="animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                <>
+                  <Save size={18} />
+                  Save Changes
+                </>
+              )}
+            </button>
+          </>
+        )}
       </div>
     </SettingsCard>
   );

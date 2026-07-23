@@ -12,6 +12,7 @@ exports.getOrdersAnalytics = async (req, res) => {
       month,
       week,
     });
+    console.log("orderData" , data);
 
     res.json({ success: true, data });
 

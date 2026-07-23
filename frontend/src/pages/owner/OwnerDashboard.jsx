@@ -1,81 +1,176 @@
-import React, { useState, useEffect } from 'react'
+import React, { useMemo } from "react";
+import { useSelector } from "react-redux";
 import { StatCard } from "../../components/owner/StatCard";
 import { StatusCard } from "../../components/owner/StatusCard";
 import { OrdersTrend } from "../../components/owner/OrdersTrend";
-import Loader from '../../components/ui/Loader';
-import { getSocket  } from '../../consfig/socket'
-import {useSelector} from 'react-redux'
 
 const OwnerDashboard = () => {
+  const { list = [] } = useSelector((state) => state.orders);
 
 
-  const [loading, setLoading] = useState(true);
+  const isToday = (date) => {
+    const orderDate = new Date(date);
+    const today = new Date();
 
-  useEffect(() => {
-    setTimeout(() => setLoading(false), 30000); // simulate loading
-  }, []);
-  const {socketId} = useSelector(state => state.socketId)
-   console.log('id dashbord' , socketId)
-  
+    return (
+      orderDate.getDate() === today.getDate() &&
+      orderDate.getMonth() === today.getMonth() &&
+      orderDate.getFullYear() === today.getFullYear()
+    );
+  };
 
-  const recentOrders = [
-    { id: '#1021', table: 'Table 4', amount: '₹420', status: 'Preparing' },
-    { id: '#1020', table: 'Table 1', amount: '₹860', status: 'Completed' },
-    { id: '#1019', table: 'Online', amount: '₹310', status: 'Completed' },
-    { id: '#1018', table: 'Table 6', amount: '₹150', status: 'Cancelled' },
-    { id: '#1017', table: 'Table 2', amount: '₹540', status: 'Completed' },
-    { id: '#1016', table: 'Online', amount: '₹760', status: 'Preparing' },
-    { id: '#1015', table: 'Table 8', amount: '₹290', status: 'Completed' },
-  ];
+  const dashboard = useMemo(() => {
+    const todayOrders = list.filter((order) => isToday(order.createdAt));
+
+    const totalOrders = todayOrders.length;
+
+    const totalRevenue = todayOrders.reduce(
+      (sum, order) =>
+        order.status !== "cancelled" ? sum + (order.totalAmount || 0) : sum,
+      0
+    );
+
+    const avgOrderValue =
+      totalOrders > 0
+        ? Math.round(totalRevenue / totalOrders)
+        : 0;
+
+    const activeOrders = todayOrders.filter(
+      (order) =>
+        order.status === "pending" ||
+        order.status === "preparing" ||
+        order.status === "served"
+    ).length;
+
+    const preparing = todayOrders.filter(
+      (order) => order.status === "preparing"
+    ).length;
+
+    const completed = todayOrders.filter(
+      (order) => order.status === "completed"
+    ).length;
+
+    const cancelled = todayOrders.filter(
+      (order) => order.status === "cancelled"
+    ).length;
+
+    const recentOrders = [...list]
+      .sort(
+        (a, b) =>
+          new Date(b.createdAt) - new Date(a.createdAt)
+      )
+      .slice(0, 7);
+
+    return {
+      totalOrders,
+      totalRevenue,
+      avgOrderValue,
+      activeOrders,
+      preparing,
+      completed,
+      cancelled,
+      recentOrders,
+    };
+  }, [list]);
+
   return (
-    <div className="p-6 bg-black min-h-screen overflow-y-auto scrollbar-hide ">
-      {/* <h1 className="text-3xl font-bold text-white mb-6">Dashboard</h1> */}
-
+    <div className="p-6 bg-black min-h-screen overflow-y-auto scrollbar-hide">
       {/* Top Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        <StatCard title="Total Orders (Today)" value="128" icon="🧾" />
-        <StatCard title="Total Revenue (Today)" value="₹24,500" icon="💰" />
-        <StatCard title="Avg Order Value" value="₹191" icon="📈" />
-        <StatCard title="Active Orders" value="12" icon="⏱" />
+        <StatCard
+          title="Total Orders (Today)"
+          value={dashboard.totalOrders}
+          icon="🧾"
+        />
+
+        <StatCard
+          title="Total Revenue (Today)"
+          value={`₹${dashboard.totalRevenue.toLocaleString()}`}
+          icon="💰"
+        />
+
+        <StatCard
+          title="Avg Order Value"
+          value={`₹${dashboard.avgOrderValue.toLocaleString()}`}
+          icon="📈"
+        />
+
+        <StatCard
+          title="Active Orders"
+          value={dashboard.activeOrders}
+          icon="⏱"
+        />
       </div>
 
-
-      {/* Middle Section */}
+      {/* Middle */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-8">
-        <div className="lg:col-span-2 ">
+        <div className="lg:col-span-2">
           <OrdersTrend />
         </div>
 
-
         <div className="space-y-4">
-          <StatusCard label="Preparing" count="8" color="border-yellow-500" />
-          <StatusCard label="Completed" count="110" color="border-green-500" />
-          <StatusCard label="Cancelled" count="10" color="border-red-500" />
+          <StatusCard
+            label="Preparing"
+            count={dashboard.preparing}
+            color="border-yellow-500"
+          />
+
+          <StatusCard
+            label="Completed"
+            count={dashboard.completed}
+            color="border-green-500"
+          />
+
+          <StatusCard
+            label="Cancelled"
+            count={dashboard.cancelled}
+            color="border-red-500"
+          />
         </div>
       </div>
 
-
       {/* Recent Orders */}
       <div className="mt-10 bg-neutral-900 rounded-2xl p-6">
-        <h3 className="text-white font-semibold mb-4">Last 7 Orders</h3>
+        <h3 className="text-white font-semibold mb-4">
+          Last 7 Orders
+        </h3>
+
         <div className="space-y-3">
-          {recentOrders && recentOrders.map((order) => (
+          {dashboard.recentOrders.map((order) => (
             <div
-              key={order.id}
+              key={order._id}
               className="flex items-center justify-between p-3 rounded-xl bg-neutral-800 hover:bg-neutral-700 transition"
             >
               <div>
-                <p className="text-white font-medium">{order.id}</p>
-                <p className="text-sm text-gray-400">{order.table}</p>
+                <p className="text-white font-medium">
+                  #{order._id.slice(-6).toUpperCase()}
+                </p>
+
+                <p className="text-sm text-gray-400">
+                  {order.table?.tableNumber
+                    ? `Table ${order.table.tableNumber}`
+                    : "Online"}
+                </p>
               </div>
+
               <div className="text-right">
-                <p className="text-white">{order.amount}</p>
-                <span className={`text-xs font-semibold ${order.status === 'Completed'
-                  ? 'text-green-400'
-                  : order.status === 'Preparing'
-                    ? 'text-yellow-400'
-                    : 'text-red-400'
-                  }`}>
+                <p className="text-white">
+                  ₹{order.totalAmount}
+                </p>
+
+                <span
+                  className={`text-xs font-semibold capitalize ${
+                    order.status === "completed"
+                      ? "text-green-400"
+                      : order.status === "preparing"
+                      ? "text-yellow-400"
+                      : order.status === "pending"
+                      ? "text-blue-400"
+                      : order.status === "served"
+                      ? "text-purple-400"
+                      : "text-red-400"
+                  }`}
+                >
                   {order.status}
                 </span>
               </div>
@@ -84,7 +179,7 @@ const OwnerDashboard = () => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default OwnerDashboard
+export default OwnerDashboard;

@@ -8,6 +8,7 @@ import {getOrderThunk} from '../redux/thunks/ordersThunk'
 import {getBillThunk} from '../redux/thunks/billThunk'
 import { getTableThunk } from "../redux/thunks/tableThunk";
 import { toast } from "react-toastify";
+import {addTodayOrder} from '../redux/features/owner/restaurantSlice'
 
 const OwnerLayout = ({ children }) => {
  const dispatch = useDispatch()
@@ -24,6 +25,7 @@ const OwnerLayout = ({ children }) => {
             dispatch(getOrderThunk(orderId))
             dispatch(getBillThunk(billId))
             dispatch(getTableThunk(tableId))
+            dispatch(addTodayOrder());
             toast.success("new order is add.");
             // show toast / play sound / update UI
           });

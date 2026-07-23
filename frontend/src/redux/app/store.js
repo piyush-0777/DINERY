@@ -17,6 +17,7 @@ import analysisreducer from '../features/analysis/analysisSlice'
 import loadanalysisreducer from '../features/analysis/loadAnalysisSlice'
 import reportreducer from '../features/report/reportSlice'
 import loadreportreducer from '../features/report/loadReportSlice'
+import loadsettingreducer from '../features/owner/settingLoadSlice'
 
 export const store = configureStore({
     reducer: {
@@ -38,5 +39,6 @@ export const store = configureStore({
         loadAnalysis: loadanalysisreducer ,
         report: reportreducer ,
         loadReport : loadreportreducer,
+        loadsetting:loadsettingreducer,
     }
 });

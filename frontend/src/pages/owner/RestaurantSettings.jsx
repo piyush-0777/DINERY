@@ -44,17 +44,7 @@ const RestaurantSettings = () => {
           <ChangePasswordCard />
         </motion.div>
 
-        {/* Bottom Save Button */}
-        <div className="sticky bottom-0 mt-10 py-5 bg-gradient-to-t from-[#0B0B0B] via-[#0B0B0B] to-transparent">
-          <div className="flex justify-end">
-            <SaveButton
-              onClick={() => {
-                console.log("Save Restaurant Settings");
-                // Dispatch updateRestaurant thunk here
-              }}
-            />
-          </div>
-        </div>
+        
       </div>
     </div>
   );

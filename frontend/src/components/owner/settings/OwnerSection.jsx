@@ -1,7 +1,95 @@
-import { User, Phone, Mail } from "lucide-react";
+import { useEffect, useState } from "react";
+import {
+  User,
+  Phone,
+  Mail,
+  Pencil,
+  Save,
+  X,
+  LoaderCircle,
+} from "lucide-react";
+import { useDispatch, useSelector } from "react-redux";
+import { toast } from "react-toastify";
+
 import SettingsCard from "./SettingsCard";
+import { updateOwnerInformation } from "../../../redux/thunks/settingThunk.js";
+import { resetSettingLoadState } from "../../../redux/features/owner/settingLoadSlice.js";
 
 export default function OwnerSection({ restaurant }) {
+  const dispatch = useDispatch();
+
+  const { loading, success, error, reqtype } = useSelector(
+    (state) => state.loadsetting
+  );
+
+  const [isEditing, setIsEditing] = useState(false);
+
+  const [formData, setFormData] = useState({
+    ownerName: "",
+    ownerPhone: "",
+    ownerEmail: "",
+  });
+
+  useEffect(() => {
+    if (restaurant) {
+      setFormData({
+        ownerName: restaurant.ownerName || "",
+        ownerPhone: restaurant.ownerPhone || "",
+        ownerEmail: restaurant.ownerEmail || "",
+      });
+    }
+  }, [restaurant]);
+
+  useEffect(() => {
+    if (reqtype !== "updateOwnerInformation") return;
+
+    if (success) {
+      toast.success("Owner information updated successfully.");
+      setIsEditing(false);
+      dispatch(resetSettingLoadState());
+    }
+
+    if (error) {
+      toast.error(error);
+      dispatch(resetSettingLoadState());
+    }
+  }, [success, error, reqtype, dispatch]);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleCancel = () => {
+    setFormData({
+      ownerName: restaurant.ownerName,
+      ownerPhone: restaurant.ownerPhone,
+      ownerEmail: restaurant.ownerEmail,
+    });
+
+    setIsEditing(false);
+  };
+
+  const handleSave = () => {
+    if (!formData.ownerName.trim()) {
+      return toast.error("Owner name is required.");
+    }
+
+    if (!formData.ownerPhone.trim()) {
+      return toast.error("Phone number is required.");
+    }
+
+    if (!formData.ownerEmail.trim()) {
+      return toast.error("Email is required.");
+    }
+
+    dispatch(updateOwnerInformation(formData));
+  };
+
   return (
     <SettingsCard
       title="Owner Information"
@@ -21,8 +109,15 @@ export default function OwnerSection({ restaurant }) {
             />
 
             <input
-              defaultValue={restaurant?.ownerName}
-              className="w-full pl-11 bg-zinc-950 border border-zinc-700 rounded-xl px-4 py-3 text-white outline-none focus:border-orange-500 transition"
+              name="ownerName"
+              value={formData.ownerName}
+              onChange={handleChange}
+              disabled={!isEditing}
+              className={`w-full pl-11 rounded-xl px-4 py-3 border transition ${
+                isEditing
+                  ? "bg-zinc-950 border-zinc-700 focus:border-orange-500 text-white"
+                  : "bg-zinc-900 border-zinc-800 text-zinc-400 cursor-not-allowed"
+              }`}
             />
           </div>
         </div>
@@ -40,14 +135,21 @@ export default function OwnerSection({ restaurant }) {
             />
 
             <input
-              defaultValue={restaurant?.ownerPhone}
-              className="w-full pl-11 bg-zinc-950 border border-zinc-700 rounded-xl px-4 py-3 text-white outline-none focus:border-orange-500 transition"
+              name="ownerPhone"
+              value={formData.ownerPhone}
+              onChange={handleChange}
+              disabled={!isEditing}
+              className={`w-full pl-11 rounded-xl px-4 py-3 border transition ${
+                isEditing
+                  ? "bg-zinc-950 border-zinc-700 focus:border-orange-500 text-white"
+                  : "bg-zinc-900 border-zinc-800 text-zinc-400 cursor-not-allowed"
+              }`}
             />
           </div>
         </div>
 
         {/* Email */}
-        <div className="md:col-span-2 lg:col-span-1">
+        <div>
           <label className="block text-zinc-400 mb-2 text-sm">
             Email Address
           </label>
@@ -60,11 +162,59 @@ export default function OwnerSection({ restaurant }) {
 
             <input
               type="email"
-              defaultValue={restaurant?.ownerEmail}
-              className="w-full pl-11 bg-zinc-950 border border-zinc-700 rounded-xl px-4 py-3 text-white outline-none focus:border-orange-500 transition"
+              name="ownerEmail"
+              value={formData.ownerEmail}
+              onChange={handleChange}
+              disabled={!isEditing}
+              className={`w-full pl-11 rounded-xl px-4 py-3 border transition ${
+                isEditing
+                  ? "bg-zinc-950 border-zinc-700 focus:border-orange-500 text-white"
+                  : "bg-zinc-900 border-zinc-800 text-zinc-400 cursor-not-allowed"
+              }`}
             />
           </div>
         </div>
+      </div>
+
+      <div className="flex justify-end gap-3 mt-8">
+        {!isEditing ? (
+          <button
+            onClick={() => setIsEditing(true)}
+            className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white px-5 py-3 rounded-xl transition"
+          >
+            <Pencil size={18} />
+            Edit
+          </button>
+        ) : (
+          <>
+            <button
+              onClick={handleCancel}
+              disabled={loading && reqtype === "updateOwnerInformation"}
+              className="flex items-center gap-2 border border-zinc-700 hover:bg-zinc-800 text-white px-5 py-3 rounded-xl transition"
+            >
+              <X size={18} />
+              Cancel
+            </button>
+
+            <button
+              onClick={handleSave}
+              disabled={loading && reqtype === "updateOwnerInformation"}
+              className="flex items-center justify-center gap-2 bg-orange-500 hover:bg-orange-600 disabled:opacity-60 disabled:cursor-not-allowed text-white px-5 py-3 rounded-xl transition min-w-[170px]"
+            >
+              {loading && reqtype === "updateOwnerInformation" ? (
+                <>
+                  <LoaderCircle size={18} className="animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                <>
+                  <Save size={18} />
+                  Save Changes
+                </>
+              )}
+            </button>
+          </>
+        )}
       </div>
     </SettingsCard>
   );

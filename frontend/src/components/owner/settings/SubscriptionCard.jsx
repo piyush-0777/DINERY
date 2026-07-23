@@ -1,7 +1,9 @@
 import { Crown, CheckCircle2, Star } from "lucide-react";
 import SettingsCard from "./SettingsCard";
+import { useNavigate } from "react-router-dom";
 
 export default function SubscriptionCard({ restaurant }) {
+  const navigate = useNavigate()
   const isPremium = restaurant?.isPremium;
 
   const activatedDate = restaurant?.premiumActivatedAt
@@ -11,6 +13,11 @@ export default function SubscriptionCard({ restaurant }) {
         year: "numeric",
       })
     : null;
+
+
+    const goToUpgradePremiumPage = () =>{
+     navigate(`/owner/getpremium`);
+    }
 
   return (
     <SettingsCard
@@ -58,7 +65,9 @@ export default function SubscriptionCard({ restaurant }) {
 
           {/* Right */}
           {!isPremium && (
-            <button className="bg-gradient-to-r from-orange-500 to-red-500 hover:opacity-90 text-white px-6 py-3 rounded-xl font-semibold transition">
+            <button 
+            onClick={goToUpgradePremiumPage}
+            className="bg-gradient-to-r from-orange-500 to-red-500 hover:opacity-90 text-white px-6 py-3 rounded-xl font-semibold transition">
               Upgrade to Premium
             </button>
           )}

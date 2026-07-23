@@ -71,6 +71,7 @@ exports.editCategory = async (req , res) => {
           // multer-storage-cloudinary already uploaded it
           category.image = req.file.path;        // secure_url
           category.publicId = req.file.filename; // public_id
+          category.save();
         }
    res.status(200).json({
       status: "success",

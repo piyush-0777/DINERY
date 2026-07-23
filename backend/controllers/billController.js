@@ -22,7 +22,9 @@ exports.BillCashPayment = async (req , res) => {
     const billId = req.params.billId;
     const tableId = req.params.tableId;
       const {customerId} = req.body;
+      
     const {bill , table} = await billService.cashBillPayment(billId , tableId , restaurant)
+
       sendBillStatusUpdateNotificationToCustomer(customerId ,billId , bill.paymentStatus)
     res.status(200).json({
       message:'payment is seccessfuly payed',
