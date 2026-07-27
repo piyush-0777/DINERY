@@ -35,13 +35,14 @@ exports.login = async (req, res) => {
     const token = jwt.sign({ ownerEmail }, process.env.JWT_SECRET_KEY, { expiresIn: "48h" })
 
 
-    res.cookie("token", token, {
-      httpOnly: true,
-      secure: false, // set true in production (HTTPS)
-      sameSite: "lax",
-      maxAge: 48 * 60 * 60 * 1000 // 48 hour
+   const isProduction = process.env.NODE_ENV === "production";
 
-    })
+res.cookie("token", token, {
+  httpOnly: true,
+  secure: isProduction,
+  sameSite: isProduction ? "none" : "lax",
+  maxAge: 48 * 60 * 60 * 1000,
+});
 
 
 

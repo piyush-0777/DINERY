@@ -3,7 +3,7 @@ import { ownerService } from "../../services/ownerService";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 
 
-export const loadDashbordThunk = createAsyncThunk('loadDashbordThunk', async (data , thunkAPI)=>{
+export const loadDashbordThunk = createAsyncThunk('loadDashbordThunk', async (data , thundkAPI)=>{
     try {
         const res = await ownerService.getRestaurantDashboard(data) 
         console.log(res)
