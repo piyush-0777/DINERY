@@ -7,7 +7,7 @@ let socket = null;
 export const connectSocket = ({ role, restaurantId, customerId  }) => {
 
   if (socket) return socket; // already connected
-  console.log(socketUrl)
+  console.log('socket url ' , socketUrl)
   socket = io(socketUrl , {
     auth: {
       role,

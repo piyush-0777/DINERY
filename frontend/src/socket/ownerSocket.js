@@ -1,11 +1,12 @@
 import { io } from "socket.io-client";
 
 let socket = null;
+const socketUrl = import.meta.env.VITE_SOCKET_URL;
 
 export const connectSocket = ({ role, restaurantId,  }) => {
   if (socket) return socket; // already connected
-
-  socket = io("http://localhost:3000", {
+  console.log('socket url ' , socketUrl)
+  socket = io(socketUrl, {
     auth: {
       role,
       restaurantId,
