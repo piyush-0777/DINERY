@@ -211,6 +211,10 @@ const HeroContent = () => {
           }}
           className="group flex items-center gap-3 rounded-xl bg-orange-500 px-8 py-4 font-semibold text-white shadow-xl shadow-orange-500/20 transition-all duration-300 hover:bg-orange-600"
         >
+          <Link
+            to="/register"
+            className="flex items-center gap-3 rounded-xl border border-orange-500/40 px-8 py-4 font-semibold text-orange-300 transition-all duration-300 hover:bg-orange-500 hover:text-white"
+          ></Link>
           Get Started
 
           <ArrowRight
