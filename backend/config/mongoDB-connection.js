@@ -9,7 +9,7 @@ mongoose.connect(`${url}/dinerydata`)
     console.log(mongoose.connection.name);
 })
 .catch((e)=>{
-    console.log('mongoDB connection error' , e)
+    console.log('mongoDB connection error', `${url}/dinerydata` , e)
 })
 
 module.exports = mongoose.connection;
