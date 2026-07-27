@@ -22,7 +22,7 @@ const RestaurantSchema = mongoose.Schema({
     profileImg: {
         type: String
     },
-    publicId:{type:String , required: true},
+    publicId:{type:String},
     ownerPhone: {
         type: String,
         required: true
