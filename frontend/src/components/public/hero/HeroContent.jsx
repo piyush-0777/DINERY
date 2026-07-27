@@ -214,13 +214,14 @@ const HeroContent = () => {
           <Link
             to="/register"
             className="flex items-center gap-3 rounded-xl border border-orange-500/40 px-8 py-4 font-semibold text-orange-300 transition-all duration-300 hover:bg-orange-500 hover:text-white"
-          ></Link>
+          >
           Get Started
 
           <ArrowRight
             size={20}
             className="transition-transform duration-300 group-hover:translate-x-1"
           />
+          </Link>
         </motion.button>
 
         <motion.button
