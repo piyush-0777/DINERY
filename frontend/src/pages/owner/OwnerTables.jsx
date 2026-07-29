@@ -4,7 +4,6 @@ import { useState } from "react";
 import TableCard from "../../components/owner/table/TableCard";
 import TableDetailsModal from "../../components/owner/table/TableDetailsModal";
 import QRPopup from "../../components/owner/table/QRPopup";
-import MergeSplitModal from "../../components/owner/table/MergeSplitModal";
 import AddTableModal from "../../components/owner/table/AddTableModal"
 import OrderDetailModal from "../../components/owner/order/OrderDetailModal";
 
@@ -24,7 +23,6 @@ export default function TablesPage() {
 
   const [selectedTable, setSelectedTable] = useState(null);
   const [qrImage, setQrImage] = useState(null);
-  const [showMergeModal, setShowMergeModal] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [selectedOrder , setSelectedOrder] = useState();
 
@@ -67,16 +65,7 @@ export default function TablesPage() {
             ➕ Add Table
           </button>
 
-          {/* Merge / Split */}
-          <button
-            onClick={() => setShowMergeModal(true)}
-            className="px-4 py-2 rounded-xl
-                 bg-neutral-900 text-white
-                 hover:bg-neutral-800
-                 hover:scale-105 transition"
-          >
-            🔀 Merge / Split
-          </button>
+          
         </div>
       </div>
       {/* Table Grid */}
@@ -103,12 +92,7 @@ export default function TablesPage() {
         onClose={() => setQrImage(null)}
       />
 
-      {showMergeModal && (
-        <MergeSplitModal
-          tables={tables}
-          onClose={() => setShowMergeModal(false)}
-        />
-      )}
+
       {showAddModal && (
   <AddTableModal
     onAdd={handleAddTable}

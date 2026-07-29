@@ -1,9 +1,8 @@
 import { Link } from "react-router-dom";
-import PublicLayout from "../../layouts/PublicLayout";
 
 const About = () => {
   return (
-    <PublicLayout>
+    
       <section className="bg-black text-white py-24">
         <div className="max-w-6xl mx-auto px-6">
 
@@ -135,7 +134,6 @@ const About = () => {
 
         </div>
       </section>
-    </PublicLayout>
   );
 };
 

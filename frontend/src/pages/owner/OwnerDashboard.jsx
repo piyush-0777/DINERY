@@ -1,8 +1,8 @@
 import React, { useMemo } from "react";
 import { useSelector } from "react-redux";
-import { StatCard } from "../../components/owner/StatCard";
-import { StatusCard } from "../../components/owner/StatusCard";
-import { OrdersTrend } from "../../components/owner/OrdersTrend";
+import { StatCard } from "../../components/owner/dashboard/StatCard";
+import { StatusCard } from "../../components/owner/dashboard/StatusCard";
+import { OrdersTrend } from "../../components/owner/dashboard/OrdersTrend";
 
 const OwnerDashboard = () => {
   const { list = [] } = useSelector((state) => state.orders);
