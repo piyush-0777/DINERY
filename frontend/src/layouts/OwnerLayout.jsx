@@ -2,7 +2,7 @@ import { Outlet } from "react-router-dom";
 import { getSocket } from "../consfig/socket";
 import { useEffect } from "react";
 // import Sidebar from "../components/common/Sidebar";
-import Navbar from "../components/owner/Navbar"
+import Navbar from "../components/owner/common/Navbar"
 import {useSelector , useDispatch} from 'react-redux'
 import {getOrderThunk} from '../redux/thunks/ordersThunk'
 import {getBillThunk} from '../redux/thunks/billThunk'

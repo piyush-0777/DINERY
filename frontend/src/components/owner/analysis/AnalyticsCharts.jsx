@@ -5,27 +5,7 @@ import {
 
 import {useSelector} from 'react-redux'
 
-const ordersData = [
-  { name: "Mon", orders: 40 },
-  { name: "Tue", orders: 55 },
-  { name: "Wed", orders: 30 },
-  { name: "Thu", orders: 70 },
-  { name: "Fri", orders: 90 },
-];
 
-const revenueData = [
-  { name: "Mon", revenue: 4000 },
-  { name: "Tue", revenue: 6500 },
-  { name: "Wed", revenue: 3000 },
-  { name: "Thu", revenue: 8500 },
-  { name: "Fri", revenue: 10000 },
-];
-
-const topItems = [
-  { name: "Pizza", sales: 120 },
-  { name: "Burger", sales: 90 },
-  { name: "Pasta", sales: 70 },
-];
 
 const orderType = [
   { name: "Dine-in", value: 70 },
@@ -36,7 +16,6 @@ const COLORS = ["#EAB308", "#444"];
 
 const AnalyticsCharts = () => {
   const data = useSelector((s) => s.analysis)
-  console.log('analisis data',data)
   return (
     <div className="grid md:grid-cols-2 gap-8 mt-8">
 

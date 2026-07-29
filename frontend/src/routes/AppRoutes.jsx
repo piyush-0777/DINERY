@@ -7,7 +7,6 @@ import CustomerLogin from "../pages/customer/CustomerLogin"
  import OwnerRoutes from "./OwnerRoutes";
  import CustomerRoutes from "./CustomerRoutes";
 import { ToastContainer } from "react-toastify";
-import PublicLayout from "../layouts/PublicLayout";
 import Home from "../pages/public/Home";
 import About from "../pages/public/About";
 import Login from "../pages/auth/Login";
