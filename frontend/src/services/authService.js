@@ -10,6 +10,14 @@ export const authService = {
   restaurantRegister: (data) =>
     request("/restaurant/registerRestaurant", "POST", data),
 
+
+  sendOTP: ( restaurantName, ownerEmail) =>
+    request("/restaurant/otp", "POST", { restaurantName , ownerEmail }),
+
+  // Verify OTP
+  verifyOTP: (ownerEmail, otp) =>
+    request("/restaurant/verifyOTP", "POST", { ownerEmail, otp }),
+
   logout: () =>
     request("/auth/logout", "POST"),
 };

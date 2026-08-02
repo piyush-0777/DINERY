@@ -18,6 +18,7 @@ import loadanalysisreducer from '../features/analysis/loadAnalysisSlice'
 import reportreducer from '../features/report/reportSlice'
 import loadreportreducer from '../features/report/loadReportSlice'
 import loadsettingreducer from '../features/owner/settingLoadSlice'
+import otpreducer from '../features/owner/otpSlice'
 
 export const store = configureStore({
     reducer: {
@@ -40,5 +41,6 @@ export const store = configureStore({
         report: reportreducer ,
         loadReport : loadreportreducer,
         loadsetting:loadsettingreducer,
+        otp:otpreducer,
     }
 });

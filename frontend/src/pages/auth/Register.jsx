@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { registerRestaurnatThunk } from "../../redux/thunks/authThunk"
 import {toast} from "react-toastify"
 import {useNavigate} from "react-router-dom"
+import { sendOTP, verifyOTP } from "../../redux/thunks/otpThunk";
 
 
 
@@ -12,6 +13,12 @@ import {useNavigate} from "react-router-dom"
 const Register = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate()
+  const {
+  loading: otpLoading,
+  verified,
+  error: otpError,
+  success: otpSuccess,
+} = useSelector((state) => state.otp);
   // state for hendel otp
   const [showOtp, setShowOtp] = useState(false);
  const [otpVerified, setOtpVerified] = useState(false);
@@ -26,6 +33,9 @@ const Register = () => {
       toast.error(error.message);
     }
   }, [error]);
+
+
+
 
   useEffect(() => {
     if (success) {
@@ -42,45 +52,73 @@ const Register = () => {
   } = useForm();
 
   // STEP 1: Get OTP
-  const handleGetOtp = () => {
-    const { ownerEmail, ownerPhone } = getValues();
+const handleGetOtp = async () => {
+  const { restaurantName, ownerEmail, ownerPhone } = getValues();
 
-    if (!ownerEmail || !ownerPhone) {
-      alert("Please enter email and phone number first");
-      return;
-    }
+  if (!restaurantName) {
+    toast.error("Restaurant name is required");
+    return;
+  }
 
-    // call SEND OTP API
-    console.log("Sending OTP to:", ownerEmail, ownerPhone);
+  if (!ownerEmail) {
+    toast.error("Email is required");
+    return;
+  }
 
+  if (!ownerPhone) {
+    toast.error("Phone number is required");
+    return;
+  }
+
+  const result = await dispatch(
+    sendOTP({
+      restaurantName,
+      ownerEmail,
+    })
+  );
+
+  if (sendOTP.fulfilled.match(result)) {
+    toast.success(result.payload.message);
     setShowOtp(true);
-  };
+  } else {
+    toast.error(result.payload?.message || "Failed to send OTP");
+  }
+};
 
 
   // handle verify otp
   const handleVerifyOtp = async () => {
-    const { otp } = getValues();
+  const { ownerEmail, otp } = getValues();
 
-    if (!otp) {
-      alert("Please enter OTP");
-      return;
-    }
+  if (!otp) {
+    toast.error("Please enter OTP");
+    return;
+  }
 
-    setVerifyingOtp(true);
+  const result = await dispatch(
+    verifyOTP({
+      email: ownerEmail,
+      otp,
+    })
+  );
 
-    // 🔥 call VERIFY OTP API here
-    console.log("Verifying OTP:", otp);
-
-    // mock success
-    setTimeout(() => {
-      setOtpVerified(true);
-      setVerifyingOtp(false);
-    }, 1000);
-  };
-
+  if (verifyOTP.fulfilled.match(result)) {
+    toast.success(result.payload.data.message);
+    console.log(result.payload)
+    setOtpVerified(true);
+  } else {
+    console.log(result.payload)
+    toast.error(result.payload?.data.message || "OTP verification failed");
+  }
+};
 
   // STEP 2: Submit Registration
   const onSubmit = async (data) => {
+
+      if (!verified) {
+    toast.error("Please verify your OTP first.");
+    return;
+  }
 
     // TODO: call register API with OTP verification
     console.log("Register Data:", data);
@@ -181,19 +219,19 @@ const Register = () => {
                     placeholder="Enter OTP"
                     {...register("otp", { required: true })}
                     className="input flex-1 border-yellow-500"
-                    disabled={otpVerified}
+                    disabled={verified}
                   />
 
-                  {!otpVerified ? (
+                  {!verified ? (
                     <button
                       type="button"
                       onClick={handleVerifyOtp}
-                      disabled={verifyingOtp}
+                      disabled={otpLoading}
                       className="px-4 bg-zinc-800 border border-zinc-700
                    rounded-lg hover:border-green-500 hover:text-green-500
                    transition disabled:opacity-50"
                     >
-                      {verifyingOtp ? "Verifying..." : "Verify OTP"}
+                      {otpLoading ? "Verifying..." : "Verify OTP"}
                     </button>
                   ) : (
                     <span className="px-4 flex items-center text-green-500 font-semibold">
@@ -208,17 +246,18 @@ const Register = () => {
                 <button
                   type="button"
                   onClick={handleGetOtp}
+                  disabled={otpLoading}
                   className="w-full py-3 bg-zinc-800 text-white font-semibold
                              rounded-lg border border-zinc-700
                              hover:border-yellow-500 hover:text-yellow-500
                              transition-all duration-300"
                 >
-                  Get OTP
+                  {otpLoading ? "Sending..." : "Get OTP"}
                 </button>
               ) : (
                 <button
                   type="submit"
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || !verified}
                   className="w-full py-3 bg-zinc-800 text-white font-semibold
                              rounded-lg border border-zinc-700
                              hover:border-green-500 hover:text-green-500
