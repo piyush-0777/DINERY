@@ -84,6 +84,13 @@ exports.registerRestaurant = async (req, res) => {
       });
     }
 
+    const existingResName = await Restaurant.findOne({restaurantName})
+    if (existingResName) {
+      return res.status(409).json({
+        error: "restaurant is already exit.."
+      })
+    }
+
     // 3. Hash password
     const hashedPassword = await hashPasswordGenerater(password);
 
@@ -164,3 +171,5 @@ exports.getDashBord = async (req, res) => {
     return res.status(500).json({ error: "server error" })
   }
 }
+
+
