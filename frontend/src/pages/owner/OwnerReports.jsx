@@ -1,51 +1,56 @@
-import ReportCard from "../../components/owner/report/ReportCard";
-import ReportTable from "../../components/owner/report/ReportTable";
-import { useState, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-
+import React ,{ useState, useEffect } from "react";
+import { useSelector } from "react-redux";
 import {
-  fetchCustomerReportThunk,
-  fetchDailySaleReportThunk,
-  fetchGSTReportThunk,
-  fetchMonthlyRevenueReportThunk,
-} from "../../redux/thunks/reportThunk";
+  ReportCard,
+  ReportTable,
+  useFetchCustomerReport,
+  useFetchDailySaleReport,
+  useFetchGSTReport,
+  useFetchMonthlyRevenueReport,
+} from "../../features/reports";
+import { toast } from "react-toastify";
 
 const ReportsPage = () => {
-
-  const dispatch = useDispatch();
-
+  const fetchCustomerReport = useFetchCustomerReport();
+  const fetchDailySaleReport = useFetchDailySaleReport();
+  const fetchGSTReport = useFetchGSTReport();
+  const fetchMonthlyRevenueReport = useFetchMonthlyRevenueReport();
   const [dateFilter, setDateFilter] = useState("Today");
 
   // ✅ data store
-  const {
-    customer,
-    dailySale,
-    gst,
-    monthlyRevenue,
-  } = useSelector((state) => state.report);
-  console.log( {
-    customer,
-    dailySale,
-    gst,
-    monthlyRevenue,
-  });
+  const { customer, dailySale, gst, monthlyRevenue } = useSelector(
+    (state) => state.report,
+  );
+  // console.log( {
+  //   customer,
+  //   dailySale,
+  //   gst,
+  //   monthlyRevenue,
+  // });
 
   // ✅ loading store
-  const { loading, reqtype , error } = useSelector((state) => state.loadReport);
-  console.log({ loading, reqtype , error })
-
+  const loading =
+    fetchCustomerReport.loading ||
+    fetchDailySaleReport.loading ||
+    fetchGSTReport.loading ||
+    fetchMonthlyRevenueReport.loading;
 
   // =======================
   // API CALL
   // =======================
   useEffect(() => {
-    console.log('i am collad')
-    dispatch(fetchCustomerReportThunk());
-    dispatch(fetchDailySaleReportThunk());
-    dispatch(fetchGSTReportThunk());
-    dispatch(fetchMonthlyRevenueReportThunk());
+    const loadData = async () => {
+      try {
+        await fetchCustomerReport.fetchCustomerReport();
+        await fetchDailySaleReport.fetchDailySaleReport();
+        await fetchGSTReport.fetchGSTReport();
+        await fetchMonthlyRevenueReport.fetchMonthlyRevenueReport();
+      } catch (error) {
+        toast.error(error?.message || "Failed to load analytics");
+      }
+    };
+    loadData();
   }, []);
-
 
   // =======================
   // FORMAT DATA
@@ -73,38 +78,50 @@ const ReportsPage = () => {
     Bill: `₹ ${item.billPrice}`,
   }));
 
-
   // =======================
   // SUMMARY
   // =======================
 
   const totalRevenue = monthlyRevenue.reduce(
     (sum, item) => sum + (item.totalrevenu || 0),
-    0
+    0,
   );
 
   const totalGST = gst.reduce(
     (sum, item) => sum + (item.gst_collected || 0),
-    0
+    0,
   );
 
   const totalOrders = dailySale.reduce(
     (sum, item) => sum + (item.totalorder || 0),
-    0
+    0,
   );
-  if(loading == true) return (
-    <div><p>loadinng.....</p></div>
-  )
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#070707] text-white p-8">
+        <div className="animate-pulse space-y-8">
+          <div className="h-10 w-60 bg-neutral-800 rounded-lg"></div>
 
+          <div className="grid lg:grid-cols-4 md:grid-cols-2 gap-6">
+            {[1, 2, 3].map((i) => (
+              <div
+                key={i}
+                className="h-36 rounded-2xl bg-neutral-900 border border-neutral-800"
+              />
+            ))}
+          </div>
+
+          <div className="h-[450px] rounded-3xl bg-neutral-900 border border-neutral-800"></div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-black text-white p-8">
-
       {/* Header */}
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-semibold text-yellow-400">
-          Reports
-        </h1>
+        <h1 className="text-3xl font-semibold text-yellow-400">Reports</h1>
 
         <select
           value={dateFilter}
@@ -123,7 +140,7 @@ const ReportsPage = () => {
       {/* 🔥 GLOBAL LOADING */}
       {loading && (
         <div className="text-center text-yellow-400 mt-4">
-          Loading {reqtype} report...
+          Loading report...
         </div>
       )}
 
@@ -137,30 +154,32 @@ const ReportsPage = () => {
 
       {/* Tables */}
       <div className="space-y-8 mt-10">
-
         {/* Daily Sale */}
-        {loading && reqtype === "dailySale" ? (
+        {fetchDailySaleReport.loading === true ? (
           <p className="text-yellow-400">Loading Daily Sales...</p>
         ) : (
           <ReportTable title="Daily Sales Report" data={dailySales} />
         )}
 
         {/* Monthly Revenue */}
-        {loading && reqtype === "monthlyRevenue" ? (
+        {fetchMonthlyRevenueReport.loading === true ? (
           <p className="text-yellow-400">Loading Monthly Revenue...</p>
         ) : (
-          <ReportTable title="Monthly Revenue Report" data={monthlyRevenueData} />
+          <ReportTable
+            title="Monthly Revenue Report"
+            data={monthlyRevenueData}
+          />
         )}
 
         {/* GST */}
-        {loading && reqtype === "gst" ? (
+        {fetchGSTReport.loading === true ? (
           <p className="text-yellow-400">Loading GST Report...</p>
         ) : (
           <ReportTable title="GST Report" data={gstReport} />
         )}
 
         {/* Customer */}
-        {loading && reqtype === "customer" ? (
+        {fetchCustomerReport.loading === true ? (
           <p className="text-yellow-400">Loading Customer Report...</p>
         ) : (
           <ReportTable title="Customer Report" data={customerReport} />
@@ -168,9 +187,7 @@ const ReportsPage = () => {
 
         {/* Cancelled */}
         <ReportTable title="Cancelled Orders Report" data={[]} />
-
       </div>
-
     </div>
   );
 };

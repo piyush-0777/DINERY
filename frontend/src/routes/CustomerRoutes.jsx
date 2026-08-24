@@ -9,11 +9,12 @@ import DashboardSkeleton from "../components/ui/DashboardSkeleton";
 import InvalidSession from "../pages/customer/InvalidSession"; // Create this page
 import useSocket from "../hooks/useSocket";
 import { useSelector , useDispatch } from "react-redux";
-import { LoadCustomerDashbord } from "../redux/thunks/customerThunk";
+
+import {useLoadCustomerDashbord} from '../features/customer'
 
 const CustomerRoutes = () => {
   const token = localStorage.getItem("token");
-  console.log(token);
+  const loadCustomerDashbord = useLoadCustomerDashbord();
    if (!token) {
     return <Navigate to="/customer/invalid-session" replace />;
   }
@@ -23,18 +24,19 @@ const CustomerRoutes = () => {
   const [connectSocket, setConnectSocket] = useState(false);
  const {  restaurantName } = useParams();
  useSocket(connectSocket);
-console.log(connectSocket)
 
 useEffect(() => {
   const load = async () => {
-    const result = await dispatch(
-      LoadCustomerDashbord({ restaurantName, token })
-    );
 
-    if (LoadCustomerDashbord.fulfilled.match(result)) {
+    try {
+      const result = await loadCustomerDashbord.loadCustomerDashbord({
+        restaurantName,
+        token,
+      });
       console.log('loadreq is dun')
       setConnectSocket(true);
-    } else {
+    } catch (error) {
+      console.error('Error loading customer dashboard:', error);
       navigate("/customer/invalid-session", { replace: true });
     }
   };
@@ -42,7 +44,7 @@ useEffect(() => {
   if (token) {
     load();
   }
-}, [dispatch, token, restaurantName]);
+}, [loadCustomerDashbord, token, restaurantName]);
   // No token -> don't even connect to customer pages
 
 
@@ -57,7 +59,7 @@ useEffect(() => {
           <Route path="CustomerOrderDeteal" element={<CustoemrOrder />} />
 
           {/* Invalid session page */}
-          
+          <Route path="invalid-session" element={<InvalidSession />} />
 
           {/* Unknown customer routes */}
           <Route

@@ -1,23 +1,25 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
-
 import {
-  fetchOrdersAnalyticsThunk,
-  fetchRevenueThunk,
-  fetchTopItemsThunk,
-} from "../../redux/thunks/analysisThunk";
-
-import AnalyticsCard from "../../components/owner/analysis/AnalyticsCard";
-import AnalyticsCharts from "../../components/owner/analysis/AnalyticsCharts";
+  AnalyticsCard,
+  AnalyticsCharts,
+  useFetchOrdereAnalytics,
+  useFetchRevenue,
+  useFetchTopItems,
+} from "../../features/analytics";
 
 const Analysis = () => {
-  const dispatch = useDispatch();
+  const fetchOrderAnalytics = useFetchOrdereAnalytics();
+  const fetchRevenu = useFetchRevenue();
+  const fetchTopItems = useFetchTopItems();
 
   const [option, setOption] = useState("week");
+  const [error, setError] = useState(null);
 
   const analysis = useSelector((state) => state.analysis);
-  const load = useSelector((state) => state.loadAnalysis);
+  const loading =
+    fetchOrderAnalytics.loading || fetchRevenu.loading || fetchTopItems.loading;
 
   const now = new Date();
 
@@ -29,35 +31,39 @@ const Analysis = () => {
   };
 
   useEffect(() => {
-    dispatch(fetchOrdersAnalyticsThunk(query));
-    dispatch(fetchRevenueThunk(query));
-    dispatch(fetchTopItemsThunk(query));
-  }, [dispatch, option]);
-
-  useEffect(() => {
-    if (load.error) {
-      toast.error(load.error || "Failed to load analytics");
-    }
-  }, [load.error]);
+    const loadData = async () => {
+      try {
+        await Promise.all([
+          fetchOrderAnalytics.fetchOrderAnalytics(query),
+          fetchRevenu.fetchRevenue(query),
+          fetchTopItems.fetchTopItems(query),
+        ]);
+      } catch (error) {
+        setError(error);
+        toast.error(error?.message || "Failed to load analytics");
+      }
+    };
+    loadData();
+  }, [option]);
 
   const totalOrders = useMemo(() => {
     return analysis.orders?.reduce(
       (sum, item) => sum + (item.totalOrder || 0),
-      0
+      0,
     );
   }, [analysis.orders]);
 
   const totalRevenue = useMemo(() => {
     return analysis.revenue?.reduce(
       (sum, item) => sum + (item.totalRevenue || 0),
-      0
+      0,
     );
   }, [analysis.revenue]);
 
   const averageOrderValue =
     totalOrders > 0 ? (totalRevenue / totalOrders).toFixed(2) : 0;
 
-  if (load.loading) {
+  if (loading) {
     return (
       <div className="min-h-screen bg-[#070707] text-white p-8">
         <div className="animate-pulse space-y-8">
@@ -78,7 +84,7 @@ const Analysis = () => {
     );
   }
 
-  if (load.error) {
+  if (error) {
     return (
       <div className="min-h-screen bg-[#070707] flex items-center justify-center p-5">
         <div className="bg-red-500/10 border border-red-500/30 rounded-3xl p-10 text-center max-w-md">
@@ -86,7 +92,9 @@ const Analysis = () => {
             Unable to load analytics
           </h2>
 
-          <p className="text-gray-400 mt-3">{load.error}</p>
+          <p className="text-gray-400 mt-3">
+            {error?.message || "Failed to load analytics"}
+          </p>
 
           <button
             onClick={() => window.location.reload()}
@@ -102,14 +110,10 @@ const Analysis = () => {
   return (
     <div className="min-h-screen bg-[#070707] text-white">
       <div className="max-w-7xl mx-auto p-8">
-
         {/* Header */}
         <div className="flex flex-col md:flex-row justify-between md:items-center gap-5">
-
           <div>
-            <h1 className="text-4xl font-bold">
-              Restaurant Analytics
-            </h1>
+            <h1 className="text-4xl font-bold">Restaurant Analytics</h1>
 
             <p className="text-neutral-400 mt-2">
               Monitor orders, revenue and business performance.
@@ -130,25 +134,20 @@ const Analysis = () => {
         {/* Cards */}
 
         <div className="grid lg:grid-cols-3 md:grid-cols-2 gap-6 mt-10">
-
-          <AnalyticsCard
-            title="Total Orders"
-            value={totalOrders}
-          />
+          <AnalyticsCard title="Total Orders" value={totalOrders} />
 
           <AnalyticsCard
             title="Total Revenue"
             value={`₹${totalRevenue.toLocaleString("en-IN", {
-    minimumFractionDigits: 4,
-    maximumFractionDigits: 4,
-  })}`}
+              minimumFractionDigits: 4,
+              maximumFractionDigits: 4,
+            })}`}
           />
 
           <AnalyticsCard
             title="Average Order"
             value={`₹${averageOrderValue}`}
           />
-
         </div>
 
         {/* Charts */}
@@ -156,7 +155,6 @@ const Analysis = () => {
         <div className="mt-10 rounded-3xl border border-neutral-800 bg-[#111] p-6">
           <AnalyticsCharts />
         </div>
-
       </div>
     </div>
   );
