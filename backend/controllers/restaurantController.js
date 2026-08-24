@@ -1,62 +1,33 @@
-const jwt = require('jsonwebtoken')
-const Restaurant = require('../models/restaurant-model')
-const bcrypt = require('bcrypt')
-const { hashPasswordGenerater, hashPasswordChecker } = require('../utils/hashPassword')
-const orderModel = require('../models/order-model')
-const generateQR = require('../utils/generateQR')
-const billModel = require('../models/bill-model')
-const tableService = require('../services/tableService')
-const foodService = require('../services/foodService')
-const categoryService = require('../services/categoryService')
-const orderService = require('../services/orderService')
-
-
+const restaurantService = require("../services/restaurantService");
+const { sendSuccess, sendError } = require("../utils/responseHandler");
 
 exports.login = async (req, res) => {
   try {
-
-    const { restaurantName, ownerName, ownerEmail, password } = req.body
-
-    // find user deteal using  resturnt model
-    const restaurant = await Restaurant.findOne({ ownerEmail });
-    if (!restaurant) {
-      res.status(401).json({ error: 'restaurant is not found. register fist' })
-      return;
+    const { ownerEmail, password } = req.body;
+    if (!ownerEmail || !password) {
+      return sendError(res, 400, "Email and password are required");
     }
 
-    const isMatchPassword = await hashPasswordChecker(password, restaurant.password);
+    const { token, restaurant } = await restaurantService.login({ ownerEmail, password });
 
-    if (!isMatchPassword) {
-      return res.status(401).json({
-        error: "Invalid email or password"
-      });
-    }
+    const isProduction = process.env.NODE_ENV === "production";
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: isProduction ? "none" : "lax",
+      maxAge: 48 * 60 * 60 * 1000,
+    });
 
-    const token = jwt.sign({ ownerEmail }, process.env.JWT_SECRET_KEY, { expiresIn: "48h" })
-
-
-   const isProduction = process.env.NODE_ENV === "production";
-
-res.cookie("token", token, {
-  httpOnly: true,
-  secure: isProduction,
-  sameSite: isProduction ? "none" : "lax",
-  maxAge: 48 * 60 * 60 * 1000,
-});
-
-
-
-    res.status(200).json({ massage: 'logged in' })
+    return sendSuccess(res, 200, "Logged in successfully", {
+      id: restaurant._id,
+      ownerEmail: restaurant.ownerEmail,
+      restaurantName: restaurant.restaurantName,
+    });
   } catch (error) {
     console.error("Login error:", error);
-    res.status(500).json({
-      error: "Internal server error"
-    });
+    return sendError(res, error.statusCode || 500, error.message || "Internal server error");
   }
-
-
-
-}
+};
 
 exports.registerRestaurant = async (req, res) => {
   try {
@@ -69,74 +40,33 @@ exports.registerRestaurant = async (req, res) => {
       ownerEmail,
     } = req.body;
 
-    // 1. Validate input
-    if (!ownerEmail || !password) {
-      return res.status(400).json({
-        error: "Email and password are required",
-      });
-    }
-
-    // 2. Check if user already exists
-    const existingRestaurant = await Restaurant.findOne({ ownerEmail });
-    if (existingRestaurant) {
-      return res.status(409).json({
-        error: "Email already registered",
-      });
-    }
-
-    const existingResName = await Restaurant.findOne({restaurantName})
-    if (existingResName) {
-      return res.status(409).json({
-        error: "restaurant is already exit.."
-      })
-    }
-
-    // 3. Hash password
-    const hashedPassword = await hashPasswordGenerater(password);
-
-    // 4. Create restaurant
-    const restaurant = await Restaurant.create({
+    const { token, user } = await restaurantService.registerRestaurant({
       restaurantName,
       address,
       ownerName,
-      password: hashedPassword,
+      password,
       ownerPhone,
       ownerEmail,
     });
 
-    // 5. Generate JWT
-    const token = jwt.sign(
-      {
-        id: restaurant._id,
-        ownerEmail: restaurant.ownerEmail,
-      },
-      process.env.JWT_SECRET_KEY,
-      { expiresIn: "48h" }
-    );
-
-    // 6. Set cookie
+    const isProduction = process.env.NODE_ENV === "production";
     res.cookie("token", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
+      secure: isProduction,
+      sameSite: isProduction ? "none" : "lax",
       maxAge: 48 * 60 * 60 * 1000,
     });
 
-    // 7. Send response
-    res.status(201).json({
-      message: "Restaurant registered successfully",
-      user: {
-        id: restaurant._id,
-        ownerName: restaurant.ownerName,
-        ownerEmail: restaurant.ownerEmail,
-        restaurantName: restaurant.restaurantName,
-      },
-    });
+    return sendSuccess(
+      res,
+      201,
+      "Restaurant registered successfully",
+      user,
+      { user }
+    );
   } catch (error) {
     console.error("Register error:", error);
-    res.status(500).json({
-      error: "Internal server error",
-    });
+    return sendError(res, error.statusCode || 500, error.message || "Internal server error");
   }
 };
 
@@ -144,32 +74,28 @@ exports.getDashBord = async (req, res) => {
   try {
     const restaurant = req.restaurant;
     if (!restaurant) {
-      return res.status(404).json({ error: "restaurant is not found" })
+      return sendError(res, 404, "Restaurant not found");
     }
 
-    // find foods
-    const foods = await foodService.getAllFood( restaurant._id)
-    // find foods category
-    const category = await categoryService.getAllcategory(restaurant._id)
+    const data = await restaurantService.getDashboardData(restaurant);
 
-    //find tables
-    const tables = await tableService.getAllTable(restaurant);
- 
-
-    // find order
-    const order = await orderService.getTodayOrder(restaurant._id);
-    const Last7DaysOrders = await orderService.getLast7DaysOrders(restaurant._id)
-
-    const bill = await billModel.find({restaurant: restaurant._id})
-    
-
-    res.status(200).json({ restaurant, foods, category , tables:tables ,order , bill, Last7DaysOrders });
-
-
+    return sendSuccess(
+      res,
+      200,
+      "Dashboard fetched successfully",
+      data,
+      {
+        restaurant: data.restaurant,
+        foods: data.foods,
+        category: data.category,
+        tables: data.tables,
+        order: data.order,
+        bill: data.bill,
+        Last7DaysOrders: data.Last7DaysOrders,
+      }
+    );
   } catch (error) {
-    console.log(error);
-    return res.status(500).json({ error: "server error" })
+    console.error("Dashboard error:", error);
+    return sendError(res, error.statusCode || 500, error.message || "Server error");
   }
-}
-
-
+};

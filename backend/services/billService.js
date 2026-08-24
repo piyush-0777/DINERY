@@ -1,29 +1,55 @@
-const mongoose = require('../config/mongoDB-connection')
-const billModel = require('../models/bill-model')
-const tableModel = require('../models/table-model')
-const tableService = require('../services/tableService')
+const mongoose = require("../config/mongoDB-connection");
+const billRepository = require("../repositories/billRepository");
+const tableRepository = require("../repositories/tableRepository");
+const tableService = require("./tableService");
 
-const cashBillPayment = async (billId , tableId , restaurant) => {
-     const session = await mongoose.startSession();
-    try {
-        session.startTransaction()
-        const bill = await billModel.findById(billId , null , {session});
-         bill.paymentStatus = 'paid';
-    bill.paymentMode = 'cash';
-    await bill.save({session})
-    const table = await tableService.updateTableStatus(tableId ,"available")
-    const tableData = await tableService.getTableById(tableId , restaurant)
-        
-
-        await session.commitTransaction();
-        session.endSession()
-        return {bill , table:tableData}
-    } catch (error) {
-        await session.abortTransaction()
-        session.endSession()
-        console.log(error)
-        throw new Error(error)
+class BillService {
+  async getBillById(billId) {
+    const bill = await billRepository.findById(billId);
+    if (!bill) {
+      const error = new Error("Bill not found");
+      error.statusCode = 404;
+      throw error;
     }
+    return bill;
+  }
+
+  async cashBillPayment(billId, tableId, restaurant) {
+    const session = await mongoose.startSession();
+
+    try {
+      session.startTransaction();
+
+      const bill = await billRepository.findById(billId, session);
+      if (!bill) {
+        throw new Error("Bill not found");
+      }
+
+      const updatedBill = await billRepository.updatePaymentStatus(
+        billId,
+        "paid",
+        "cash",
+        session
+      );
+
+      // Reset table status to available
+      await tableRepository.updateStatus(tableId, "available", null, session);
+
+      await session.commitTransaction();
+      session.endSession();
+
+      const tableData = await tableService.getTableById(tableId, restaurant);
+
+      return {
+        bill: updatedBill,
+        table: tableData,
+      };
+    } catch (error) {
+      await session.abortTransaction();
+      session.endSession();
+      throw error;
+    }
+  }
 }
 
-module.exports = { cashBillPayment }
+module.exports = new BillService();

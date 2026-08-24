@@ -1,135 +1,116 @@
-const foodModel = require('../models/food-model')
-const foodService = require('../services/foodService')
-const deleteImage = require('../utils/deletImg')
+const foodService = require("../services/foodService");
+const { sendSuccess, sendError } = require("../utils/responseHandler");
 
-exports.createFood = async(req , res) =>{
-try {
- const {name , description, price, category} = req.body
-
- const resId =  req.restaurant._id;
-
- if(!resId) {
-  return res.status(401).json({error:'resturant is ont found'})
- }
-
-if (!req.file) {
-  return res.status(400).json({ error: "Image is required" });
-}
- const foodImg = req.file.path;
- 
-
- 
- const food = await foodModel.create({
-    restaurant:resId ,name , description, price, category , foodImg , publicId:req.file.filename
- })
- 
-
- return res.status(200).json({message: 'done' , food});
-} catch(err) {
-
-  return res.status(500).json({error: 'server error 121' })
-}
-
-}
-
-exports.deletFood = async (req , res) => {
+exports.createFood = async (req, res) => {
   try {
-    const resId =  req.restaurant._id;
+    const { name, description, price, category } = req.body;
+    const restaurantId = req.restaurant?._id;
 
- if(!resId) {
-  return res.status(401).json({error:'resturant is ont found'})
- }
- const foodId = req.params.foodId;
-
- if(!foodId) {
-  return res.status(401).json({error:'foodid is ont found'});
- }
-
- const isdelet = await foodService.deletFood(foodId , resId);
-
- if(isdelet) {
-  return res.status(200).json({message:'food deleted..'})
- }
- 
-  } catch (error) {
-    console.log(error)
-  return res.status(500).json({error: 'server error' })
-  }
-}
-
-exports.editFood = async (req , res ) => {
-  
-  try {
-    
-    const food = await foodModel.findById(req.params.foodId);
-    
-    if (!food) {
-      return res.status(404).json({ message: "Food not found" });
+    if (!restaurantId) {
+      return sendError(res, 401, "Restaurant is not authenticated");
     }
 
-    // Update normal fields
-    food.name = req.body.name;
-    food.description = req.body.description;
-    food.price = req.body.price;
-    food.category = req.body.category;
-    food.isAvailable = req.body.isAvailable;
-
-    // ✅ IMAGE CHANGE CHECK
-    if (req.file) {
-      console.log("Image changed");
-
-      // 🧹 delete old image
-      if (food.publicId) {
-        await deleteImage(food.publicId);
-      }
-
-      // multer-storage-cloudinary already uploaded it
-      food.foodImg = req.file.path;        // secure_url
-      food.publicId = req.file.filename; // public_id
+    if (!name?.trim() || price === undefined) {
+      return sendError(res, 400, "Food name and price are required");
     }
 
-    await food.save();
+    if (!req.file) {
+      return sendError(res, 400, "Image is required");
+    }
 
-    res.status(200).json({
-      status: "success",
-      message: "Food updated successfully",
-      data: food
+    const food = await foodService.createFood({
+      restaurantId,
+      name: name.trim(),
+      description: description?.trim() || "",
+      price: Number(price),
+      category,
+      file: req.file,
     });
 
+    return sendSuccess(
+      res,
+      200,
+      "Food item created successfully",
+      food,
+      { food }
+    );
   } catch (error) {
-    console.log(error)
-    res.status(500).json({ message: error.message });
+    console.error("createFood error:", error);
+    return sendError(res, error.statusCode || 500, error.message || "Server error");
   }
+};
 
-
-}
-
-exports.changeAvailablity = async (req , res ) => {
+exports.deletFood = async (req, res) => {
   try {
-    
-    const food = await foodModel.findById(req.params.foodId);
-   
-    if (!food) {
-      return res.status(404).json({ message: "Food not found" });
+    const restaurantId = req.restaurant?._id;
+    const foodId = req.params.foodId;
+
+    if (!restaurantId) {
+      return sendError(res, 401, "Restaurant is not authenticated");
     }
 
-    // Update normal fields
-    
-    food.isAvailable = !food.isAvailable;
+    if (!foodId) {
+      return sendError(res, 400, "Food ID is required");
+    }
 
-    // ✅ IMAGE CHANGE CHECK
-    
+    await foodService.deletFood(foodId, restaurantId);
 
-    await food.save();
+    return sendSuccess(res, 200, "Food item deleted successfully");
+  } catch (error) {
+    console.error("deletFood error:", error);
+    return sendError(res, error.statusCode || 500, error.message || "Server error");
+  }
+};
 
-    res.status(200).json({
-      status: "success",
-      message: "chang togle updated successfully",
-      data: food
+exports.editFood = async (req, res) => {
+  try {
+    const foodId = req.params.foodId;
+    if (!foodId) {
+      return sendError(res, 400, "Food ID is required");
+    }
+
+    const { name, description, price, category, isAvailable } = req.body;
+
+    const updatedFood = await foodService.editFood(foodId, {
+      name: name !== undefined ? name.trim() : undefined,
+      description: description !== undefined ? description.trim() : undefined,
+      price: price !== undefined ? Number(price) : undefined,
+      category,
+      isAvailable: isAvailable !== undefined ? Boolean(isAvailable === "true" || isAvailable === true) : undefined,
+      file: req.file,
     });
 
+    return sendSuccess(
+      res,
+      200,
+      "Food updated successfully",
+      updatedFood,
+      { data: updatedFood }
+    );
   } catch (error) {
-    console.log(error)
-    res.status(500).json({ message: error.message });
+    console.error("editFood error:", error);
+    return sendError(res, error.statusCode || 500, error.message || "Server error");
   }
-}
+};
+
+exports.changeAvailablity = async (req, res) => {
+  try {
+    const foodId = req.params.foodId;
+    if (!foodId) {
+      return sendError(res, 400, "Food ID is required");
+    }
+
+    const updatedFood = await foodService.changeAvailability(foodId);
+
+    return sendSuccess(
+      res,
+      200,
+      "Food availability updated successfully",
+      updatedFood,
+      { data: updatedFood }
+    );
+  } catch (error) {
+    console.error("changeAvailablity error:", error);
+    return sendError(res, error.statusCode || 500, error.message || "Server error");
+  }
+};

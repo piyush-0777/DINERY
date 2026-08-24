@@ -1,37 +1,20 @@
 const settingService = require("../services/settingService");
+const { sendSuccess, sendError } = require("../utils/responseHandler");
 
 exports.UpdateRestaurantProfile = async (req, res) => {
   try {
     const restaurant = req.restaurant;
-
     if (!restaurant) {
-      return res.status(401).json({
-        success: false,
-        message: "Unauthorized",
-      });
-    }
-
-    if (!req.file) {
-      return res.status(400).json({
-        success: false,
-        message: "Image is required",
-      });
+      return sendError(res, 401, "Unauthorized");
     }
 
     const { restaurantName, address } = req.body;
-
     if (!restaurantName?.trim()) {
-      return res.status(400).json({
-        success: false,
-        message: "Restaurant name is required",
-      });
+      return sendError(res, 400, "Restaurant name is required");
     }
 
     if (!address?.trim()) {
-      return res.status(400).json({
-        success: false,
-        message: "Address is required",
-      });
+      return sendError(res, 400, "Address is required");
     }
 
     const updatedRestaurant = await settingService.UpdateRestaurantProfile(
@@ -41,53 +24,38 @@ exports.UpdateRestaurantProfile = async (req, res) => {
       address.trim()
     );
 
-    return res.status(200).json({
-      success: true,
-      message: "Restaurant profile updated successfully",
-      data: updatedRestaurant,
-    });
+    return sendSuccess(
+      res,
+      200,
+      "Restaurant profile updated successfully",
+      updatedRestaurant,
+      { data: updatedRestaurant }
+    );
   } catch (error) {
-    console.error("UpdateRestaurantProfile:", error);
-
-    return res.status(500).json({
-      success: false,
-      message: error.message || "Internal Server Error",
-    });
+    console.error("UpdateRestaurantProfile error:", error);
+    return sendError(res, error.statusCode || 500, error.message || "Internal Server Error");
   }
 };
 
 exports.UpdateOwnerInformation = async (req, res) => {
   try {
     const restaurant = req.restaurant;
-
     if (!restaurant) {
-      return res.status(401).json({
-        success: false,
-        message: "Unauthorized",
-      });
+      return sendError(res, 401, "Unauthorized");
     }
 
     const { ownerName, ownerPhone, ownerEmail } = req.body;
 
     if (!ownerName?.trim()) {
-      return res.status(400).json({
-        success: false,
-        message: "Owner name is required",
-      });
+      return sendError(res, 400, "Owner name is required");
     }
 
     if (!ownerPhone?.trim()) {
-      return res.status(400).json({
-        success: false,
-        message: "Owner phone is required",
-      });
+      return sendError(res, 400, "Owner phone is required");
     }
 
     if (!ownerEmail?.trim()) {
-      return res.status(400).json({
-        success: false,
-        message: "Owner email is required",
-      });
+      return sendError(res, 400, "Owner email is required");
     }
 
     const data = await settingService.UpdateOwnerInformation(
@@ -97,39 +65,29 @@ exports.UpdateOwnerInformation = async (req, res) => {
       ownerEmail.trim()
     );
 
-    return res.status(200).json({
-      success: true,
-      message: "Owner information updated successfully",
+    return sendSuccess(
+      res,
+      200,
+      "Owner information updated successfully",
       data,
-    });
+      { data }
+    );
   } catch (error) {
-    console.error("UpdateOwnerInformation:", error);
-
-    return res.status(500).json({
-      success: false,
-      message: error.message || "Internal Server Error",
-    });
+    console.error("UpdateOwnerInformation error:", error);
+    return sendError(res, error.statusCode || 500, error.message || "Internal Server Error");
   }
 };
 
 exports.UpdateGSTNumber = async (req, res) => {
   try {
     const restaurant = req.restaurant;
-
     if (!restaurant) {
-      return res.status(401).json({
-        success: false,
-        message: "Unauthorized",
-      });
+      return sendError(res, 401, "Unauthorized");
     }
 
     const { gstNumber } = req.body;
-
     if (!gstNumber?.trim()) {
-      return res.status(400).json({
-        success: false,
-        message: "GST Number is required",
-      });
+      return sendError(res, 400, "GST Number is required");
     }
 
     const data = await settingService.UpdateGSTNumber(
@@ -137,53 +95,38 @@ exports.UpdateGSTNumber = async (req, res) => {
       gstNumber.trim()
     );
 
-    return res.status(200).json({
-      success: true,
-      message: "GST number updated successfully",
+    return sendSuccess(
+      res,
+      200,
+      "GST number updated successfully",
       data,
-    });
+      { data }
+    );
   } catch (error) {
-    console.error("UpdateGSTNumber:", error);
-
-    return res.status(500).json({
-      success: false,
-      message: error.message || "Internal Server Error",
-    });
+    console.error("UpdateGSTNumber error:", error);
+    return sendError(res, error.statusCode || 500, error.message || "Internal Server Error");
   }
 };
 
 exports.UpdatePassword = async (req, res) => {
   try {
     const restaurant = req.restaurant;
-
     if (!restaurant) {
-      return res.status(401).json({
-        success: false,
-        message: "Unauthorized",
-      });
+      return sendError(res, 401, "Unauthorized");
     }
 
     const { CurrentPassword, NewPassword } = req.body;
 
     if (!CurrentPassword) {
-      return res.status(400).json({
-        success: false,
-        message: "Current password is required",
-      });
+      return sendError(res, 400, "Current password is required");
     }
 
     if (!NewPassword) {
-      return res.status(400).json({
-        success: false,
-        message: "New password is required",
-      });
+      return sendError(res, 400, "New password is required");
     }
 
     if (CurrentPassword === NewPassword) {
-      return res.status(400).json({
-        success: false,
-        message: "New password must be different from current password",
-      });
+      return sendError(res, 400, "New password must be different from current password");
     }
 
     await settingService.UpdatePassword(
@@ -192,16 +135,9 @@ exports.UpdatePassword = async (req, res) => {
       NewPassword
     );
 
-    return res.status(200).json({
-      success: true,
-      message: "Password updated successfully",
-    });
+    return sendSuccess(res, 200, "Password updated successfully");
   } catch (error) {
-    console.error("UpdatePassword:", error);
-
-    return res.status(500).json({
-      success: false,
-      message: error.message || "Internal Server Error",
-    });
+    console.error("UpdatePassword error:", error);
+    return sendError(res, error.statusCode || 500, error.message || "Internal Server Error");
   }
 };

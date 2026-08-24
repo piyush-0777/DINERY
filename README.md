@@ -114,9 +114,10 @@ graph TD
     subgraph Backend Layered Tier
         Routes["Routes Layer"]
         Middlewares["Middlewares (Auth, Multer, Error)"]
-        Controllers["Controllers Layer"]
+        Controllers["Controllers Layer (sendSuccess / sendError)"]
         Services["Services Layer (Business Logic & Transactions)"]
-        Models["Models / Data Access Layer (Mongoose)"]
+        Repositories["Repositories Layer (Data Access Pattern)"]
+        Models["Models / Schemas Layer (Mongoose)"]
     end
 
     subgraph Data & Cloud Services
@@ -134,7 +135,8 @@ graph TD
     Routes --> Middlewares
     Middlewares --> Controllers
     Controllers --> Services
-    Services --> Models
+    Services --> Repositories
+    Repositories --> Models
     Models --> MongoDB
     Services --> Cloudinary
     Services --> EmailService
@@ -143,14 +145,40 @@ graph TD
 
 ### Backend Layered Architecture
 
-The backend follows a clean **3-Tier Layered Architecture** ensuring modularity, separation of concerns, and maintainability:
+The backend follows an industry-standard **4-Tier Layered Architecture with the Repository Pattern** ensuring modularity, clear separation of concerns, and maintainability:
 
-1. **Routing Layer (`/routes`):** Defines HTTP endpoint routes, methods, and attaches middleware handlers (authentication, multipart image upload).
-2. **Controller Layer (`/controllers`):** Validates incoming HTTP request parameters, headers, and bodies; delegates core business logic to the services layer; and formats JSON responses.
-3. **Service Layer (`/services`):** Encapsulates domain logic, database operations, MongoDB atomic multi-document transactions (`session`), email dispatch, and socket notification triggers.
-4. **Data Access / Model Layer (`/models`):** Defines strict Mongoose schemas, relationships, defaults, and data models.
-5. **Middlewares (`/middlewares`):** Handles JWT authentication (`authenticateResturant`), error interception, and Multer-Cloudinary image streaming.
-6. **Socket Layer (`/socket`):** Manages real-time connection state, room assignments (`restaurantId` and `customer:{customerId}`), and socket event dispatchers.
+1. **Routing Layer (`/routes`):** Declares endpoint URL paths, HTTP methods, and associates middleware handlers (JWT authentication, Multer uploads).
+2. **Controller Layer (`/controllers`):** Receives HTTP requests, validates parameters and request payloads, delegates business operations to services, and formats standard responses via `sendSuccess` and `sendError`.
+3. **Service Layer (`/services`):** Encapsulates core business rules, multi-step MongoDB transactions (`session`), email dispatch, and WebSocket notification broadcasts.
+4. **Repository Layer (`/repositories`):** Abstracts data access logic, database queries, and MongoDB aggregation pipelines away from the business layer.
+5. **Data Access / Model Layer (`/models`):** Defines strict Mongoose schemas, indexes, and document models.
+6. **Middlewares (`/middlewares`):** Centralizes JWT authentication (`authenticateResturant`), Multer-Cloudinary image streaming, and global unhandled error catching.
+7. **Socket Layer (`/socket`):** Handles bidirectional real-time WebSocket state, room routing (`restaurantId` and `customer:{customerId}`), and event emission.
+8. **Utilities (`/utils`):** Centralized response helpers (`sendSuccess`, `sendError`), password encryption, QR code generators, and OTP utilities.
+
+### Standardized Response Structure
+
+All API endpoints return a standardized, uniform JSON response:
+
+#### Success Response
+```json
+{
+  "success": true,
+  "statusCode": 200,
+  "message": "Operation completed successfully",
+  "data": { ... }
+}
+```
+
+#### Error Response
+```json
+{
+  "success": false,
+  "statusCode": 400,
+  "message": "Validation or operation error description",
+  "error": "Detailed error message"
+}
+```
 
 ### Real-Time WebSocket Architecture
 
@@ -201,7 +229,7 @@ backend/
 ├── config/
 │   ├── cloudConfig.js             # Cloudinary configuration and Multer storage
 │   └── mongoDB-connection.js      # MongoDB Mongoose database connection
-├── controllers/                   # Request handling and response formatting
+├── controllers/                   # Request handling and standardized responses
 │   ├── analyticsController.js     # Analytics endpoint controllers
 │   ├── billController.js          # Bill calculation & settlement controllers
 │   ├── categoryController.js      # Menu category management
@@ -215,7 +243,7 @@ backend/
 │   └── tableController.js         # Table management & QR code assignment
 ├── middlewares/
 │   ├── authMiddleware.js          # JWT verification & restaurant resolver
-│   ├── errorMiddleware.js         # Global error handling middleware
+│   ├── errorMiddleware.js         # Global error handling middleware (sendError)
 │   └── multerMiddleware.js        # File upload parser middleware
 ├── models/                        # Mongoose schemas & data models
 │   ├── bill-model.js              # Bill schema (amounts, tax, payment status)
@@ -227,6 +255,16 @@ backend/
 │   ├── restaurant-model.js        # Restaurant profile & credentials schema
 │   ├── subscription-model.js      # Premium subscription schema
 │   └── table-model.js             # Table schema (tableId, QR UUID, status)
+├── repositories/                  # Data access layer (encapsulating queries)
+│   ├── billRepository.js          # Bill queries & aggregation pipelines
+│   ├── categoryRepository.js      # Category CRUD queries
+│   ├── customerRepository.js      # Customer session queries
+│   ├── foodRepository.js          # Food item CRUD & toggle queries
+│   ├── orderRepository.js         # Order queries & sales aggregation pipelines
+│   ├── otpRepository.js           # OTP verification queries
+│   ├── restaurantRepository.js    # Restaurant profile & credential queries
+│   ├── subscriptionRepository.js  # Subscription plan queries
+│   └── tableRepository.js         # Table queries & status mutations
 ├── routes/                        # Express API route declarations
 │   ├── analyticsRoutes.js         # /api/analytics
 │   ├── billRoutes.js              # /api/bill
@@ -239,16 +277,17 @@ backend/
 │   ├── settingRoutes.js           # /api/setting
 │   └── tableRoutes.js             # /api/tables
 ├── services/                      # Core business logic & database transactions
-│   ├── analyticsService.js        # Order, revenue & top items aggregation pipelines
-│   ├── billService.js             # Bill transactions & payment settlement
-│   ├── categoryService.js         # Category CRUD & associated food cleanup
-│   ├── customerService.js         # Customer session & table allocation
+│   ├── analyticsService.js        # Order, revenue & top items service
+│   ├── billService.js             # Bill transactions & payment settlement service
+│   ├── categoryService.js         # Category CRUD & cascading food cleanup
+│   ├── customerService.js         # Customer session & table allocation service
 │   ├── emailValidationService.js  # Email format & domain validator
-│   ├── foodService.js             # Food queries & image deletion
+│   ├── foodService.js             # Food queries & image deletion service
 │   ├── orderService.js            # Order placement transactions & status transitions
-│   ├── otpService.js              # OTP generation & validation logic
-│   ├── reportService.js           # Daily sales, GST & customer report aggregations
-│   ├── settingService.js          # Profile & password modification services
+│   ├── otpService.js              # OTP generation & validation service
+│   ├── reportService.js           # Daily sales, GST & customer report service
+│   ├── restaurantService.js       # Restaurant authentication & dashboard service
+│   ├── settingService.js          # Profile & password modification service
 │   └── tableService.js            # Table status mutations & QR code builder
 ├── socket/
 │   ├── socketEvent.js             # Outbound real-time socket event broadcasters
@@ -258,6 +297,7 @@ backend/
 │   ├── generateOTP.js             # Random numeric OTP generator
 │   ├── generateQR.js              # QR code generator creating data URLs
 │   ├── hashPassword.js            # Bcrypt hashing & password comparison helpers
+│   ├── responseHandler.js         # Standardized sendSuccess and sendError helpers
 │   └── sendOtpToEmail.js          # Nodemailer email transport handler
 ├── .env                           # Environment configuration
 ├── app.js                         # Application entrypoint & HTTP server bootstrap
