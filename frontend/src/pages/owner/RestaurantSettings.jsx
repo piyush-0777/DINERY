@@ -1,14 +1,15 @@
 import { useSelector } from "react-redux";
 import { motion } from "framer-motion";
+import {
+  SettingsHeader ,
+  ProfileSection ,
+  OwnerSection ,
+  BusinessSection ,
+  SubscriptionCard ,
+  ChangePasswordCard ,
+  SaveButton ,
 
-
-import SettingsHeader from "../../components/owner/settings/SettingsHeader";
-import ProfileSection from "../../components/owner/settings/ProfileSection";
-import OwnerSection from "../../components/owner/settings/OwnerSection";
-import BusinessSection from "../../components/owner/settings/BusinessSection";
-import SubscriptionCard from "../../components/owner/settings/SubscriptionCard";
-import ChangePasswordCard from "../../components/owner/settings/ChangePasswordCard";
-import SaveButton from "../../components/owner/settings/SaveButton";
+} from '../../features/settings'
 
 const RestaurantSettings = () => {
   const restaurant = useSelector(

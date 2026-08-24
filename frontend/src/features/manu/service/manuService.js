@@ -1,0 +1,21 @@
+import request from "../../../services/api";
+
+export const menuService = {
+  getMenuByRestaurant: (restaurantId) =>
+    request(`/menu/${restaurantId}`, "GET"),
+
+  addMenuItem: (data) => request("/food/create", "POST", data, true), // true for form data
+
+  updateMenuItem: (menuId, data) =>
+    request(`/food/updatefood/${menuId}`, "PUT", data, true),
+
+  deleteMenuItem: (menuId) => request(`/food/deletfood/${menuId}`, "DELETE"),
+  changeAvailablity: (menuId) =>
+    request(`/food/changeavailablity/${menuId}`, "PUT"),
+
+  addCategory: (data) => request("/category/addcategory", "POST", data, true),
+  deleteCategory: (categoryId) =>
+    request(`/category/deletcategory/${categoryId}`, "DELETE"), // return thsi
+  updateCategory: (categoryId, data) =>
+    request(`/category/editcategory/${categoryId}`, "PUT", data, true),
+};

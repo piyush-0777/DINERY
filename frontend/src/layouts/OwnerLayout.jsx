@@ -2,18 +2,16 @@ import { Outlet } from "react-router-dom";
 import { getSocket } from "../consfig/socket";
 import { useEffect } from "react";
 // import Sidebar from "../components/common/Sidebar";
-import Navbar from "../components/owner/common/Navbar"
+import Navbar from "../components/owner/Navbar"
 import {useSelector , useDispatch} from 'react-redux'
-import {getOrderThunk} from '../redux/thunks/ordersThunk'
-import {getBillThunk} from '../redux/thunks/billThunk'
-import { getTableThunk } from "../redux/thunks/tableThunk";
+import {getOrderThunk} from '../features/order'
+import {getBillThunk} from '../features/bill'
+import { getTableThunk } from "../features/table";
 import { toast } from "react-toastify";
-import {addTodayOrder} from '../redux/features/owner/restaurantSlice'
+import {addTodayOrder} from '../features/loadside/slice/restaurantSlice'
 
 const OwnerLayout = ({ children }) => {
- const dispatch = useDispatch()
-  const { loading, success, error, } = useSelector(state => state.loardDashbordState)
-
+const dispatch = useDispatch()
   useEffect(() => {
           const socket = getSocket()
           if (!socket){

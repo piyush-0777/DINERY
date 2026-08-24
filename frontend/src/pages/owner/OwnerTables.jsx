@@ -1,19 +1,23 @@
 import { useSelector , useDispatch} from "react-redux";
 import { useState } from "react";
+import {useCashPayment} from '../../features/bill'
+import {
+  TableCard ,
+  TableDetailsModal ,
+  QRPopup ,
+  AddTableModal ,
+  useAddTable ,
 
-import TableCard from "../../components/owner/table/TableCard";
-import TableDetailsModal from "../../components/owner/table/TableDetailsModal";
-import QRPopup from "../../components/owner/table/QRPopup";
-import AddTableModal from "../../components/owner/table/AddTableModal"
-import OrderDetailModal from "../../components/owner/order/OrderDetailModal";
-
-import {cashPaymentThunk} from '../../redux/thunks/billThunk'
-import {addTableThunk , deleteTableThunk} from '../../redux/thunks/tableThunk'
+} from '../../features/table'
+import {OrderDetailModal} from '../../features/order'
+import { toast } from "react-toastify";
 
 
 export default function TablesPage() {
 
   const dispatch = useDispatch() 
+  const addTable = useAddTable()
+  const cashPayment = useCashPayment()
 
   const tables = useSelector(state => state.tables.tables);
   const loardTable = useSelector(state => state.loardtables)
@@ -27,14 +31,26 @@ export default function TablesPage() {
   const [selectedOrder , setSelectedOrder] = useState();
 
 
-  const handleAddTable = (data) => {
-    dispatch(addTableThunk(data))
+  const handleAddTable = async (data) => {
+    
+    try {
+      const result = await addTable.addTable(data);
+      setShowAddModal(false)
+      toast.success('table is added')
+    } catch (error) {
+      toast.error(error.message || 'faild to add table')
+    }
   }
 
 
-  const cashPayment = (billId , tableId , customerId) => {
-      console.log('bill' , billId , 'table' , tableId)
-      dispatch(cashPaymentThunk({billId , tableId , customerId}))
+  const handleCashPayment = async(billId , tableId , customerId) => {
+    try{
+      const result = await cashPayment.cashPayment({billId , tableId , customerId})
+      toast.success('payment done')
+    } catch(error) {
+      toast.error(error.message || 'payment faild')
+
+    }
   
   }
 
@@ -96,6 +112,7 @@ export default function TablesPage() {
       {showAddModal && (
   <AddTableModal
     onAdd={handleAddTable}
+    loading ={addTable.loading}
     onClose={() => setShowAddModal(false)}
   />
 )}
@@ -107,7 +124,9 @@ bill = {
      bills.filter((e)=> e.order === selectedOrder._id)[0]
 }
 onClose={()=>{setSelectedOrder(null)}}
-onCashPayment={cashPayment} />}
+onCashPayment={handleCashPayment} 
+loading={cashPayment.loading}
+/>}
     </div>
   );
 }

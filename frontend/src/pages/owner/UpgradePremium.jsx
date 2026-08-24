@@ -1,12 +1,14 @@
-import { useState , useEffect } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 
-import PricingToggle from "../../components/owner/upgradepremium/PricingToggle";
-import PlanCard from "../../components/owner/upgradepremium/PlanCard";
-import FeatureComparison from "../../components/owner/upgradepremium/FeatureComparison";
-import PaymentCard from "../../components/owner/upgradepremium/PaymentCard";
-import FAQSection from "../../components/owner/upgradepremium/FAQSection";
-import PremiumBadge from "../../components/owner/upgradepremium/PremiumBadge";
+import {
+  PricingToggle,
+  PlanCard,
+  FeatureComparison,
+  PaymentCard,
+  FAQSection,
+  PremiumBadge,
+} from "../../features/premium";
 
 const UpgradePremium = () => {
   const [billing, setBilling] = useState("monthly");
@@ -164,7 +166,6 @@ const UpgradePremium = () => {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
       <div className="mx-auto max-w-7xl px-4 py-12">
-
         {/* Hero */}
 
         <motion.div
@@ -179,23 +180,18 @@ const UpgradePremium = () => {
           </h1>
 
           <p className="mx-auto mt-5 max-w-3xl text-lg text-gray-600 dark:text-gray-400">
-            Unlock advanced restaurant management features,
-            analytics, unlimited tables, staff management,
-            inventory tracking and priority support.
+            Unlock advanced restaurant management features, analytics, unlimited
+            tables, staff management, inventory tracking and priority support.
           </p>
 
           <div className="mt-10 flex justify-center">
-            <PricingToggle
-              billing={billing}
-              setBilling={setBilling}
-            />
+            <PricingToggle billing={billing} setBilling={setBilling} />
           </div>
         </motion.div>
 
         {/* Pricing */}
 
         <div className="mt-16 grid gap-8 lg:grid-cols-2">
-
           <PlanCard
             title="Free"
             price={0}
@@ -214,15 +210,12 @@ const UpgradePremium = () => {
             features={premiumFeatures}
             onSelect={handlePayment}
           />
-
         </div>
 
         {/* Compare */}
 
         <div className="mt-20">
-          <FeatureComparison
-            features={comparisonFeatures}
-          />
+          <FeatureComparison features={comparisonFeatures} />
         </div>
 
         {/* Payment */}
@@ -243,7 +236,6 @@ const UpgradePremium = () => {
         <div className="mt-20">
           <FAQSection />
         </div>
-
       </div>
     </div>
   );

@@ -1,49 +1,8 @@
 import { useForm  } from "react-hook-form";
-import { useDispatch , useSelector} from "react-redux"
-import {loginRestaurantThunk} from "../../redux/thunks/authThunk"
-import { useEffect } from "react";
-import {toast} from "react-toastify"
-import {useNavigate} from "react-router-dom"
 import { Link } from "react-router-dom";
+import LoginForm from "../../features/auth/components/LoginForm"
 
 const Login = () => {
-  const navigate = useNavigate()
-  const dispatch = useDispatch()
-  const { loading, error, success }  = useSelector(state => state.auth)
-  
-console.log({ loading, error, success })
-
-
-  useEffect(() => {
-    if(error?.status == 500) {
-      toast.error('sever down');
-    } else {
-      if (error?.message) {
-        toast.error(error.message);
-      }
-    }
-    }, [error]);
-  
-    useEffect(() => {
-      if (success) {
-        toast.success("Registration successful 🎉");
-        navigate("/owner/dashboard");
-      }
-    }, [success, navigate]);
-
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm();
-
-  const onSubmit = (data) => {
-    
-    // TODO: call login API here
-    console.log("Login Data:", data);
-    dispatch(loginRestaurantThunk(data))
-    
-  };
 
   return (
    
@@ -78,103 +37,7 @@ console.log({ loading, error, success })
               Login to manage your restaurant
             </p>
 
-            <form
-              onSubmit={handleSubmit(onSubmit)}
-              className="space-y-5"
-            >
-              {/* Restaurant Name */}
-              <div>
-                <input
-                  type="text"
-                  placeholder="Restaurant Name"
-                  {...register("restaurantName", {
-                    required: "Restaurant name is required",
-                  })}
-                  className="w-full p-3 bg-black border border-zinc-700 rounded-lg
-                             focus:outline-none focus:border-yellow-500 transition"
-                />
-                {errors.restaurantName && (
-                  <p className="text-red-500 text-xs mt-1">
-                    {errors.restaurantName.message}
-                  </p>
-                )}
-              </div>
-
-              {/* Owner Name */}
-              <div>
-                <input
-                  type="text"
-                  placeholder="Owner Name"
-                  {...register("ownerName", {
-                    required: "Owner name is required",
-                  })}
-                  className="w-full p-3 bg-black border border-zinc-700 rounded-lg
-                             focus:outline-none focus:border-yellow-500 transition"
-                />
-                {errors.ownerName && (
-                  <p className="text-red-500 text-xs mt-1">
-                    {errors.ownerName.message}
-                  </p>
-                )}
-              </div>
-
-              {/* Email */}
-              <div>
-                <input
-                  type="ownerEmail"
-                  placeholder="Email Address"
-                  {...register("ownerEmail", {
-                    required: "Email is required",
-                    pattern: {
-                      value: /^\S+@\S+$/i,
-                      message: "Invalid email address",
-                    },
-                  })}
-                  className="w-full p-3 bg-black border border-zinc-700 rounded-lg
-                             focus:outline-none focus:border-yellow-500 transition"
-                />
-                {errors.email && (
-                  <p className="text-red-500 text-xs mt-1">
-                    {errors.email.message}
-                  </p>
-                )}
-              </div>
-
-              {/* Password */}
-              <div>
-                <input
-                  type="password"
-                  placeholder="Password"
-                  {...register("password", {
-                    required: "Password is required",
-                    minLength: {
-                      value: 6,
-                      message: "Minimum 6 characters",
-                    },
-                  })}
-                  className="w-full p-3 bg-black border border-zinc-700 rounded-lg
-                             focus:outline-none focus:border-yellow-500 transition"
-                />
-                {errors.password && (
-                  <p className="text-red-500 text-xs mt-1">
-                    {errors.password.message}
-                  </p>
-                )}
-              </div>
-
-              {/* Submit */}
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="w-full py-3 bg-zinc-800 text-white font-semibold
-                           rounded-lg border border-zinc-700
-                           hover:border-yellow-500 hover:text-yellow-500
-                           disabled:opacity-50 disabled:cursor-not-allowed
-                           transition-all duration-300"
-              >
-                {loading ? "Logging in..." : "Login to Dinery"}
-              </button>
-            </form>
+            <LoginForm/>
             <p className="text-sm pt-1 text-center text-gray-400 ">
                             Don't have an account?{" "}
                             <Link

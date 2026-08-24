@@ -1,5 +1,5 @@
 import { io } from "socket.io-client";
-import {addSocketId} from '../redux/features/owner/socketSlice'
+import {addSocketId} from '../features/loadside/slice/socketSlice'
 import { useDispatch } from "react-redux";
 const socketUrl = import.meta.env.VITE_SOCKET_URL;
 let socket = null;
@@ -7,7 +7,6 @@ let socket = null;
 export const connectSocket = ({ role, restaurantId, customerId  }) => {
 
   if (socket) return socket; // already connected
-  console.log('socket url ' , socketUrl)
   socket = io(socketUrl , {
     auth: {
       role,

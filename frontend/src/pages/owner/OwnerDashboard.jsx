@@ -1,12 +1,9 @@
 import React, { useMemo } from "react";
 import { useSelector } from "react-redux";
-import { StatCard } from "../../components/owner/dashboard/StatCard";
-import { StatusCard } from "../../components/owner/dashboard/StatusCard";
-import { OrdersTrend } from "../../components/owner/dashboard/OrdersTrend";
+import {StatCard , StatusCard , OrdersTrend} from '../../features/dashboard'
 
 const OwnerDashboard = () => {
   const { list = [] } = useSelector((state) => state.orders);
-
 
   const isToday = (date) => {
     const orderDate = new Date(date);
@@ -27,38 +24,33 @@ const OwnerDashboard = () => {
     const totalRevenue = todayOrders.reduce(
       (sum, order) =>
         order.status !== "cancelled" ? sum + (order.totalAmount || 0) : sum,
-      0
+      0,
     );
 
     const avgOrderValue =
-      totalOrders > 0
-        ? Math.round(totalRevenue / totalOrders)
-        : 0;
+      totalOrders > 0 ? Math.round(totalRevenue / totalOrders) : 0;
 
     const activeOrders = todayOrders.filter(
       (order) =>
         order.status === "pending" ||
         order.status === "preparing" ||
-        order.status === "served"
+        order.status === "served",
     ).length;
 
     const preparing = todayOrders.filter(
-      (order) => order.status === "preparing"
+      (order) => order.status === "preparing",
     ).length;
 
     const completed = todayOrders.filter(
-      (order) => order.status === "completed"
+      (order) => order.status === "completed",
     ).length;
 
     const cancelled = todayOrders.filter(
-      (order) => order.status === "cancelled"
+      (order) => order.status === "cancelled",
     ).length;
 
     const recentOrders = [...list]
-      .sort(
-        (a, b) =>
-          new Date(b.createdAt) - new Date(a.createdAt)
-      )
+      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
       .slice(0, 7);
 
     return {
@@ -131,9 +123,7 @@ const OwnerDashboard = () => {
 
       {/* Recent Orders */}
       <div className="mt-10 bg-neutral-900 rounded-2xl p-6">
-        <h3 className="text-white font-semibold mb-4">
-          Last 7 Orders
-        </h3>
+        <h3 className="text-white font-semibold mb-4">Last 7 Orders</h3>
 
         <div className="space-y-3">
           {dashboard.recentOrders.map((order) => (
@@ -154,21 +144,19 @@ const OwnerDashboard = () => {
               </div>
 
               <div className="text-right">
-                <p className="text-white">
-                  ₹{order.totalAmount}
-                </p>
+                <p className="text-white">₹{order.totalAmount}</p>
 
                 <span
                   className={`text-xs font-semibold capitalize ${
                     order.status === "completed"
                       ? "text-green-400"
                       : order.status === "preparing"
-                      ? "text-yellow-400"
-                      : order.status === "pending"
-                      ? "text-blue-400"
-                      : order.status === "served"
-                      ? "text-purple-400"
-                      : "text-red-400"
+                        ? "text-yellow-400"
+                        : order.status === "pending"
+                          ? "text-blue-400"
+                          : order.status === "served"
+                            ? "text-purple-400"
+                            : "text-red-400"
                   }`}
                 >
                   {order.status}
