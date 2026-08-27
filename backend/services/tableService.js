@@ -1,127 +1,140 @@
-const tableModel = require('../models/table-model')
-const customerModel = require("../models/customer-model");
-const orderModel = require("../models/order-model");
+const tableRepository = require("../repositories/tableRepository");
+const customerRepository = require("../repositories/customerRepository");
+const orderRepository = require("../repositories/orderRepository");
 const generateQR = require("../utils/generateQR");
+const crypto = require("crypto");
 
-const getTableById = async(tableId , restaurant) =>{
-    try {
-        const table = await tableModel.findById(tableId)
-         const qrImage = await generateQR(table, restaurant.restaurantName);
-
-        const tableData = {
-            ...table.toObject(),
-            qrImage,
-        };
-
-        if (
-            table.status === "active" ||
-            table.status === "occupied"
-        ) {
-            tableData.customer = await customerModel.findById(
-                table.currentCustomer
-            );
-        }
-
-        if (table.status === "occupied") {
-            tableData.order = await orderModel
-                .findOne({
-                    customer: table.currentCustomer,
-                })
-                .sort({ createdAt: -1 });
-        }
-        return tableData;
-    } catch (error) {
-        throw new Error(error)
-    }
-}
-
-const updateTableStatus = async (tableId, status, customerId = null) => {
-    try {
-        const validStatuses = ["available", "active", "occupied"];
-        if (!validStatuses.includes(status)) {
-            throw new Error("Invalid table status");
-        }
-
-        const table = await tableModel.findById(tableId);
-
-        if (!table) {
-            throw new Error("Table not found");
-        }
-
-        table.status = status;
-
-        switch (status) {
-            case "available":
-                table.currentCustomer = null;
-                table.activeSince = null;
-                break;
-
-            case "active":
-                table.currentCustomer = customerId;
-                table.activeSince = new Date();
-                break;
-
-            case "occupied":
-                // Keep the same customer
-                table.activeSince = null;
-                break;
-        }
-
-        await table.save();
-
-        return table;
-    } catch (error) {
-        throw new Error(error.message);
-    }
-};
-
-const getAllTable = async (restaurant) =>{
-     if (!restaurant) {
-        throw new Error("Restaurant not found");
+class TableService {
+  async getTableById(tableId, restaurant) {
+    const table = await tableRepository.findById(tableId);
+    if (!table) {
+      const error = new Error("Table not found");
+      error.statusCode = 404;
+      throw error;
     }
 
-    const tables = await tableModel.find({
-        restaurant: restaurant._id,
+    const qrImage = await generateQR(table, restaurant.restaurantName);
+
+    const tableData = {
+      ...table.toObject(),
+      qrImage,
+    };
+
+    if (table.status === "active" || table.status === "occupied") {
+      if (table.currentCustomer) {
+        tableData.customer = await customerRepository.findById(table.currentCustomer);
+      }
+    }
+
+    if (table.status === "occupied" && table.currentCustomer) {
+      tableData.order = await orderRepository.findCustomerOrderByTable(
+        table.currentCustomer,
+        table._id
+      );
+    }
+
+    return tableData;
+  }
+
+  async createTable({ restaurant, capacity, tableNumber }) {
+    if (!restaurant) {
+      const error = new Error("Restaurant not found");
+      error.statusCode = 404;
+      throw error;
+    }
+
+    const table = await tableRepository.create({
+      restaurant: restaurant._id,
+      tableId: tableNumber,
+      capacity: capacity || 2,
+      qrCode: crypto.randomUUID(),
     });
 
+    const qrImage = await generateQR(table, restaurant.restaurantName);
+    return {
+      ...table.toObject(),
+      qrImage,
+    };
+  }
+
+  async deleteTable(tableId, restaurant) {
+    if (!restaurant) {
+      const error = new Error("Restaurant not found");
+      error.statusCode = 404;
+      throw error;
+    }
+
+    const table = await tableRepository.findById(tableId);
+    if (!table) {
+      const error = new Error("Table not found");
+      error.statusCode = 404;
+      throw error;
+    }
+
+    if (table.status !== "available") {
+      const error = new Error("Table cannot be deleted while occupied or active");
+      error.statusCode = 400;
+      throw error;
+    }
+
+    await tableRepository.deleteById(tableId);
+    return table;
+  }
+
+  async updateTableStatus(tableId, status, customerId = null) {
+    const validStatuses = ["available", "active", "occupied"];
+    if (!validStatuses.includes(status)) {
+      const error = new Error("Invalid table status");
+      error.statusCode = 400;
+      throw error;
+    }
+
+    const table = await tableRepository.updateStatus(tableId, status, customerId);
+    if (!table) {
+      const error = new Error("Table not found");
+      error.statusCode = 404;
+      throw error;
+    }
+
+    return table;
+  }
+
+  async getAllTable(restaurant) {
+    if (!restaurant) {
+      const error = new Error("Restaurant not found");
+      error.statusCode = 404;
+      throw error;
+    }
+
+    const tables = await tableRepository.findAllByRestaurant(restaurant._id);
     const tablesWithDetails = [];
 
     for (const table of tables) {
-        const qrImage = await generateQR(table, restaurant.restaurantName);
+      const qrImage = await generateQR(table, restaurant.restaurantName);
 
-        const tableData = {
-            ...table.toObject(),
-            qrImage,
-        };
+      const tableData = {
+        ...table.toObject(),
+        qrImage,
+      };
 
-        if (
-            table.status === "active" ||
-            table.status === "occupied"
-        ) {
-            tableData.customer = await customerModel.findById(
-                table.currentCustomer
-            );
+      if (table.status === "active" || table.status === "occupied") {
+        if (table.currentCustomer) {
+          tableData.customer = await customerRepository.findById(table.currentCustomer);
         }
+      }
 
-        if (table.status === "occupied") {
-            tableData.order = await orderModel
-                .findOne({
-                    customer: table.currentCustomer,
-                })
-                .sort({ createdAt: -1 });
-        }
+      if (table.status === "occupied" && table.currentCustomer) {
+        tableData.order = await orderRepository.findCustomerOrderByTable(
+          table.currentCustomer,
+          table._id
+        );
+      }
 
-        tablesWithDetails.push(tableData);
+      tablesWithDetails.push(tableData);
     }
 
     return tablesWithDetails;
+  }
 }
 
-
-
-module.exports = {
-    getTableById,
-    updateTableStatus,
-    getAllTable
-};
-
+module.exports = new TableService();

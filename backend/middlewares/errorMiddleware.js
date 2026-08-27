@@ -1,12 +1,15 @@
-const errorMiddleware = (err ,req , res , next) =>{
-    console.log('error:' , err.stack || err);
+const { sendError } = require("../utils/responseHandler");
 
-    const statusCode = err.statusCode || 500
+/**
+ * Global Error Handling Middleware
+ */
+const errorMiddleware = (err, req, res, next) => {
+  console.error("Unhandled Error:", err.stack || err);
 
-    res.status(statusCode).json({
-        success: false ,
-        Error: err.massage || 'Internal server error'
-    })
-}
+  const statusCode = err.statusCode || err.status || 500;
+  const message = err.message || "Internal server error";
 
-module.exports = errorMiddleware
+  return sendError(res, statusCode, message, err.message || "Server Error");
+};
+
+module.exports = errorMiddleware;

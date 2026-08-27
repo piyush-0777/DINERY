@@ -1,76 +1,40 @@
-
-const Restaurant = require('../models/restaurant-model')
-const otpService = require('../services/otpService')
-const validateEmail = require("../services/emailValidationService");
+const otpService = require("../services/otpService");
+const { sendSuccess, sendError } = require("../utils/responseHandler");
 
 exports.sendOTP = async (req, res) => {
   try {
-
     const ownerEmail = req.body.ownerEmail?.trim().toLowerCase();
     const restaurantName = req.body.restaurantName?.trim();
-    
+
     if (!ownerEmail || !restaurantName) {
-      return res.status(400).json({
-        error: "Email and password are required",
-      });
+      return sendError(res, 400, "Email and restaurant name are required");
     }
 
-    // 2. Check if user already exists
-    const existingRestaurant = await Restaurant.findOne({ ownerEmail });
-    if (existingRestaurant) {
-      return res.status(409).json({
-        error: "Email already registered",
-      });
-    }
-
-    const existingResName = await Restaurant.findOne({ restaurantName })
-    if (existingResName) {
-      return res.status(409).json({
-        error: "restaurant is already exit.."
-      })
-    }
-    
-    const result = await validateEmail(ownerEmail);
-
-if (!result.success) {
-    return res.status(400).json(result);
-}
-
-    const data = await otpService.sendOTP(ownerEmail)
-   
-
-    res.status(201).json({ message: 'otp send seccessfuly' })
+    const result = await otpService.sendOTP(ownerEmail, restaurantName);
+    return sendSuccess(res, 201, result.message || "OTP sent successfully");
   } catch (error) {
-    console.log(error);
-    return res.status(500).json({ error: 'server error 121' })
+    console.error("sendOTP error:", error);
+    return sendError(res, error.statusCode || 500, error.message || "Server error");
   }
-
-
-
-}
+};
 
 exports.verifyOTP = async (req, res) => {
-      try {
-        const ownerEmail = req.body.ownerEmail?.trim().toLowerCase();
-        const otp = req.body.otp?.trim();
-        if (!ownerEmail || !otp) {
-            return res.status(400).json({
-                success: false,
-                message: "Email and OTP are required"
-            });
-        }
+  try {
+    const ownerEmail = req.body.ownerEmail?.trim().toLowerCase();
+    const otp = req.body.otp?.toString().trim();
 
-        const data = await otpService.verifyOTP(ownerEmail, otp);
-
-        return res.status(data.statusCode || 200).json(data);
-
-    } catch (error) {
-        console.error(error);
-
-        return res.status(500).json({
-            success: false,
-            message: "Server error"
-        });
+    if (!ownerEmail || !otp) {
+      return sendError(res, 400, "Email and OTP are required");
     }
 
-}
+    const data = await otpService.verifyOTP(ownerEmail, otp);
+    if (!data.success) {
+      return sendError(res, data.statusCode || 400, data.message || "Invalid OTP");
+    }
+
+    return sendSuccess(res, data.statusCode || 200, data.message || "OTP verified successfully");
+  } catch (error) {
+    console.error("verifyOTP error:", error);
+    return sendError(res, error.statusCode || 500, error.message || "Server error");
+  }
+};

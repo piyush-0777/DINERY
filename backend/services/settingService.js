@@ -1,195 +1,89 @@
-const RestaurantModel = require("../models/restaurant-model");
-const mongoose = require("../config/mongoDB-connection");
-const bcrypt = require("bcrypt");
+const restaurantRepository = require("../repositories/restaurantRepository");
+const { hashPasswordGenerater, hashPasswordChecker } = require("../utils/hashPassword");
 const deleteImage = require("../utils/deletImg");
 
-exports.UpdateRestaurantProfile = async (
-  image,
-  restaurantId,
-  newRestaurantName,
-  newAddress
-) => {
-  const session = await mongoose.startSession();
-
-  try {
-    session.startTransaction();
-
-    const restaurant = await RestaurantModel.findById(restaurantId).session(
-      session
-    );
-
+class SettingService {
+  async UpdateRestaurantProfile(file, restaurantId, restaurantName, address) {
+    const restaurant = await restaurantRepository.findById(restaurantId);
     if (!restaurant) {
-      throw new Error("Restaurant not found");
+      const error = new Error("Restaurant not found");
+      error.statusCode = 404;
+      throw error;
     }
 
-    // Check duplicate restaurant name
-    if (
-      restaurant.restaurantName !== newRestaurantName &&
-      (await RestaurantModel.exists({
-        restaurantName: newRestaurantName,
-        _id: { $ne: restaurantId },
-      }).session(session))
-    ) {
-      throw new Error("Restaurant name already exists");
+    let profileImg = restaurant.profileImg;
+    let publicId = restaurant.publicId;
+
+    if (file) {
+      if (restaurant.publicId) {
+        await deleteImage(restaurant.publicId);
+      }
+      profileImg = file.path;
+      publicId = file.filename;
     }
 
-    const oldPublicId = restaurant.publicId;
+    return await restaurantRepository.updateProfile(restaurantId, {
+      restaurantName,
+      address,
+      profileImg,
+      publicId,
+    });
+  }
 
-    if (image) {
-      restaurant.profileImg = image.path;
-      restaurant.publicId = image.filename;
+  async UpdateOwnerInformation(restaurantId, ownerName, ownerPhone, ownerEmail) {
+    const restaurant = await restaurantRepository.findById(restaurantId);
+    if (!restaurant) {
+      const error = new Error("Restaurant not found");
+      error.statusCode = 404;
+      throw error;
     }
 
-    restaurant.restaurantName = newRestaurantName;
-    restaurant.address = newAddress;
-
-    await restaurant.save({ session });
-
-    await session.commitTransaction();
-
-    // Delete previous image after successful commit
-    if (image && oldPublicId) {
-      try {
-        await deleteImage(oldPublicId);
-      } catch (err) {
-        console.error("Image delete error:", err);
+    // Check if new email is taken by another restaurant
+    if (ownerEmail !== restaurant.ownerEmail) {
+      const existing = await restaurantRepository.findByEmail(ownerEmail);
+      if (existing && existing._id.toString() !== restaurantId.toString()) {
+        const error = new Error("Email already registered with another account");
+        error.statusCode = 409;
+        throw error;
       }
     }
 
-    return restaurant;
-  } catch (error) {
-    await session.abortTransaction();
-    throw error;
-  } finally {
-    session.endSession();
+    return await restaurantRepository.updateOwnerInfo(restaurantId, {
+      ownerName,
+      ownerPhone,
+      ownerEmail,
+    });
   }
-};
 
-exports.UpdateOwnerInformation = async (
-  restaurantId,
-  ownerName,
-  ownerPhone,
-  ownerEmail
-) => {
-  const session = await mongoose.startSession();
-
-  try {
-    session.startTransaction();
-
-    const restaurant = await RestaurantModel.findById(restaurantId).session(
-      session
-    );
-
+  async UpdateGSTNumber(restaurantId, gstNumber) {
+    const restaurant = await restaurantRepository.findById(restaurantId);
     if (!restaurant) {
-      throw new Error("Restaurant not found");
+      const error = new Error("Restaurant not found");
+      error.statusCode = 404;
+      throw error;
     }
 
-    // Check duplicate email
-    if (
-      restaurant.ownerEmail !== ownerEmail &&
-      (await RestaurantModel.exists({
-        ownerEmail,
-        _id: { $ne: restaurantId },
-      }).session(session))
-    ) {
-      throw new Error("Email already exists");
-    }
-
-    restaurant.ownerName = ownerName;
-    restaurant.ownerPhone = ownerPhone;
-    restaurant.ownerEmail = ownerEmail;
-
-    await restaurant.save({ session });
-
-    await session.commitTransaction();
-
-    return restaurant;
-  } catch (error) {
-    await session.abortTransaction();
-    throw error;
-  } finally {
-    session.endSession();
+    return await restaurantRepository.updateGSTNumber(restaurantId, gstNumber);
   }
-};
 
-exports.UpdateGSTNumber = async (restaurantId, gstNumber) => {
-  const session = await mongoose.startSession();
-
-  try {
-    session.startTransaction();
-
-    const restaurant = await RestaurantModel.findById(restaurantId).session(
-      session
-    );
-
+  async UpdatePassword(restaurantId, currentPassword, newPassword) {
+    const restaurant = await restaurantRepository.findById(restaurantId);
     if (!restaurant) {
-      throw new Error("Restaurant not found");
+      const error = new Error("Restaurant not found");
+      error.statusCode = 404;
+      throw error;
     }
 
-    restaurant.gstNumber = gstNumber;
-
-    await restaurant.save({ session });
-
-    await session.commitTransaction();
-
-    return restaurant;
-  } catch (error) {
-    await session.abortTransaction();
-    throw error;
-  } finally {
-    session.endSession();
-  }
-};
-
-exports.UpdatePassword = async (
-  restaurantId,
-  currentPassword,
-  newPassword
-) => {
-  const session = await mongoose.startSession();
-
-  try {
-    session.startTransaction();
-
-    const restaurant = await RestaurantModel.findById(restaurantId).session(
-      session
-    );
-
-    if (!restaurant) {
-      throw new Error("Restaurant not found");
-    }
-
-    const isMatch = await bcrypt.compare(
-      currentPassword,
-      restaurant.password
-    );
-
+    const isMatch = await hashPasswordChecker(currentPassword, restaurant.password);
     if (!isMatch) {
-      throw new Error("Current password is incorrect");
+      const error = new Error("Incorrect current password");
+      error.statusCode = 400;
+      throw error;
     }
 
-    const samePassword = await bcrypt.compare(
-      newPassword,
-      restaurant.password
-    );
-
-    if (samePassword) {
-      throw new Error(
-        "New password cannot be the same as the current password"
-      );
-    }
-
-    restaurant.password = await bcrypt.hash(newPassword, 10);
-
-    await restaurant.save({ session });
-
-    await session.commitTransaction();
-
-    return true;
-  } catch (error) {
-    await session.abortTransaction();
-    throw error;
-  } finally {
-    session.endSession();
+    const hashedPassword = await hashPasswordGenerater(newPassword);
+    return await restaurantRepository.updatePassword(restaurantId, hashedPassword);
   }
-};
+}
+
+module.exports = new SettingService();

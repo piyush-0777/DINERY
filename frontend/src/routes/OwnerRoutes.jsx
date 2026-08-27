@@ -7,74 +7,106 @@ import DashboardSkeleton from "../components/ui/DashboardSkeleton";
 
 import OwnerDashboard from "../pages/owner/OwnerDashboard";
 import OwnerMenu from "../pages/owner/OwnerMenu";
-import OwnerTables from "../pages/owner/OwnerTables"
+import OwnerTables from "../pages/owner/OwnerTables";
 import OwnerOrder from "../pages/owner/OwnerOrders";
 import OwnerAnalytics from "../pages/owner/OwnerAnalytics";
-import OwnerReports from "../pages/owner/OwnerReports"
-import RestaurantSettings from "../pages/owner/RestaurantSettings"
-import UpgradePremium from "../pages/owner/UpgradePremium"
-import useSocket from '../hooks/useSocket'
+import OwnerReports from "../pages/owner/OwnerReports";
+import RestaurantSettings from "../pages/owner/RestaurantSettings";
+import UpgradePremium from "../pages/owner/UpgradePremium";
+import SubscriptionGuard from "../components/common/SubscriptionGuard";
+import { TrialBanner } from "../features/premium";
+import useSocket from "../hooks/useSocket";
 
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import { useLoardDashbord } from "../features/loadside";
 import { toast } from "react-toastify";
 
-// import ManageProducts from "../pages/owner/ManageProducts";
-// import ManageOrders from "../pages/owner/ManageOrders";
-// import SalesAnalytics from "../pages/owner/SalesAnalytics";
-// import RestaurantSettings from "../pages/owner/RestaurantSettings";
-
 const OwnerRoutes = () => {
-   useSocket()
-   const loardDashbord = useLoardDashbord()
-   const {socketId} = useSelector(state => state.socketId)
+  useSocket();
+  const loardDashbord = useLoardDashbord();
+  const { socketId } = useSelector((state) => state.socketId);
+  const restaurantState = useSelector((state) => state.restaurant);
   const [showSplash, setShowSplash] = useState(true);
 
-  
-  if(loardDashbord.error) {
-    toast.error(error?.message)
-  }
-    
-   
+  const subscription =
+    restaurantState?.subscription ||
+    loardDashbord?.data?.subscription ||
+    null;
 
-  const initDashboard = async () => {
+  if (loardDashbord.error) {
+    toast.error(loardDashbord.error?.message);
+  }
+
+  useEffect(() => {
     const splashTimer = setTimeout(() => {
       setShowSplash(false);
-    }, 4000);
-
-  }
-  useEffect(() => {
-    initDashboard()
+    }, 2000);
+    return () => clearTimeout(splashTimer);
   }, []);
 
-
-   
-
   return (
-    
-      <AnimatePresence mode="wait">
-        {showSplash ? (
-          <SplashScreen key="splash" />
-        ) : loardDashbord.loading || socketId === null ? (
-          <DashboardSkeleton key="skeleton" />
-        ) : (
-          <OwnerLayout>
+    <AnimatePresence mode="wait">
+      {showSplash ? (
+        <SplashScreen key="splash" />
+      ) : loardDashbord.loading || socketId === null ? (
+        <DashboardSkeleton key="skeleton" />
+      ) : (
+        <OwnerLayout>
+          {/* Trial & Expiry Countdown Banner */}
+          <TrialBanner subscription={subscription} />
+
           <Routes>
             <Route path="dashboard" element={<OwnerDashboard />} />
-            <Route path="menu" element={<OwnerMenu />} />
-            <Route path="tables" element={<OwnerTables />} />
-            <Route path="orders" element={<OwnerOrder />} />
-            <Route path="analytics" element={<OwnerAnalytics />} />
-            <Route path="reports" element={<OwnerReports />} />
-            <Route path="setting" element={<RestaurantSettings />}/>
-             <Route path="getpremium" element={<UpgradePremium />}/>
-       
-          </Routes>
-          </OwnerLayout>
-        )}
-      </AnimatePresence>
 
-   
+            {/* Paywall-Guarded Operational Routes */}
+            <Route
+              path="menu"
+              element={
+                <SubscriptionGuard subscription={subscription}>
+                  <OwnerMenu />
+                </SubscriptionGuard>
+              }
+            />
+            <Route
+              path="tables"
+              element={
+                <SubscriptionGuard subscription={subscription}>
+                  <OwnerTables />
+                </SubscriptionGuard>
+              }
+            />
+            <Route
+              path="orders"
+              element={
+                <SubscriptionGuard subscription={subscription}>
+                  <OwnerOrder />
+                </SubscriptionGuard>
+              }
+            />
+            <Route
+              path="analytics"
+              element={
+                <SubscriptionGuard subscription={subscription}>
+                  <OwnerAnalytics />
+                </SubscriptionGuard>
+              }
+            />
+            <Route
+              path="reports"
+              element={
+                <SubscriptionGuard subscription={subscription}>
+                  <OwnerReports />
+                </SubscriptionGuard>
+              }
+            />
+
+            {/* Always Accessible for Upgrading & Account Recovery */}
+            <Route path="setting" element={<RestaurantSettings />} />
+            <Route path="getpremium" element={<UpgradePremium />} />
+          </Routes>
+        </OwnerLayout>
+      )}
+    </AnimatePresence>
   );
 };
 

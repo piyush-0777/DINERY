@@ -1,83 +1,74 @@
 const reportService = require("../services/reportService");
-
-
-
-// =====================
-// customer report
-// =====================
+const { sendSuccess, sendError } = require("../utils/responseHandler");
 
 exports.getCustomerReport = async (req, res) => {
   try {
-    const restaurantId = req.restaurant._id;
+    const restaurantId = req.restaurant?._id;
+    if (!restaurantId) {
+      return sendError(res, 401, "Restaurant is not authenticated");
+    }
 
-    const data = await reportService.getCustomerReportService(
-      restaurantId
-    );
+    const data = await reportService.getCustomerReportService(restaurantId);
 
-     res.json({ success: true, data });
+    return sendSuccess(res, 200, "Customer report fetched successfully", data, {
+      data,
+    });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.error("getCustomerReport error:", err);
+    return sendError(res, err.statusCode || 500, err.message || "Failed to fetch customer report");
   }
 };
-
-
-
-// =====================
-// daily sale
-// =====================
 
 exports.getDailySaleReport = async (req, res) => {
   try {
-    const restaurantId = req.restaurant._id;
+    const restaurantId = req.restaurant?._id;
+    if (!restaurantId) {
+      return sendError(res, 401, "Restaurant is not authenticated");
+    }
 
-    const data = await reportService.getDailySaleReportService(
-      restaurantId
-    );
-    console.log(data);
+    const data = await reportService.getDailySaleReportService(restaurantId);
 
-     res.json({ success: true, data });
+    return sendSuccess(res, 200, "Daily sale report fetched successfully", data, {
+      data,
+    });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.error("getDailySaleReport error:", err);
+    return sendError(res, err.statusCode || 500, err.message || "Failed to fetch daily sale report");
   }
 };
-
-
-
-// =====================
-// GST
-// =====================
 
 exports.getGSTReport = async (req, res) => {
   try {
-    const restaurantId = req.restaurant._id;
+    const restaurantId = req.restaurant?._id;
+    if (!restaurantId) {
+      return sendError(res, 401, "Restaurant is not authenticated");
+    }
 
-    const data = await reportService.getGSTReportService(
-      restaurantId
-    );
+    const data = await reportService.getGSTReportService(restaurantId);
 
-     res.json({ success: true, data });
+    return sendSuccess(res, 200, "GST report fetched successfully", data, {
+      data,
+    });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.error("getGSTReport error:", err);
+    return sendError(res, err.statusCode || 500, err.message || "Failed to fetch GST report");
   }
 };
 
-
-
-// =====================
-// Monthly revenue
-// =====================
-
 exports.getMonthlyRevenueReport = async (req, res) => {
   try {
-    const restaurantId = req.restaurant._id;
+    const restaurantId = req.restaurant?._id;
+    if (!restaurantId) {
+      return sendError(res, 401, "Restaurant is not authenticated");
+    }
 
-    const data =
-      await reportService.getMonthlyRevenueReportService(
-        restaurantId
-      );
+    const data = await reportService.getMonthlyRevenueReportService(restaurantId);
 
-     res.json({ success: true, data });
+    return sendSuccess(res, 200, "Monthly revenue report fetched successfully", data, {
+      data,
+    });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.error("getMonthlyRevenueReport error:", err);
+    return sendError(res, err.statusCode || 500, err.message || "Failed to fetch monthly revenue report");
   }
 };

@@ -1,86 +1,76 @@
-const categories = require('../models/categories-model')
-const categoryService = require('../services/categoryService')
-const deleteImage = require('../utils/deletImg')
+const categoryService = require("../services/categoryService");
+const { sendSuccess, sendError } = require("../utils/responseHandler");
 
 exports.addCategory = async (req, res) => {
-    try {
-        const { name } = req.body;
-        if (!req.file) {
-            return res.status(404).json({ error: "image is require" })
-        }
-        const image = req.file.path;
-        const resid = req.restaurant._id
-        const category = await categories.create({
-            restaurant: resid,
-            name: name,
-            image: image,
-            publicId:req.file.filename ,
-        });
-        
-        return res.status(200).json({message:'category added' , category});
-    } catch (err) {
-
-        console.log(err);
-        res.status(500).json({error: 'server error'});
-    }
-
-}
-
-exports.deletCategory = async (req, res) => {
   try {
-    const category_id = req.params.categoryId;
-    const restaurant = req.restaurant; // ✅ renamed
-
-    if (!restaurant || !category_id) {
-      return res.status(404).json({ error: 'res or cat id is not found' });
+    const { name } = req.body;
+    if (!name?.trim()) {
+      return sendError(res, 400, "Category name is required");
     }
 
-    const result = await categoryService.deletCategory(
-      category_id,
-      restaurant._id
+    if (!req.file) {
+      return sendError(res, 400, "Category image is required");
+    }
+
+    const restaurantId = req.restaurant._id;
+    const category = await categoryService.addCategory({
+      restaurantId,
+      name: name.trim(),
+      file: req.file,
+    });
+
+    return sendSuccess(
+      res,
+      200,
+      "Category added successfully",
+      category,
+      { category }
     );
-
-    if (result) {
-      return res.status(200).json({ message: 'category deleted.' });
-    }
-
   } catch (error) {
-    console.log(error);
-    return res.status(500).json({ error: 'internal server error' });
+    console.error("addCategory error:", error);
+    return sendError(res, error.statusCode || 500, error.message || "Server error");
   }
 };
 
-exports.editCategory = async (req , res) => {
+exports.deletCategory = async (req, res) => {
   try {
-    const category = await categories.findById(req.params.categoryId)
+    const categoryId = req.params.categoryId;
+    const restaurant = req.restaurant;
 
-     if (!category) {
-      return res.status(404).json({ message: "category not found" });
+    if (!restaurant || !categoryId) {
+      return sendError(res, 400, "Restaurant or category ID is missing");
     }
 
-    category.name = req.body.name;
+    await categoryService.deletCategory(categoryId, restaurant._id);
 
-    if (req.file) {
-          console.log("Image changed");
-    
-          // 🧹 delete old image
-          if (category.publicId) {
-            await deleteImage(category.publicId);
-          }
-    
-          // multer-storage-cloudinary already uploaded it
-          category.image = req.file.path;        // secure_url
-          category.publicId = req.file.filename; // public_id
-          category.save();
-        }
-   res.status(200).json({
-      status: "success",
-      message: "category updated successfully",
-      data: category
-    });
+    return sendSuccess(res, 200, "Category deleted successfully");
   } catch (error) {
-    console.log(error)
-    res.status(500).json({ message: error.message });
+    console.error("deletCategory error:", error);
+    return sendError(res, error.statusCode || 500, error.message || "Internal server error");
   }
+};
 
-}
+exports.editCategory = async (req, res) => {
+  try {
+    const categoryId = req.params.categoryId;
+    if (!categoryId) {
+      return sendError(res, 400, "Category ID is required");
+    }
+
+    const updatedCategory = await categoryService.editCategory(categoryId, {
+      name: req.body.name?.trim(),
+      file: req.file,
+    });
+
+    return sendSuccess(
+      res,
+      200,
+      "Category updated successfully",
+      updatedCategory,
+      { data: updatedCategory }
+    );
+  } catch (error) {
+    console.error("editCategory error:", error);
+    return sendError(res, error.statusCode || 500, error.message || "Server error");
+  }
+};

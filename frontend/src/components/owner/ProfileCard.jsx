@@ -1,4 +1,4 @@
-import { Settings, LogOut } from "lucide-react";
+import { Settings, LogOut, Shield } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 
@@ -7,6 +7,8 @@ const ProfileCard = () => {
   const restaurant = useSelector(
     (state) => state.restaurant.restaurant
   );
+  const role = restaurant?.role || localStorage.getItem("userRole");
+
   const goTosetting = () =>{
     navigate(`/owner/setting`);
   }
@@ -54,11 +56,23 @@ const ProfileCard = () => {
 
       {/* Actions */}
       <div className="mt-4 space-y-1">
+        {role === "admin" && (
+          <button
+            onClick={() => navigate("/admin")}
+            className="flex items-center gap-3 w-full px-3 py-2 rounded-lg
+            text-amber-400 hover:text-amber-300
+            bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 transition-all font-bold text-sm cursor-pointer"
+          >
+            <Shield size={16} />
+            <span>Admin Console</span>
+          </button>
+        )}
+
         <button
         onClick={goTosetting}
           className="flex items-center gap-3 w-full px-3 py-2 rounded-lg
           text-gray-300 hover:text-white
-          hover:bg-gray-800 transition-all"
+          hover:bg-gray-800 transition-all cursor-pointer"
         >
           <Settings size={16} />
           <span>Settings</span>

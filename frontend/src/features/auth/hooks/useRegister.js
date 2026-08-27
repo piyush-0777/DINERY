@@ -17,7 +17,7 @@ export const useRegister = () => {
         throw error
             
         } finally {
-            setLoding(false)
+            setLoading(false)
         }
     }
 

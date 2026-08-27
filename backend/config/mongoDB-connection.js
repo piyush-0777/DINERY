@@ -1,15 +1,15 @@
-const mongoose = require('mongoose')
+require("dotenv").config();
+const mongoose = require("mongoose");
 
-const url = process.env.MONGODB_URL
-console.log(`${url}/dinerydata`)
+const url = process.env.MONGODB_URL || "mongodb://127.0.0.1:27017/dinerydata";
 
-mongoose.connect(`${url}/dinerydata`)
-.then(()=>{
-    console.log('mongoDB is connected....')
-    console.log(mongoose.connection.name);
-})
-.catch((e)=>{
-    console.log('mongoDB connection error', `${url}/dinerydata` , e)
-})
+mongoose
+  .connect(url)
+  .then(() => {
+    console.log("MongoDB connected successfully:", mongoose.connection.name);
+  })
+  .catch((err) => {
+    console.error("MongoDB connection error:", err.message);
+  });
 
-module.exports = mongoose.connection;
+module.exports = mongoose;
