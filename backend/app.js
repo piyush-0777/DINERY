@@ -71,8 +71,15 @@ app.use((req, res) => {
 app.use(errorMiddleware);
 
 const PORT = process.env.EXPRESS_PORT || 3000;
-server.listen(PORT, () => {
-  console.log(`Server + Socket.io running on port ${PORT}`);
-});
+if (!process.env.VERCEL) {
+  server.listen(PORT, () => {
+    console.log(`Server + Socket.io running on port ${PORT}`);
+  });
+}
 
-module.exports = { app, server };
+// Attach server and self references to maintain complete compatibility
+app.server = server;
+app.app = app;
+app.default = app;
+
+module.exports = app;
