@@ -5,6 +5,8 @@ const categoryRepository = require("../repositories/categoryRepository");
 const tableService = require("./tableService");
 const orderRepository = require("../repositories/orderRepository");
 const billRepository = require("../repositories/billRepository");
+const subscriptionService = require("./subscriptionService");
+const ROLES = require("../constants/roles");
 const { hashPasswordGenerater, hashPasswordChecker } = require("../utils/hashPassword");
 
 class RestaurantService {
@@ -23,13 +25,23 @@ class RestaurantService {
       throw error;
     }
 
+    const role = restaurant.role || ROLES.OWNER;
+
+    // Check subscription status
+    const subscriptionStatus = await subscriptionService.getSubscriptionStatus(restaurant);
+
     const token = jwt.sign(
-      { id: restaurant._id, ownerEmail: restaurant.ownerEmail },
+      {
+        id: restaurant._id,
+        ownerEmail: restaurant.ownerEmail,
+        role,
+        restaurantName: restaurant.restaurantName,
+      },
       process.env.JWT_SECRET_KEY,
       { expiresIn: "48h" }
     );
 
-    return { token, restaurant };
+    return { token, restaurant, role, subscription: subscriptionStatus };
   }
 
   async registerRestaurant({
@@ -39,6 +51,7 @@ class RestaurantService {
     password,
     ownerPhone,
     ownerEmail,
+    role = ROLES.OWNER,
   }) {
     if (!ownerEmail || !password) {
       const error = new Error("Email and password are required");
@@ -62,6 +75,14 @@ class RestaurantService {
 
     const hashedPassword = await hashPasswordGenerater(password);
 
+    // Validate assigned role
+    const assignedRole = [ROLES.OWNER, ROLES.ADMIN, ROLES.USER].includes(role)
+      ? role
+      : ROLES.OWNER;
+
+    const trialStartedAt = new Date();
+    const trialExpiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 Days Free Trial
+
     const restaurant = await restaurantRepository.create({
       restaurantName,
       address,
@@ -69,21 +90,39 @@ class RestaurantService {
       password: hashedPassword,
       ownerPhone,
       ownerEmail,
+      role: assignedRole,
+      isPremium: true,
+      plan: "premium",
+      currentPlan: "trial",
+      subscriptionStatus: "trial",
+      trialStartedAt,
+      trialExpiresAt,
+      currencyPreference: "INR",
     });
 
     const token = jwt.sign(
-      { id: restaurant._id, ownerEmail: restaurant.ownerEmail },
+      {
+        id: restaurant._id,
+        ownerEmail: restaurant.ownerEmail,
+        role: assignedRole,
+        restaurantName: restaurant.restaurantName,
+      },
       process.env.JWT_SECRET_KEY,
       { expiresIn: "48h" }
     );
 
     return {
       token,
+      restaurant,
       user: {
         id: restaurant._id,
         ownerName: restaurant.ownerName,
         ownerEmail: restaurant.ownerEmail,
         restaurantName: restaurant.restaurantName,
+        role: assignedRole,
+        subscriptionStatus: "trial",
+        trialExpiresAt,
+        daysLeft: 7,
       },
     };
   }
@@ -98,14 +137,16 @@ class RestaurantService {
     const restaurantId = restaurant._id;
 
     // Parallel fetch for optimal performance
-    const [foods, category, tables, order, Last7DaysOrders, bill] = await Promise.all([
-      foodRepository.findAllByRestaurant(restaurantId),
-      categoryRepository.findAllByRestaurant(restaurantId),
-      tableService.getAllTable(restaurant),
-      orderRepository.findTodayOrders(restaurantId),
-      orderRepository.getLast7DaysOrders(restaurantId),
-      billRepository.findAllByRestaurant(restaurantId),
-    ]);
+    const [foods, category, tables, order, Last7DaysOrders, bill, subscription] =
+      await Promise.all([
+        foodRepository.findAllByRestaurant(restaurantId),
+        categoryRepository.findAllByRestaurant(restaurantId),
+        tableService.getAllTable(restaurant),
+        orderRepository.findTodayOrders(restaurantId),
+        orderRepository.getLast7DaysOrders(restaurantId),
+        billRepository.findAllByRestaurant(restaurantId),
+        subscriptionService.getSubscriptionStatus(restaurant),
+      ]);
 
     return {
       restaurant,
@@ -115,6 +156,7 @@ class RestaurantService {
       order,
       bill,
       Last7DaysOrders,
+      subscription,
     };
   }
 }

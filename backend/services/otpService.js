@@ -35,8 +35,12 @@ class OTPService {
 
     const existingOtp = await otpRepository.findByEmail(ownerEmail);
     if (existingOtp) {
-      await sendMail(ownerEmail, existingOtp.otp);
-      return { message: "OTP sent successfully" };
+      if (!existingOtp.verified && existingOtp.expiresAt > new Date()) {
+        await sendMail(ownerEmail, existingOtp.otp);
+        return { success: true, message: "OTP sent successfully" };
+      }
+      // If already expired or verified, remove old record to generate fresh OTP
+      await otpRepository.deleteByEmail(ownerEmail);
     }
 
     const otpNumber = generateOTP();
@@ -49,7 +53,7 @@ class OTPService {
     });
 
     await sendMail(ownerEmail, otp.otp);
-    return { message: "OTP sent successfully" };
+    return { success: true, message: "OTP sent successfully" };
   }
 
   async verifyOTP(ownerEmail, otp) {

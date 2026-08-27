@@ -20,6 +20,18 @@ class CustomerRepository {
     if (session) query.session(session);
     return await query.exec();
   }
+
+  async findAll(session = null) {
+    const query = Customer.find().populate("restaurant", "restaurantName ownerEmail");
+    if (session) query.session(session);
+    return await query.exec();
+  }
+
+  async count(filter = {}, session = null) {
+    const query = Customer.countDocuments(filter);
+    if (session) query.session(session);
+    return await query.exec();
+  }
 }
 
 module.exports = new CustomerRepository();

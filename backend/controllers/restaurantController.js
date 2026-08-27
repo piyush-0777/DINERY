@@ -8,7 +8,7 @@ exports.login = async (req, res) => {
       return sendError(res, 400, "Email and password are required");
     }
 
-    const { token, restaurant } = await restaurantService.login({ ownerEmail, password });
+    const { token, restaurant, role } = await restaurantService.login({ ownerEmail, password });
 
     const isProduction = process.env.NODE_ENV === "production";
     res.cookie("token", token, {
@@ -22,6 +22,10 @@ exports.login = async (req, res) => {
       id: restaurant._id,
       ownerEmail: restaurant.ownerEmail,
       restaurantName: restaurant.restaurantName,
+      role: role || restaurant.role || "owner",
+      token,
+    }, {
+      role: role || restaurant.role || "owner",
     });
   } catch (error) {
     console.error("Login error:", error);
@@ -38,6 +42,7 @@ exports.registerRestaurant = async (req, res) => {
       password,
       ownerPhone,
       ownerEmail,
+      role,
     } = req.body;
 
     const { token, user } = await restaurantService.registerRestaurant({
@@ -47,6 +52,7 @@ exports.registerRestaurant = async (req, res) => {
       password,
       ownerPhone,
       ownerEmail,
+      role,
     });
 
     const isProduction = process.env.NODE_ENV === "production";
@@ -62,7 +68,7 @@ exports.registerRestaurant = async (req, res) => {
       201,
       "Restaurant registered successfully",
       user,
-      { user }
+      { user, token }
     );
   } catch (error) {
     console.error("Register error:", error);
@@ -92,6 +98,7 @@ exports.getDashBord = async (req, res) => {
         order: data.order,
         bill: data.bill,
         Last7DaysOrders: data.Last7DaysOrders,
+        subscription: data.subscription,
       }
     );
   } catch (error) {

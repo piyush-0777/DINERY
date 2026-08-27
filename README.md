@@ -29,6 +29,8 @@ DINERY is a modern, full-stack, real-time restaurant management and contactless 
   - [Analytics Endpoints](#8-analytics-api)
   - [Report Generation Endpoints](#9-report-generation-api)
   - [Restaurant Settings Endpoints](#10-restaurant-settings-api)
+  - [Platform Admin Endpoints](#11-platform-admin-api)
+- [🛡️ Role-Based Access Control (RBAC)](#️-role-based-access-control-rbac)
 - [⚡ Real-Time Socket.io Events](#-real-time-socketio-events)
 - [🗄️ Database Schemas](#️-database-schemas)
 - [🚀 Getting Started & Setup Guide](#-getting-started--setup-guide)
@@ -229,7 +231,10 @@ backend/
 ├── config/
 │   ├── cloudConfig.js             # Cloudinary configuration and Multer storage
 │   └── mongoDB-connection.js      # MongoDB Mongoose database connection
+├── constants/
+│   └── roles.js                   # RBAC system roles definition (owner, user, admin)
 ├── controllers/                   # Request handling and standardized responses
+│   ├── adminController.js         # Platform administrator controller
 │   ├── analyticsController.js     # Analytics endpoint controllers
 │   ├── billController.js          # Bill calculation & settlement controllers
 │   ├── categoryController.js      # Menu category management
@@ -242,18 +247,21 @@ backend/
 │   ├── settingController.js       # Profile, GST & password update controllers
 │   └── tableController.js         # Table management & QR code assignment
 ├── middlewares/
-│   ├── authMiddleware.js          # JWT verification & restaurant resolver
+│   ├── authMiddleware.js          # JWT authentication & customer session resolver
+│   ├── authorizeMiddleware.js     # Role-Based Access Control (RBAC) guard factory
 │   ├── errorMiddleware.js         # Global error handling middleware (sendError)
-│   └── multerMiddleware.js        # File upload parser middleware
+│   ├── multerMiddleware.js        # File upload parser middleware
+│   └── subscriptionGuard.js       # Hard paywall guard (checks 7-day trial & active plan)
 ├── models/                        # Mongoose schemas & data models
 │   ├── bill-model.js              # Bill schema (amounts, tax, payment status)
 │   ├── categories-model.js        # Category schema (name, Cloudinary image)
-│   ├── customer-model.js          # Customer session schema
+│   ├── customer-model.js          # Customer session schema (with role)
 │   ├── food-model.js              # Food product schema (price, image, status)
 │   ├── order-model.js             # Order schema (items, subtotal, status)
 │   ├── otp-model.js               # Time-expiring OTP schema
-│   ├── restaurant-model.js        # Restaurant profile & credentials schema
-│   ├── subscription-model.js      # Premium subscription schema
+│   ├── pricing-model.js           # Dynamic 1M, 3M, 12M plans schema (INR & USD)
+│   ├── restaurant-model.js        # Restaurant profile, trial & subscription schema
+│   ├── subscription-model.js      # Subscription purchase history schema
 │   └── table-model.js             # Table schema (tableId, QR UUID, status)
 ├── repositories/                  # Data access layer (encapsulating queries)
 │   ├── billRepository.js          # Bill queries & aggregation pipelines
@@ -262,20 +270,23 @@ backend/
 │   ├── foodRepository.js          # Food item CRUD & toggle queries
 │   ├── orderRepository.js         # Order queries & sales aggregation pipelines
 │   ├── otpRepository.js           # OTP verification queries
-│   ├── restaurantRepository.js    # Restaurant profile & credential queries
-│   ├── subscriptionRepository.js  # Subscription plan queries
+│   ├── pricingRepository.js        # Dynamic plan pricing queries & default seeder
+│   ├── restaurantRepository.js    # Restaurant profile & subscription queries
+│   ├── subscriptionRepository.js  # Subscription plan history queries
 │   └── tableRepository.js         # Table queries & status mutations
 ├── routes/                        # Express API route declarations
-│   ├── analyticsRoutes.js         # /api/analytics
+│   ├── adminRoutes.js             # /api/admin (Protected: Admin only)
+│   ├── analyticsRoutes.js         # /api/analytics (Paywalled)
 │   ├── billRoutes.js              # /api/bill
-│   ├── categoryRoutes.js          # /api/category
+│   ├── categoryRoutes.js          # /api/category (Paywalled)
 │   ├── customerRoutes.js          # /api/customer
-│   ├── foodRoutes.js              # /api/food
+│   ├── foodRoutes.js              # /api/food (Paywalled)
 │   ├── orderRoutes.js             # /api/order
-│   ├── reportRouter.js            # /api/report
+│   ├── reportRouter.js            # /api/report (Paywalled)
 │   ├── restaurantRoutes.js        # /api/restaurant
 │   ├── settingRoutes.js           # /api/setting
-│   └── tableRoutes.js             # /api/tables
+│   ├── subscriptionRoutes.js      # /api/subscription (Plans, Status, Activate)
+│   └── tableRoutes.js             # /api/tables (Paywalled)
 ├── services/                      # Core business logic & database transactions
 │   ├── analyticsService.js        # Order, revenue & top items service
 │   ├── billService.js             # Bill transactions & payment settlement service
@@ -285,9 +296,11 @@ backend/
 │   ├── foodService.js             # Food queries & image deletion service
 │   ├── orderService.js            # Order placement transactions & status transitions
 │   ├── otpService.js              # OTP generation & validation service
+│   ├── pricingService.js          # Live plan pricing & currency service
 │   ├── reportService.js           # Daily sales, GST & customer report service
-│   ├── restaurantService.js       # Restaurant authentication & dashboard service
+│   ├── restaurantService.js       # Restaurant authentication & 7-day trial service
 │   ├── settingService.js          # Profile & password modification service
+│   ├── subscriptionService.js     # Subscription status, trial checks & activation
 │   └── tableService.js            # Table status mutations & QR code builder
 ├── socket/
 │   ├── socketEvent.js             # Outbound real-time socket event broadcasters
@@ -475,6 +488,36 @@ Base Route: `/api/setting`
 | `PATCH` | `/OwnerInformationUpdate` | 🔒 Owner | Update owner personal information | `{ "ownerName": "string", "ownerPhone": "string", "ownerEmail": "string" }` |
 | `PATCH` | `/GSTNumberUpdate` | 🔒 Owner | Update restaurant GST tax identification number | `{ "gstNumber": "string" }` |
 | `PATCH` | `/PasswordUpdate` | 🔒 Owner | Change owner account password | `{ "CurrentPassword": "string", "NewPassword": "string" }` |
+
+---
+
+### 11. Platform Admin API
+Base Route: `/api/admin`
+
+| Method | Endpoint | Auth | Description | Request Body / Params |
+|---|---|---|---|---|
+| `GET` | `/restaurants` | 🛡️ Admin | Retrieve all registered restaurants | *None* |
+| `GET` | `/users` | 🛡️ Admin | Retrieve all registered users & customers | *None* |
+| `GET` | `/stats` | 🛡️ Admin | Platform-wide analytics (total restaurants, users, orders, revenue) | *None* |
+| `PATCH` | `/restaurants/:restaurantId/plan` | 🛡️ Admin | Change restaurant subscription tier (`free` / `premium`) | URL Param: `restaurantId`<br>Body: `{ "plan": "free" | "premium" }` |
+| `PATCH` | `/restaurants/:restaurantId/role` | 🛡️ Admin | Update user or owner role (`owner`, `admin`, `user`) | URL Param: `restaurantId`<br>Body: `{ "role": "owner" | "admin" | "user" }` |
+
+---
+
+## 🛡️ Role-Based Access Control (RBAC)
+
+The backend implements strict Role-Based Access Control enforcing authorization at the route level via `authorize(...allowedRoles)`:
+
+| Role | Description | Access Permissions |
+|---|---|---|
+| **`owner`** | Restaurant owner & managers | Full access to their restaurant menu, categories, tables, active kitchen orders, billing, reports, analytics, and settings. |
+| **`user`** | Dining customers & end-users | Public table check-in, load personal dining dashboard, browse menu, place orders, and view their bill. |
+| **`admin`** | Platform Superadmin | Full platform administrative privileges, view platform-wide stats, manage all restaurants & users, update plans and roles, plus access to all owner endpoints. |
+
+### Middlewares
+- **`authenticate`**: Verifies JWT Bearer token or cookie, resolves account from database, and attaches `{ id, email, role, ... }` to `req.user`.
+- **`authenticateCustomer`**: Resolves customer identity via customer JWT or table QR token for seamless dining sessions.
+- **`authorize(...roles)`**: Guard middleware that rejects requests with `403 Forbidden` if `req.user.role` is not permitted.
 
 ---
 

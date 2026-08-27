@@ -1,14 +1,15 @@
-const nodemailer = require('nodemailer')
-const myemail = process.env.EMAIL
- const mypass = process.env.MYPASS
+const nodemailer = require('nodemailer');
+require('dotenv').config();
 
-const trensport = nodemailer.createTransport({
-    service: 'gmail' ,
-    auth:{
-        user:myemail ,  
-        pass: mypass ,
-    }
-})
+const createTransporter = () => {
+    return nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+            user: process.env.EMAIL,
+            pass: process.env.MYPASS,
+        },
+    });
+};
 
 
  // Replace with generated OTP
@@ -158,20 +159,21 @@ body{
 </body>
 </html>
 `;
+        const transporter = createTransporter();
         const mailOptions = {
-    from: '"Dinery" ',
-    to: emailID,
-    subject: "Your Dinery Verification Code",
-    text: `Your Dinery OTP is ${otp}. It is valid for 10 minutes. Do not share it with anyone.`,
-    html: htmlTemplate,
-};
+            from: `"Dinery" <${process.env.EMAIL}>`,
+            to: emailID,
+            subject: "Your Dinery Verification Code",
+            text: `Your Dinery OTP is ${otp}. It is valid for 10 minutes. Do not share it with anyone.`,
+            html: htmlTemplate,
+        };
 
-
-    const res = await trensport.sendMail(mailOptions)
-    return res
+        const res = await transporter.sendMail(mailOptions);
+        return res;
     } catch (error) {
-        throw new Error(error)
+        console.error("sendMail error:", error);
+        throw error;
     }
-}
+};
 
 module.exports = sendMail

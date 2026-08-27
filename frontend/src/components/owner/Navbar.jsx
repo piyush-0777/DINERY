@@ -32,9 +32,9 @@ const Navbar = () => {
     const [showProfile, setShowProfile] = useState(false);
     const [active, setActive] = useState("Dashboard");
     const [mobileMenu, setMobileMenu] = useState(false);
-    const restaurantImg = useSelector(
-    (state) => state.restaurant.restaurant?.profileImg
-  );
+    const restaurant = useSelector((state) => state.restaurant.restaurant);
+    const restaurantImg = restaurant?.profileImg;
+    const role = restaurant?.role || localStorage.getItem("userRole");
 
     useEffect(()=>{
         navigate(`/owner/${active.toLowerCase()}`);
@@ -115,6 +115,18 @@ const Navbar = () => {
                                 />
                             </li>
                         ))}
+
+                        {role === "admin" && (
+                            <li>
+                                <button
+                                    onClick={() => navigate("/admin")}
+                                    className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl text-xs font-black uppercase tracking-wider bg-gradient-to-r from-amber-500 to-yellow-400 text-black shadow-lg hover:brightness-110 transition-all cursor-pointer"
+                                >
+                                    <span>🛡️</span>
+                                    <span>Admin Console</span>
+                                </button>
+                            </li>
+                        )}
                     </ul>
 
                     {/* Profile */}
@@ -143,6 +155,18 @@ const Navbar = () => {
                 {/* Mobile Full Menu */}
                 {mobileMenu && (
                     <div className="md:hidden bg-black border-t border-gray-800 px-6 py-4 space-y-4">
+                        {role === "admin" && (
+                            <button
+                                onClick={() => {
+                                    setMobileMenu(false);
+                                    navigate("/admin");
+                                }}
+                                className="w-full text-left py-2.5 px-4 rounded-xl text-xs font-black uppercase tracking-wider bg-gradient-to-r from-amber-500 to-yellow-400 text-black flex items-center gap-2 shadow-md"
+                            >
+                                <span>🛡️</span>
+                                <span>Admin Console</span>
+                            </button>
+                        )}
                         {navItems.map((item) => (
                             <button
                                 key={item}

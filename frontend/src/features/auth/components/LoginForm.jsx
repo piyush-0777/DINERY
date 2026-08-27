@@ -17,12 +17,24 @@ const LoginForm = () => {
   } = useForm();
 
   const onSubmit = async (data) => {
-
-    // TODO: call login API here
     try {
-      const result = await login(data)
+      const result = await login(data);
+      const token = result.data?.token || result.token;
+      if (token) {
+        localStorage.setItem("token", token);
+      }
+      const userRole = result.data?.role || result.role;
+      if (userRole) {
+        localStorage.setItem("userRole", userRole);
+      }
+
       toast.success("Login successful 🎉");
-      navigate("/owner/dashboard");
+
+      if (userRole === "admin") {
+        navigate("/admin");
+      } else {
+        navigate("/owner/dashboard");
+      }
     } catch (err) {
       if (err?.status === 500) {
         toast.error("Server down");
@@ -32,7 +44,6 @@ const LoginForm = () => {
         toast.error("Login failed");
       }
     }
-
   };
 
 

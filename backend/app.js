@@ -6,6 +6,8 @@ const path = require("path");
 const cookieParser = require("cookie-parser");
 const mongoDB_connection = require("./config/mongoDB-connection");
 const errorMiddleware = require("./middlewares/errorMiddleware");
+const subscriptionGuard = require("./middlewares/subscriptionGuard");
+const pricingRepository = require("./repositories/pricingRepository");
 const { initSocket } = require("./socket/socketServer");
 const { sendError } = require("./utils/responseHandler");
 
@@ -20,6 +22,8 @@ const billRoutes = require("./routes/billRoutes");
 const analyticsRoutes = require("./routes/analyticsRoutes");
 const reportRoutes = require("./routes/reportRouter");
 const settingRoutes = require("./routes/settingRoutes");
+const adminRoutes = require("./routes/adminRoutes");
+const subscriptionRoutes = require("./routes/subscriptionRoutes");
 
 const app = express();
 const server = http.createServer(app);
@@ -36,17 +40,27 @@ app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Seed default dynamic pricing plans on startup
+pricingRepository.seedDefaultPricing().catch((err) => {
+  console.error("Error seeding default pricing plans:", err);
+});
+
 // API Routes
+// Public & Authentication
 app.use("/api/restaurant", restaurantRoutes);
-app.use("/api/category", categoryRoutes);
-app.use("/api/tables", tableRoutes);
 app.use("/api/customer", customerRoutes);
-app.use("/api/food", foodRoutes);
-app.use("/api/order", orderRoutes);
-app.use("/api/bill", billRoutes);
-app.use("/api/analytics", analyticsRoutes);
-app.use("/api/report", reportRoutes);
+app.use("/api/subscription", subscriptionRoutes);
 app.use("/api/setting", settingRoutes);
+app.use("/api/admin", adminRoutes);
+
+// Operational Routes (Protected by Hard Paywall Subscription Guard)
+app.use("/api/category", subscriptionGuard, categoryRoutes);
+app.use("/api/tables", subscriptionGuard, tableRoutes);
+app.use("/api/food", subscriptionGuard, foodRoutes);
+app.use("/api/order", orderRoutes); // Has mixed customer/owner routes; status update is guarded
+app.use("/api/bill", billRoutes);
+app.use("/api/analytics", subscriptionGuard, analyticsRoutes);
+app.use("/api/report", subscriptionGuard, reportRoutes);
 
 // Catch-all 404 handler for undefined API routes
 app.use((req, res) => {

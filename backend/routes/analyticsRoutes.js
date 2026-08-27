@@ -1,24 +1,29 @@
 const express = require("express");
 const router = express.Router();
 const analyticsController = require("../controllers/analyticsController");
-const {authenticateResturant} = require('../middlewares/authMiddleware')
+const { authenticate, authorize } = require("../middlewares/authMiddleware");
+const ROLES = require("../constants/roles");
 
+// Protected: Only Owner or Admin can access business analytics
+router.get(
+  "/orders",
+  authenticate,
+  authorize(ROLES.OWNER, ROLES.ADMIN),
+  analyticsController.getOrdersAnalytics
+);
 
+router.get(
+  "/revenue",
+  authenticate,
+  authorize(ROLES.OWNER, ROLES.ADMIN),
+  analyticsController.getRevenueTrend
+);
 
-// Orders per day/week/month
-router.get("/orders",authenticateResturant, analyticsController.getOrdersAnalytics);
-
-// Revenue trend per day/week/month
-router.get("/revenue",authenticateResturant, analyticsController.getRevenueTrend);
-
-// Top selling items per day/week/month
-router.get("/top-items",authenticateResturant, analyticsController.getTopSellingItems);
-
-// Order type (Dine-in vs Online)
-// router.get("/order-type",authenticateResturant, analyticsController.getOrderTypeAnalytics);
-
-// // Compare revenue periods
-// router.get("/compare",authenticateResturant, analyticsController.compareRevenue);
+router.get(
+  "/top-items",
+  authenticate,
+  authorize(ROLES.OWNER, ROLES.ADMIN),
+  analyticsController.getTopSellingItems
+);
 
 module.exports = router;
-

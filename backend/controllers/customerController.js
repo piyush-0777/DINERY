@@ -65,6 +65,7 @@ exports.customerLogin = async (req, res) => {
       {
         tableStatus: "active",
         data: loginCustomer.customer,
+        token: loginCustomer.token,
       }
     );
   } catch (error) {
@@ -78,7 +79,8 @@ exports.loadCustomerDashbord = async (req, res) => {
     const { restaurantName } = req.params;
     const token =
       req.headers.authorization?.split(" ")[1] ||
-      req.cookies?.token;
+      req.cookies?.token ||
+      req.body?.token;
 
     if (!token) {
       return sendError(res, 401, "Token is not provided");
@@ -121,7 +123,8 @@ exports.customerPlaceOrder = async (req, res) => {
     const { restaurantName } = req.params;
     const token =
       req.headers.authorization?.split(" ")[1] ||
-      req.cookies?.token;
+      req.cookies?.token ||
+      req.body?.token;
 
     if (!token) {
       return sendError(res, 401, "Token is not provided");

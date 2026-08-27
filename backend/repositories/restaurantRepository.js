@@ -19,6 +19,18 @@ class RestaurantRepository {
     return await query.exec();
   }
 
+  async findAll(session = null) {
+    const query = Restaurant.find().select("-password").sort({ createdAt: -1 });
+    if (session) query.session(session);
+    return await query.exec();
+  }
+
+  async count(filter = {}, session = null) {
+    const query = Restaurant.countDocuments(filter);
+    if (session) query.session(session);
+    return await query.exec();
+  }
+
   async create(data, session = null) {
     if (session) {
       const [restaurant] = await Restaurant.create([data], { session });
@@ -67,6 +79,96 @@ class RestaurantRepository {
     return await Restaurant.findByIdAndUpdate(
       id,
       { $set: { password: hashedPassword } },
+      options
+    );
+  }
+
+  async updateRole(id, role, session = null) {
+    const options = { new: true };
+    if (session) options.session = session;
+
+    return await Restaurant.findByIdAndUpdate(
+      id,
+      { $set: { role } },
+      options
+    );
+  }
+
+  async updatePlan(id, plan, isPremium = false, session = null) {
+    const options = { new: true };
+    if (session) options.session = session;
+
+    return await Restaurant.findByIdAndUpdate(
+      id,
+      {
+        $set: {
+          plan,
+          isPremium,
+          premiumActivatedAt: isPremium ? new Date() : null,
+        },
+      },
+      options
+    );
+  }
+
+  async grantSubscription(id, { currentPlan, subscriptionExpiresAt, subscriptionStatus = "active" }, session = null) {
+    const options = { new: true };
+    if (session) options.session = session;
+
+    return await Restaurant.findByIdAndUpdate(
+      id,
+      {
+        $set: {
+          isPremium: true,
+          plan: "premium",
+          currentPlan,
+          subscriptionStatus,
+          subscriptionExpiresAt,
+          premiumActivatedAt: new Date(),
+        },
+      },
+      options
+    );
+  }
+
+  async updateSubscriptionDetails(id, updateData, session = null) {
+    const options = { new: true };
+    if (session) options.session = session;
+
+    return await Restaurant.findByIdAndUpdate(
+      id,
+      { $set: updateData },
+      options
+    );
+  }
+
+  async updateCurrencyPreference(id, currencyPreference, session = null) {
+    const options = { new: true };
+    if (session) options.session = session;
+
+    return await Restaurant.findByIdAndUpdate(
+      id,
+      { $set: { currencyPreference } },
+      options
+    );
+  }
+
+  async revokeSubscription(id, session = null) {
+    const options = { new: true };
+    if (session) options.session = session;
+
+    return await Restaurant.findByIdAndUpdate(
+      id,
+      {
+        $set: {
+          isPremium: false,
+          plan: "free",
+          currentPlan: "free",
+          subscriptionStatus: "expired",
+          subscriptionExpiresAt: new Date(Date.now() - 1000),
+          trialExpiresAt: new Date(Date.now() - 1000),
+        },
+      },
       options
     );
   }
